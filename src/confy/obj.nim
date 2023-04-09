@@ -2,16 +2,26 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import std/os
+import confy/RMV/paths
 # confy dependencies
 import ./types
 import ./state
 
 
 proc new *(_ :typedesc[BuildObj];
-    src :openArray[string]
-  ) :BuildObj=  BuildObj(src: src)
+    src  :seq[Path];
+    trg  :Path= Path("");
+    kind :BinKind= Program;
+  ) :BuildObj=
   ## Creates a new BuildObj with the given data.
+  BuildObj(kind: kind, src: src, trg: trg)
+
+proc new *(kind :BinKind;
+    src :seq[Path];
+    trg :Path= Path("");
+  ) :BuildObj=
+  ## Creates a new BuildObj with the given data.
+  BuildObj.new(src, trg, kind)
 
 proc setup *(obj :BuildObj) :void=  discard
   ## Setup the object data to be ready for compilation.

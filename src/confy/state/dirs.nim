@@ -2,11 +2,14 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import std/os
+import confy/RMV/paths
 # confy dependencies
 import ../types
 
-var rootDir      *:Dir=  "."  # Assumes the confy file is inside src/
+var rootDir *:Dir=
+  when defined(nimscript):  Dir(".")   # Assumes the confy file is inside root/src/
+  else:                     Dir("..")  # Assumes the nimble file is in root/
+
 # Root Folders
 var srcDir       *:Dir=  rootDir/"src"
 var binDir       *:Dir=  rootDir/"bin"
