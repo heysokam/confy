@@ -1,7 +1,7 @@
 import pkg/confy
 
-let bin = Program.new(
-  src = @["hello.c"],
+var bin = Program.new(
+  src = srcDir.glob(),
   trg = "hello.x64",
 )
 

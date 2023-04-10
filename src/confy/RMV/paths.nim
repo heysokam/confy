@@ -15,17 +15,23 @@ export ReadDirEffect, WriteDirEffect
 
 type Path * = distinct string
 
+
 #__________________________________________________________________
 # New functionality
 #_____________________________
-func `/`*(head :Path; tail :string): Path {.inline.} =
+func `/`*(head :Path; tail :string): Path {.inline.} =  Path(joinPath(head.string, tail))
   ## Joins two directory names to one, where the second is a string.
-  Path(joinPath(head.string, tail))
-#_____________________________
+func `/`*(head :string; tail :Path): Path {.inline.} =  Path(joinPath(head, tail.string))
+  ## Joins two directory names to one, where the first is a string.
 func `$` *(path :Path) :string=  path.string
+  ## Converts the path to a string.
+func join *(list :seq[Path]; sep :string) :string {.inline.}=
+  for path in list: result.add path.string&sep
 #__________________________________________________________________
 
 
+
+#__________________________________________________________________
 func `==`*(x, y: Path): bool {.inline.} =
   ## Compares two paths.
   ##

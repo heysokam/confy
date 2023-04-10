@@ -1,16 +1,19 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
+# std dependencies
+import std/strformat
 # confy dependencies
 import ../types
 import ../tools
+import ../logger
 # Builder module dependencies
 import ./gcc as cc
 
 #_____________________________
-proc build *(obj :BuildObj) :void=
-  obj.root.setup()
-  cc.compile(obj.src[0])
+proc build *(obj :var BuildObj) :void=
+  log &"Setting up {obj.root}"; obj.root.setup()
+  log &"Building {obj.trg}";    cc.compile(obj.src, obj.trg)
 
 
 

@@ -22,7 +22,7 @@ skipFiles &= @["confy.nim"]
 # Default nimble confy.task
 #___________________
 before confy: echo cfg.prefix,"This is happening before confy.task."
-after  confy: echo cfg.prefix,"This is happening after  confy.task."
+after  confy: echo cfg.prefix,"This is happening after confy.task."
 task   confy, "This is the default nimble.confy task":
   sh &"{c.nimc} --outDir:{c.binDir} {c.srcDir/\"confy.nim\"}"   # nim -c --outDir:binDir srcDir/confy.nim
   withDir c.binDir: sh "./confy"

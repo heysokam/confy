@@ -1,9 +1,7 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
+# std dependencies
+import confy/RMV/paths
 
-import ./state/dirs   ; export dirs
-import ./state/format ; export format
-import ./state/cmds   ; export cmds
-import ./state/files  ; export files
-
+var db :Path

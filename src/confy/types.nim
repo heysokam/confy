@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import RMV/paths    # Will come from std/paths when nim 2.0 is stable
+import confy/RMV/paths    # Will come from std/paths when nim 2.0 is stable
 
 
 type Dir  * = Path
@@ -12,6 +12,10 @@ type Fil  * = Path
   ## Note: Name chosen based on the etymology of the word File, which comes from latin Fillum.
   ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
   ##       Very :NotLikeThis:
+type TU * = object
+  ## Data for a single Translation Unit   (? Might be the same as BuildObj ?)
+  src  *:seq[Path]
+  trg  *:Path
 
 type Opt  * = bool
   ## Command line ShortOptions / Switches
