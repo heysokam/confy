@@ -11,6 +11,7 @@ import ./types
 import ./tools/git
 from   ./state as c import nil
 import ./logger
+import ./cfg
 
 #_____________________________
 # Dir Helpers
@@ -20,11 +21,16 @@ proc chgDir *(file :Fil; dirFrom, dirTo :Dir) :Fil=  file.replace(dirFrom, dirTo
 #_____________________________
 # Dir Setup
 proc setup *(trg :Dir) :void=
+  log0 &"Setting up {trg}"; 
   for dir in [c.binDir, c.libDir]:  # Setup binDir and libDir
-    log &"inside setup: {dir}"
-    # let binDir = trg/(dir.splitPath().name)
-    # makeDir binDir
-    # (binDir/".gitignore").writeFile(git.ignore)
+    let curr = trg/dir
+    if curr.dirExists and "bin" notin curr:
+      if not quiet: log1 &"Folder {curr.absolutePath} already exists. Ignoring its setup."
+      continue
+    else:  log1 &"Configuring folder  {curr}"
+    createDir curr
+    if   "bin" in curr:  (curr/".gitignore").writeFile(git.ignore)
+    elif "lib" in curr:  (curr/".gitignore").writeFile(git.ignoreAll)
 
 #_____________________________
 # Glob Path Creation

@@ -2,7 +2,7 @@
 Comfortable compiler configuraton tool.  
 Inspired by SCons, without the baggage of Python.  
 Aims to be ergonomic, readable and have a minimal/simple syntax.  
-Behaves as a library. It will build your own binary that runs the compilation commands.  
+Behaves as a library. It builds your own binary that runs the compilation commands.  
 Comes with sane defaults.  
 
 ---

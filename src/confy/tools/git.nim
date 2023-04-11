@@ -4,7 +4,7 @@
 
 
 #_____________________________
-const ignoreAll ="""
+const ignoreAll * ="""
 *
 """  ## Completely hides a folder from git
 

@@ -64,6 +64,7 @@ proc compileNoObj *(src :seq[Fil]; trg :Fil) :void=  direct(src, trg, Cstr)
 
 proc compile *(src :var seq[Fil]; trg :Fil) :void=
   ## Compiles the given `src` list of files using `gcc`
+  log &"Building {trg}"
   var objs :seq[Fil]
   for file in src:
     let trg = (file.chgDir(srcDir, binDir)).toObj(OS.Linux)
