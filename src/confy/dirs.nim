@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths
+import confy/RMV/paths ; export paths
 import confy/RMV/osdirs
 import std/strutils
 import std/strformat
@@ -12,6 +12,10 @@ import ./tools/git
 from   ./state as c import nil
 import ./logger
 
+#_____________________________
+# Dir Helpers
+proc chgDir *(file :Fil; dirFrom, dirTo :Dir) :Fil=  file.replace(dirFrom, dirTo)
+  ## Changes the given `file` path from `dirFrom` to `dirTo`.
 
 #_____________________________
 # Dir Setup

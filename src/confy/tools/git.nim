@@ -4,15 +4,13 @@
 
 
 #_____________________________
-const ignoreAll =  ## Completely hides a folder from git
-"""
+const ignoreAll ="""
 *
-"""
+"""  ## Completely hides a folder from git
 
 #_____________________________
-const ignore * =  ## Hides all files in a folder, but not the folder
-"""
+const ignore * = """
 *
 !.gitignore
-"""
+"""  ## Hides all files in a folder, but not the folder
 

@@ -3,9 +3,10 @@
 #:_____________________________________________________
 # std dependencies
 import std/db_sqlite as sqlite
+import std/math
 # confy dependencies
-import ./types
-import ./state as c
+import ../types
+import ../state as c
 
 # user, password, database name can be empty. They are not used on db_sqlite module.
 proc example_short=
@@ -47,7 +48,7 @@ proc example_long=
 
 
 # TODO:
-proc add(files :seq[string])
-proc rmv(files :seq[string])
-proc chk(files :seq[string])
+# proc add(files :seq[string])
+# proc rmv(files :seq[string])
+# proc chk(files :seq[string])
 

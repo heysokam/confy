@@ -7,6 +7,7 @@ import ./confy/state   as cState   ; export cState
 import ./confy/tools   as cTools   ; export cTools
 import ./confy/obj     as cObj     ; export cObj
 import ./confy/builder as cBuilder ; export cBuilder
+import ./confy/dirs    as cDirs    ; export cDirs
 
 ## WARNING:
 ## This seamlessly converts from string to Path without the compiler saying anything about it.

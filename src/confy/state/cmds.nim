@@ -15,5 +15,5 @@ let switchVerbose   = if cfg.verbose: "--verbose" else: ""
 let switchVerbosity = if cfg.verbose: "--verbosity:2" else: ""
 # Commands
 var nimble * = &"nimble {switchVerbose}"
-var nimc   * = &"nim c {switchVerbosity}"
+var nimc   * = &"nim c {switchVerbosity} -d:release --gc:orc"
 

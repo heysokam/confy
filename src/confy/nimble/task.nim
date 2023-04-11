@@ -16,7 +16,7 @@ import confy/auto
 import confy/tools
 from   confy/state as c import nil
 
-skipFiles &= @["confy.nim"]
+skipFiles.add cfg.file
 
 #_________________________________________________
 # Default nimble confy.task
@@ -24,6 +24,6 @@ skipFiles &= @["confy.nim"]
 before confy: echo cfg.prefix,"This is happening before confy.task."
 after  confy: echo cfg.prefix,"This is happening after confy.task."
 task   confy, "This is the default nimble.confy task":
-  sh &"{c.nimc} --outDir:{c.binDir} {c.srcDir/\"confy.nim\"}"   # nim -c --outDir:binDir srcDir/confy.nim
-  withDir c.binDir: sh "./confy"
+  sh &"{c.nimc} --outDir:{c.binDir} {c.srcDir/cfg.file}"   # nim -c --outDir:binDir srcDir/build.nim
+  withDir c.binDir: sh &"./{cfg.file.splitFile.name}"
 
