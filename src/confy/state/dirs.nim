@@ -6,10 +6,12 @@ import confy/RMV/paths
 # confy dependencies
 import ../types
 
+#_____________________________
+# Folders
+#___________________
 var rootDir *:Dir=
   when defined(nimscript):  Dir(".")   # Assumes the confy file is inside root/src/
   else:                     Dir("..")  # Assumes the nimble file is in root/
-
 # Root Folders
 var srcDir       *:Dir=  rootDir/"src"
 var binDir       *:Dir=  rootDir/"bin"
@@ -17,6 +19,7 @@ var libDir       *:Dir=  rootDir/"lib"
 var docDir       *:Dir=  rootDir/"doc"
 var examplesDir  *:Dir=  rootDir/"examples"
 var testsDir     *:Dir=  rootDir/"tests"
+#___________________
 # Subfolders
 var cacheDir     *:Dir=  binDir/"nimcache"
 

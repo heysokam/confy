@@ -3,8 +3,10 @@
 #:_____________________________________________________
 # std dependencies
 import confy/RMV/os
+import std/strformat
 # confy dependencies
 import ../types
+import ../auto
 import ../cfg
 
 
@@ -15,6 +17,14 @@ proc sh *(cmd :string) :void=
   else:
     if cfg.fakeRun: return
     discard execShellCmd cmd
+
+#_____________________________
+proc touch *(trg :Fil) :void=  
+  ## Creates the target file if it doesn't exist.
+  when defined(nimscript):
+    when defined linux:   exec &"touch {trg}"
+    elif defined windows: exec &"Get-Item {trg}"
+  else:  trg.open(mode = fmReadWriteExisting).close
 
 #_____________________________
 proc with *(os :OS; cpu :CPU) :System=
