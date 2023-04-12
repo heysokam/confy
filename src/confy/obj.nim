@@ -5,7 +5,7 @@
 import confy/RMV/paths
 # confy dependencies
 import ./types
-import ./state
+import ./cfg as c
 
 
 proc new *(_ :typedesc[BuildTrg];

@@ -4,7 +4,6 @@
 
 # confy dpendencies, specifically for nimble
 import ../cfg   ; export cfg
-import ../state ; export state
 
 
 #_________________________________________________________________________

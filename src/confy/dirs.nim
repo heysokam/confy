@@ -9,9 +9,8 @@ import std/strformat
 # confy dependencies
 import ./types
 import ./tools/git
-from   ./state as c import nil
 import ./logger
-import ./cfg
+import ./cfg as c
 
 #_____________________________
 # Dir Helpers

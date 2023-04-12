@@ -7,6 +7,7 @@ import std/strformat
 import ../types
 import ../logger
 import ../dirs
+import ../tools/db
 # Builder module dependencies
 import ./gcc as cc
 

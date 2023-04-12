@@ -11,19 +11,18 @@ import confy/RMV/paths
 import std/strformat
 import std/strutils
 # confy dependencies
-import confy/cfg
+from   confy/cfg as c import nil
 import confy/auto
 import confy/tools
-from   confy/state as c import nil
 
-skipFiles.add cfg.file
+skipFiles.add c.file
 
 #_________________________________________________
 # Default nimble confy.task
 #___________________
-before confy: echo cfg.prefix,"This is happening before confy.task."
-after  confy: echo cfg.prefix,"This is happening after confy.task."
+before confy: echo c.prefix,"This is happening before confy.task."
+after  confy: echo c.prefix,"This is happening after confy.task."
 task   confy, "This is the default nimble.confy task":
-  sh &"{c.nimc} --outDir:{c.binDir} {c.srcDir/cfg.file}"   # nim -c --outDir:binDir srcDir/build.nim
-  withDir c.binDir: sh &"./{cfg.file.splitFile.name}"
+  sh &"{c.nimc} --outDir:{c.binDir} {c.srcDir/c.file}"   # nim -c --outDir:binDir srcDir/build.nim
+  withDir c.binDir: sh &"./{c.file.splitFile.name}"
 

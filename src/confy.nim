@@ -3,7 +3,7 @@
 #:_____________________________________________________
 
 import ./confy/types   as cTypes   ; export cTypes
-import ./confy/state   as cState   ; export cState
+import ./confy/cfg     as cCfg     ; export cCfg
 import ./confy/tools   as cTools   ; export cTools
 import ./confy/obj     as cObj     ; export cObj
 import ./confy/builder as cBuilder ; export cBuilder

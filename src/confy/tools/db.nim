@@ -8,7 +8,7 @@ import std/math
 import std/times
 # confy dependencies
 import ../types
-import ../state as c
+import ../cfg as c
 # Tools dependencies
 import ./helper
 import ./hash as md5
@@ -45,32 +45,6 @@ template with (trg :Fil; body :untyped) :void=
   db.close()  # Close connection
 
 #_____________________________
-# Database Management
-#___________________
-proc init *(trg :Fil) :void=
-  ## Initializes the `trg` database file.
-  ## - Accepts the file basename without extension.
-  ## - Creates the file if it doesn't exist, and resets its contents if it does.
-  let dbFile = trg.changeFileExt(".db")
-  dbFile.touch()
-  with dbFile: db.reset()
-#___________________
-proc add *(trg :Fil; src :seq[string]) :void=
-  ## Adds the given `src` list of files to the `trg` database.
-  ## - Assumes the `src` files have already been checked.
-  ## - Any previously existing entries of each `src` file are removed.
-  ## - Initializes the `trg` database if it doesn't exist.
-  ## - Accepts the `trg` database file basename without extension.
-  ## - If `trg` database file has an incorrect extension, it will be changed to `.db`.
-  let dbFile = trg.changeFileExt(".db")
-  if not fileExists dbFile: dbFile.init()
-  with dbFile:
-    # Insert multiple
-    db.exec(sql"BEGIN")  # Begin the multi-query
-    for file in src:  db.rmv(file); db.add(file)
-    db.exec(sql"COMMIT")
-
-#_____________________________
 # Modification Checks
 #___________________
 proc timestamp (db :DbConn; trg :Fil) :bool=  db.getTime(trg) != trg.getLastModificationTime.`$`
@@ -85,61 +59,47 @@ proc chk (db :DbConn; trg :Fil) :bool=
 #___________________
 proc chk *(src, trg :Fil) :bool=
   ## Checks if the `trg` file has been modified, based on the information stored in the `src` database.
-  ## Only its timestamp is used if the modification time hasn't changed.
-  ## When the timestamp has changed, an MD5 hash check is done on the file.
+  ## - Only its timestamp is used if the modification time hasn't changed.
+  ## - When the timestamp has changed, an MD5 hash check is done on the file.
+  ## - Always true When the database doesn't exist.
   let dbFile = src.changeFileExt(".db")
   if not fileExists dbFile: return true
   with dbFile: result = db.chk(trg)
+
+#_____________________________
+# Database Management
+#___________________
+proc init *(trg :Fil) :void=
+  ## Initializes the `trg` database file.
+  ## - Accepts the file basename without extension.
+  ## - Creates the file if it doesn't exist, and resets its contents if it does.
+  let dbFile = trg.changeFileExt(".db")
+  dbFile.touch()
+  with dbFile: db.reset()
+#___________________
+proc add *(trg :Fil; src :seq[Fil]) :void=
+  ## Adds the given `src` list of files to the `trg` database.
+  ## - Assumes the `src` files have already been checked.
+  ## - Any previously existing entries of each `src` file are removed.
+  ## - Initializes the `trg` database if it doesn't exist.
+  ## - Accepts the `trg` database file basename without extension.
+  ## - If `trg` database file has an incorrect extension, it will be changed to `.db`.
+  let dbFile = trg.changeFileExt(".db")
+  if not fileExists dbFile: dbFile.init()
+  with dbFile:
+    # Insert multiple
+    db.exec(sql"BEGIN")  # Begin the multi-query
+    for file in src:  db.rmv(file); db.add(file)
+    db.exec(sql"COMMIT")
 #___________________
 proc update *(src :Fil; trg :seq[Fil]) :seq[Fil]=
-  ## Updates the database with the files that have been modified.
-  ## Runs `chk(src, trg)` on all files in the `trg` list.
-  ## Adds those files that are not tracked yet.
+  ## Updates the database with the files that have been modified from the given `trg` file list.
+  ## - Runs `chk(src, trg)` on all files in the `trg` list.
+  ## - Files that are not tracked yet are just added to the list.
+  ## Returns a new list with those files that have been modified.
   let dbFile = src.changeFileExt(".db")
+  if not fileExists dbFile: dbFile.init()
   with dbFile:
-    db.exec(sql"BEGIN")  # Begin the multi-query
     for file in trg:
-      if db.chk(file): db.add(file)
-    db.exec(sql"COMMIT")
+      if db.chk(file): db.add(file); result.add(file)
 
-
-
-
-
-##[
-# user, password, database name can be empty. They are not used on db_sqlite module.
-proc example_short=
-  # Open connection
-  let db = "mytest.db".open("", "", "")
-  # Create a table
-  db.exec(sql"DROP TABLE IF EXISTS my_table")
-  db.exec(sql"""CREATE TABLE my_table (
-                   id   INTEGER,
-                   name VARCHAR(50) NOT NULL )""")
-  # Insert data
-  db.exec(sql"INSERT INTO my_table (id, name) VALUES (0, ?)", "Jack")
-  # Close connection
-  db.close()
-
-proc example_long=
-  # Open connection
-  let db = "mytest.db".open("", "", "")
-  # Create a table
-  db.exec(sql"DROP TABLE IF EXISTS my_table")
-  db.exec(sql"""CREATE TABLE my_table (
-                   id   INTEGER,
-                   name VARCHAR(50) NOT NULL )""")
-  # Insert multiple
-  db.exec(sql"BEGIN")  # Begin the multi-add
-  for i in 1..1000:
-    db.exec(sql"INSERT INTO my_table (name, i, f) VALUES (?, ?, ?)",  "Item#" & $i, i, sqrt(i.float))
-  db.exec(sql"COMMIT")
-  # Read data from the db
-  for x in db.fastRows(sql"SELECT * FROM my_table"):
-    echo x
-  let id = db.tryInsertId(sql"""INSERT INTO my_table (name, i, f) VALUES (?, ?, ?)""",
-                             "Item#1001", 1001, sqrt(1001.0))
-  echo "Inserted item: ", db.getValue(sql"SELECT name FROM my_table WHERE id=?", id)
-  # Close connection
-  db.close()
-]##

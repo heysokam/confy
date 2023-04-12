@@ -9,8 +9,7 @@ import std/strutils
 # confy dependencies
 import ../types
 import ../tools
-import ../cfg
-import ../state as c
+import ../cfg as c
 import ../logger
 import ../dirs
 # Builder Module dependencies
