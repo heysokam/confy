@@ -2,8 +2,8 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths
-import confy/RMV/osdirs
+import std/paths
+import std/dirs
 import std/strformat
 import std/strutils
 # confy dependencies
@@ -30,6 +30,10 @@ proc toObj (file :Fil; os :OS) :Fil=
   of   OS.Windows:  file.changeFileExt ext.win.obj
   of   OS.Mac:      file.changeFileExt ext.mac.obj
   else: raise newException(IOError, &"Support for {os} is currently not implemented.")
+#_____________________________
+proc isObj (trg :Fil) :bool=  trg.endsWith(".o")
+  ## Returns true if the `trg` file is already a compiled object.
+
 
 # addFileExt proc
 
@@ -63,16 +67,24 @@ proc compileNoObj *(src :seq[Fil]; trg :Fil) :void=  direct(src, trg, Cstr)
 
 proc compile *(src :var seq[Fil]; trg :Fil) :void=
   ## Compiles the given `src` list of files using `gcc`
+  ## Assumes the paths given are already relative/absolute in the correct way.
   log &"Building {trg}"
   var objs :seq[Fil]
+  var cmds :seq[string]
   for file in src:
-    let trg = (file.chgDir(srcDir, binDir)).toObj(OS.Linux)
+    var trg = file.chgDir(srcDir, binDir)
+    echo trg
+    if trg.isObj:  # File is already an object. Add to objs and continue
+      objs.add(trg); continue
+    trg = trg.toObj(OS.Linux)
     let dir = trg.splitFile.dir
-    let cmd = &"{cc} -MMD -c {srcDir/file} -o {trg}"
+    let cmd = &"{cc} -MMD -c {file} -o {trg}"
     if quiet: echo &"{Cstr} {trg}"
     else:     echo cmd
     objs.add trg
     if not dir.dirExists: createDir dir
     sh cmd
+    # cmds.add cmd
+  # sh cmds, c.cores
   objs.link(trg)
 

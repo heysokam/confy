@@ -1,6 +1,6 @@
 #include "./hello.h"
 int main(void) {
-  hello();
   test();
+  hello();
   return 0;
 }

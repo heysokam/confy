@@ -2,29 +2,44 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/os
+import std/os
 import std/strformat
+# when not defined(nimscript): import confy/RMV/osproc
 # confy dependencies
 import ../types
 import ../auto
 import ../cfg
+import ../logger
 
 
-#_____________________________
+#_______________________________________
 # General Tools
-proc sh *(cmd :string) :void=
+#_____________________________
+proc sh *(cmd :string; dbg :bool= false) :void=
+  ## Runs the given command in a shell.
+  if dbg: log cmd
   when defined(nimscript): exec cmd
   else:
     if cfg.fakeRun: return
     discard execShellCmd cmd
+#_____________________________
+##[
+proc sh *(cmds: openArray[string]; cores :int) :void=
+  ## Runs the given commands in parallel, using the given number of cores.
+  ## When used with nimscript, it ignores cores and runs the commands one after the other.
+  when defined(nimscript):
+    for cmd in cmds: exec cmd
+  else:
+    discard execProcesses(cmds, n = cores)
+]##
 
 #_____________________________
-proc touch *(trg :Fil) :void=  
+proc touch *(trg :Fil) :void=
   ## Creates the target file if it doesn't exist.
   when defined(nimscript):
     when defined linux:   exec &"touch {trg}"
     elif defined windows: exec &"Get-Item {trg}"
-  else:  trg.open(mode = fmReadWriteExisting).close
+  else:  trg.open(mode = fmAppend).close
 
 #_____________________________
 proc with *(os :OS; cpu :CPU) :System=

@@ -2,8 +2,8 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths ; export paths
-import confy/RMV/osdirs
+import std/paths ; export paths
+import std/dirs
 import std/strutils
 import std/strformat
 # confy dependencies

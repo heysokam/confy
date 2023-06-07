@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths
+import std/paths
 # confy dependencies
 import ./types
 import ./cfg as c

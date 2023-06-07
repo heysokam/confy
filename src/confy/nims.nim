@@ -3,14 +3,13 @@
 #:_____________________________________________________
 # WARNING:                                             |
 # This file is meant to be `include`d, not `import`ed, |
-# into your project.nimble file.                       |
+# into your project.nims file.                         |
 # Import dependencies are solved globally.             |
 #_______________________________________________________
 
-# nimble confy task
-include ./nimble/task
+# nims confy task
+include ./nims/task
 # confy dependencies for nimble
-import  ./nimble/deps
-from    ./nimble/confy as c import nil
+from    ./nims/confy as c import nil
 
 --nimcache:c.cacheDir

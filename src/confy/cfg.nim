@@ -2,9 +2,11 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths
-import confy/RMV/os
+when not defined(nimscript):
+  import std/os
+  import std/paths except `/`
 import std/strformat
+import std/cpuinfo
 # confy dependencies
 import ./types
 import ./auto
@@ -12,20 +14,24 @@ import ./auto
 #_______________________________________
 # confy: Configuration defaults
 #___________________
-var cores   *:float=   0.8
-  ## Percentage of total cores to use for compiling.
+when defined(nimscript):
+  var cores *:int= 1
+else:
+  var cores *:int= (0.8 * countProcessors().float).int
+  ## Total cores to use for compiling.  (default = 80% of max)
 var verbose *:Opt=     off
   ## Output will be fully verbose when active.
 var quiet   *:Opt=     off
   ## Output will be formatted in a minimal clean style when active.
 var prefix  *:string=  "confy: "
   ## Prefix that will be added at the start of every command output.
-var tab     *:string=  "|    : "
+var tab     *:string=  "     : "
   ## Tab that will be added at the start of every new line in of the same message.
 var Cstr    *:string=  "CC"
   ## Prefix used for formatting the quiet output calls to the Compiler.
 var Lstr    *:string=  "LD"
   ## Prefix used for formatting the quiet output calls to the Linker.
+
 
 #_________________________________________________
 # confy: Debugging
@@ -34,24 +40,12 @@ var fakeRun  *:Opt=  off
   ## Everything will run normally, but commands will not really be executed.
 
 
-#_________________________________________________
-# confy: Files
-#___________________
-var db  *:Fil=  ".confy.db"
-  ## File used for storing the builder database.
-
-#_________________________________________________
-# Project: Files
-#___________________
-var file  *:Fil=  "build.nim"
-  ## File used for storing the builder config/app.
-
 #_____________________________
 # Project: Folders
 #___________________
 var rootDir *:Dir=
-  when defined(nimscript):  Dir(".")   # Assumes the nimble file is in root/
-  else:                     Dir("..")  # Assumes the build  file is inside root/src/
+  when defined(nimscript):  Dir(".")               # Assumes the nims  file is in root/, and is called from that folder.
+  else:                     Dir(getAppDir()/"..")  # Assumes the builder is inside root/bin/
 # Root Folders
 var srcDir       *:Dir=  rootDir/"src"
 var binDir       *:Dir=  rootDir/"bin"
@@ -61,7 +55,15 @@ var examplesDir  *:Dir=  rootDir/"examples"
 var testsDir     *:Dir=  rootDir/"tests"
 #___________________
 # Subfolders
-var cacheDir     *:Dir=  binDir/"cache"
+var cacheDir     *:Dir=  binDir/".cache"
+
+#_________________________________________________
+# Project: Files
+#___________________
+var file  *:Fil=  "build.nim"
+  ## File used for storing the builder config/app.
+var db    *:Fil=  binDir/".confy.db"
+  ## File used for storing the builder database.
 
 
 #_________________________________________________
@@ -72,5 +74,5 @@ let switchVerbose   = if cfg.verbose: "--verbose" else: ""
 let switchVerbosity = if cfg.verbose: "--verbosity:2" else: ""
 # Commands
 var nimble * = &"nimble {switchVerbose}"
-var nimc   * = &"nim c {switchVerbosity} -d:release --gc:orc"
+var nimc   * = &"nim c {switchVerbosity} -d:release --mm:orc"
 

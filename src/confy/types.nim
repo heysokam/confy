@@ -2,8 +2,12 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import confy/RMV/paths    # Will come from std/paths when nim 2.0 is stable
-
+when defined(nimscript):
+  from std/os import DirSep
+  proc `/`*(p1,p2 :string) :string=  p1 & DirSep & p2
+  type Path * = string
+else:
+  import std/paths
 
 type Dir  * = Path
   ## Path to a Directory

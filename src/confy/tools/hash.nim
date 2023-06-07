@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
-import std/md5
+import checksums/md5
 # confy dependencies
 import ../types
 import ../auto

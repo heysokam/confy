@@ -1,8 +1,8 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
-# confy dependencies
-include confy/nimble
+import std/os
+import std/strformat
 
 #_____________________________
 # Package
@@ -14,15 +14,22 @@ license       = "MIT"
 
 #_____________________________
 # Dependencies
-requires "nim >= 1.6.12"
+requires "nim >= 1.9.3"
+requires "db_connector"
+requires "checksums"
 
 #_____________________________
 # Folders
-srcDir       = c.srcDir
-binDir       = c.binDir
-let helloDir = c.examplesDir/"hello"
+srcDir          = "src"
+binDir          = "bin"
+let examplesDir = "examples"
+let helloDir    = examplesDir/"hello"
 
-#_____________________________________________________
+#_________________________________________________
+# Run the example demo project
+#___________________
+before demo: echo packageName,": This is happening before hello.task."
+after  demo: echo packageName,": This is happening after hello.task."
 task demo, "Executes confy inside the demo folder":
-  withDir helloDir: exec c.nimble&" confy"
+  withDir helloDir: exec "nim hello.nims"
 

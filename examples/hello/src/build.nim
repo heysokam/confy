@@ -1,4 +1,4 @@
-import pkg/confy
+import confy
 
 let srcCore = srcDir.glob()
 let srcSub  = glob srcDir/"sub"
