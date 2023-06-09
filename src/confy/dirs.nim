@@ -8,8 +8,8 @@ import std/strutils
 import std/strformat
 # confy dependencies
 import ./types
-import ./tools/git
-import ./logger
+import ./tool/git
+import ./tool/logger
 import ./cfg as c
 
 #_____________________________
@@ -20,16 +20,15 @@ proc chgDir *(file :Fil; dirFrom, dirTo :Dir) :Fil=  file.replace(dirFrom, dirTo
 #_____________________________
 # Dir Setup
 proc setup *(trg :Dir) :void=
-  log0 &"Setting up {trg}"; 
-  for dir in [c.binDir, c.libDir]:  # Setup binDir and libDir
-    let curr = trg/dir
+  if not quiet: log0 &"Setting up folder {trg}"
+  let curr = if not trg.isAbsolute: c.binDir/trg else: trg
+  block:
     if curr.dirExists and "bin" notin curr:
       if not quiet: log1 &"Folder {curr.absolutePath} already exists. Ignoring its setup."
-      continue
-    else:  log1 &"Configuring folder  {curr}"
+      break
     createDir curr
-    if   "bin" in curr:  (curr/".gitignore").writeFile(git.ignore)
-    elif "lib" in curr:  (curr/".gitignore").writeFile(git.ignoreAll)
+  if   c.binDir in curr:  (curr/".gitignore").writeFile(git.ignore)
+  # elif c.libDir in curr:  (curr/".gitignore").writeFile(git.ignoreAll)
 
 #_____________________________
 # Glob Path Creation

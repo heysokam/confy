@@ -5,18 +5,40 @@
 import std/strformat
 # confy dependencies
 import ../types
-import ../logger
+import ../tool/logger
 import ../dirs
-import ../tools/db
+import ../tool/db
+import ../tool/helper
 import ../cfg as c
 # Builder module dependencies
-import ./gcc as cc
+from   ./C   as cc import nil
+from   ./zig as z  import nil
 
 #_____________________________
-proc build *(obj :var BuildTrg) :void=
+proc exists (c :Compiler) :bool=
+  ## Returns true if the given compiler exists in the system.
+  case c
+  of Zig:   z.initOrExists()
+  of GCC:   cc.exists(c)
+  of Clang: cc.exists(c)
+#_____________________________
+proc compile(src :seq[Fil]; obj :BuildTrg) :void=
+  case obj.cc
+  of Zig:   z.compile(src, obj)
+  of GCC:   cc.compile(src, obj)
+  of Clang: cc.compile(src, obj)
+
+#_____________________________
+proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
+  if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
   obj.root.setup()                  # Setup the root folder of the project.
   c.db.init()                       # Initialize the database
   var modif = c.db.update(obj.src)  # Find all the files that have been modified
-  if modif.len == 0:  log &"{obj.trg} is already up to date."; return
-  cc.compile(modif, obj.trg)        # Compile only the modified files.
+  if force: compile(obj.src, obj)   # Force building all files
+  else:
+    if modif.len == 0:  log &"{obj.trg} is already up to date."; return
+    compile(modif, obj)             # Compile only the modified files.
+  if run and obj.kind == Program:
+    log &"Finished building {obj.trg}. Running..."
+    sh obj.trg
 

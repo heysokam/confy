@@ -1,8 +1,6 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
-# Base internal funcionality for all builder modules  |
-#_____________________________________________________|
 # std dependencies
 import std/paths
 import std/dirs
@@ -10,15 +8,27 @@ import std/strformat
 import std/strutils
 # confy dependencies
 import ../types
-import ../tool/logger
-import ../tool/helper
+import ../tools
 import ../cfg as c
+import ../tool/logger
 import ../dirs
 import ../flags as fl
+# Builder Module dependencies
+import ./base
 
 
-# >>  Remember to add executable flags to the resulting binaries
-
+#_____________________________
+let   gcc    = if c.verbose: "gcc -v" else: "gcc"
+let   gccp   = if c.verbose: "g++ -v" else: "g++"
+let   clang  = if c.verbose: "clang -v"   else: "clang"
+let   clangp = if c.verbose: "clang++ -v" else: "clang++"
+#_____________________________
+proc exists *(c :Compiler) :bool=
+  ## Returns true if the given compiler exists in the system.
+  case c
+  of GCC:   result = gorgeEx(gcc   & " --version").exitCode == 0
+  of Clang: result = gorgeEx(clang & " --version").exitCode == 0
+  else:     result = false
 #_____________________________
 const ext = Extensions(
   unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o"),
@@ -40,37 +50,51 @@ const validExt = [".cpp", ".cc", ".c", ext.unix.obj, ext.win.obj, ext.mac.obj]
 proc isValid (src :string) :bool=  src.splitFile.ext in validExt
   ## Returns true if the given src file has a valid known file extension.
 
+#_____________________________
+proc getCC (src :string) :string=
+  ## Returns the correct gcc command to build the given src file.
+  case src.splitFile.ext
+  of ".cpp", ".cc", ext.unix.obj, ext.win.obj:
+    result = gccp
+  of ".c": result = gcc
+  else:    result = "echo"
+  echo src, "  ", src.splitFile.ext, "   ", result
+
+# addFileExt proc
+
+# >>  Remember to add executable flags to the resulting binaries
+
 
 #_____________________________
-# Direct compilation
+# GCC: Internal
 #___________________
-proc direct * (
+proc direct (
     src      : Fil;
     trg      : Fil;
-    CC       : string;
     flags    : seq[string];
     quietStr : string;
+    ccmd     : string = gccp;
   ) :void=
   ## Builds the `src` file directly into the `trg` file.
-  ## Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
+  ## Doesn't compile an intermediate `.o` step.
   let flg   = flags.join(" ")
-  let cmd   = &"{CC} {flg} {src} -o {trg}"
+  let cmd   = &"{ccmd} {flg} {src} -o {trg}"
   if quiet: echo &"{quietStr} {trg}"
   else:     echo cmd
   sh cmd
 
-proc direct * (
+proc direct (
     src      : seq[Fil];
     trg      : Fil;
-    CC       : string;
     flags    : seq[string];
     quietStr : string;
+    ccmd     : string = gccp;
   ) :void=
   ## Builds the `src` list of files directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step.
   let files = src.join(" ")
   let flg   = flags.join(" ")
-  let cmd   = &"{CC} {files} {flg} -o {trg}"
+  let cmd   = &"{ccmd} {files} {flg} -o {trg}"
   if quiet: echo &"{quietStr} {trg}"
   else:     echo cmd
   sh cmd
@@ -78,61 +102,28 @@ proc direct * (
 #_____________________________
 # GCC: Linker
 #___________________
-proc link *(
-    src   : seq[Fil];
-    trg   : Fil;
-    CC    : string;
-    flags : Flags;
-  ) :void=
+proc link *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP; ccmd :string= gccp) :void=
   ## Links the given `src` list of files into the `trg` binary.
-  direct(src, trg, CC, flags.ld, Lstr)
+  direct(src, trg, flags.ld, Lstr, ccmd)
 
 #_____________________________
 # GCC: Compiler
 #___________________
-proc compileNoObj *(
-    src      : seq[Fil];
-    trg      : Fil;
-    CC       : string;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
-  ## Compiles the given `src` list of files using the given CC into the `trg` binary.
+proc compileNoObj *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP) :void=  direct(src, trg, flags.cc, Cstr)
+  ## Compiles the given `src` list of files using `gcc` into the `trg` binary.
   ## Doesn't compile an intermediate `.o` step.
-  direct(src, trg, CC, flags.cc, quietStr)
-#___________________
-proc compileToObj *(
-    src      : seq[Fil];
-    dir      : Dir;
-    CC       : string;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
+proc compileToObj *(src :seq[Fil]; dir :Dir; flags :Flags= fl.allPP; quietStr :string= Cstr) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   for file in src:
     let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".o")
-    file.direct(trg, CC&" -c", flags.cc, quietStr)
-#___________________
-proc compileToMod *(
-    src      : seq[Fil];
-    dir      : Dir;
-    CC       : string;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
+    file.direct(trg, flags.cc, quietStr, file.getCC()&" -c")
+proc compileToMod *(src :seq[Fil]; dir :Dir; flags :Flags= fl.allPP; quietStr :string= Cstr) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
     let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".pcm")
-    file.direct(trg, CC&" -c", flags.cc, quietStr)
+    file.direct(trg, flags.cc, quietStr, file.getCC()&" -c")
 
-#___________________
-proc compile *(
-    src      : seq[Fil];
-    trg      : Fil;
-    CC       : string;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
+proc compile *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP) :void=
   ## Compiles the given `src` list of files using `gcc`
   ## Assumes the paths given are already relative/absolute in the correct way.
   log &"Building {trg}"
@@ -145,7 +136,7 @@ proc compile *(
       objs.add(trg); continue
     trg = trg.toObj(OS.Linux)
     let dir = trg.splitFile.dir
-    let cmd = &"{CC} -MMD {cfl} -c {file} -o {trg}"
+    let cmd = &"{file.getCC()} -MMD {cfl} -c {file} -o {trg}"
     if quiet: echo &"{Cstr} {trg}"
     else:     echo cmd
     objs.add trg
@@ -153,18 +144,12 @@ proc compile *(
     sh cmd
     # cmds.add cmd
   # sh cmds, c.cores
-  objs.link(trg, CC, flags)
-#___________________
-proc compile *(
-    src      : seq[Fil];
-    obj      : BuildTrg;
-    CC       : string;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
+  objs.link(trg, flags)
+
+proc compile *(src :seq[Fil]; obj :BuildTrg) :void=
   case obj.kind
-  of Program:  src.compile(obj.trg, CC, obj.flags, quietStr)
-  of Object:   src.compileToObj(obj.root, CC, obj.flags, quietStr)
-  of Module:   src.compileToMod(obj.root, CC, obj.flags, quietStr)
+  of Program:  src.compile(obj.trg, obj.flags)
+  of Object:   src.compileToObj(obj.root, obj.flags)
+  of Module:   src.compileToMod(obj.root, obj.flags)
   of SharedLibrary, StaticLibrary: cerr "Compiling as SharedLibrary and StaticLibrary is not implemented."
 

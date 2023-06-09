@@ -10,6 +10,7 @@ import std/cpuinfo
 # confy dependencies
 import ./types
 import ./auto
+import ./flags as fl
 
 #_______________________________________
 # confy: Configuration defaults
@@ -56,15 +57,17 @@ var testsDir     *:Dir=  rootDir/"tests"
 #___________________
 # Subfolders
 var cacheDir     *:Dir=  binDir/".cache"
+var zigDir       *:Dir=  binDir/"zig"
 
 #_________________________________________________
 # Project: Files
 #___________________
-var file  *:Fil=  "build.nim"
+var file    *:Fil=  "build.nim"
   ## File used for storing the builder config/app.
-var db    *:Fil=  binDir/".confy.db"
+var db      *:Fil=  binDir/".confy.db"
   ## File used for storing the builder database.
-
+var zigJson *:Fil=  binDir/".zig.json"
+  ## Zig download index json file.
 
 #_________________________________________________
 # Nim: commands with Sane Defaults
@@ -75,4 +78,11 @@ let switchVerbosity = if cfg.verbose: "--verbosity:2" else: ""
 # Commands
 var nimble * = &"nimble {switchVerbose}"
 var nimc   * = &"nim c {switchVerbosity} -d:release --mm:orc"
+
+
+#_________________________________________________
+# Compiler Flags
+#___________________
+var flagsC * = fl.allC
+var flags  * = fl.allPP
 

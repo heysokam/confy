@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # confy dependencies
-import ./cfg
+import ../cfg
 
 proc log0 *(msg :string) :void=  echo cfg.prefix, msg
   ## Level0 log. For logging the title of a category of steps.
@@ -16,3 +16,6 @@ proc log *(msg :varargs[string, `$`]) :void=
   for id,arg in msg.pairs:
     if id == 0: continue
     log1 arg
+
+template cerr*(msg :string) :void=  raise newException(CompileError, msg)
+  ## Raises a compile exception error with the given message.

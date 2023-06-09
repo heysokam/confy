@@ -21,21 +21,29 @@ type TU * = object
   src  *:seq[Path]
   trg  *:Path
 
+type CompileError * = object of IOError
+  ## For exceptions during the compile process
+
 type Opt  * = bool
   ## Command line ShortOptions / Switches
 
-type BinKind * = enum Program, SharedLibrary, StaticLibrary
-  ## Type of binary that will be output. `.exe`, `.lib`, `.a`, etc
+type BinKind * = enum Program, SharedLibrary, StaticLibrary, Object, Module
+  ## Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc
+
+type Flags * = object
+  ## Set of flags to send to the compiler stages.
+  cc *:seq[string]
+  ld *:seq[string]
 
 type OS * = enum
   Windows = "windows", Mac     = "macosx",  Linux   = "linux"
   NetBSD  = "netbsd",  FreeBSD = "freebsd", OpenBSD = "openbsd"
   Solaris = "solaris", Aix     = "aix",     Haiku   = "haiku",  Other   = "standalone"
 type CPU *{.pure.}= enum
-  x86     = "i386",    x86_64    = "amd64",     arm         = "arm",         arm64 = "arm64",
+  x86     = "i386",    x86_64    = "amd64",     arm         = "arm",         arm64    = "arm64",
   mips    = "mips",    mipsel    = "mipsel",    mips64      = "mips64",      mips64el = "mips64el", 
-  powerpc = "powerpc", powerpc64 = "powerpc64", powerpc64el = "powerpc64el", sparc = "sparc",
-  riscv32 = "riscv32", riscv64   = "riscv64",   alpha       = "alpha",       unknown = "unknown",
+  powerpc = "powerpc", powerpc64 = "powerpc64", powerpc64el = "powerpc64el", sparc    = "sparc",
+  riscv32 = "riscv32", riscv64   = "riscv64",   alpha       = "alpha",       unknown  = "unknown",
 type System * = object
   ## Properties of a specific target system
   os   *:OS
@@ -52,10 +60,15 @@ type Extensions * = object
   win   *:Extension
   mac   *:Extension
 
+type Compiler * = enum Zig, GCC, Clang
+  ## Known compiler names.
+
 type BuildTrg * = object
-  kind  *:BinKind
-  src   *:seq[Fil]
-  trg   *:Fil
-  root  *:Dir
-  syst  *:System   ## Target system of the build object  (eg: linux.x86_64)
+  kind  *:BinKind   ## Type of build target
+  src   *:seq[Fil]  ## Sequence of source files to build with. Any `.o` files will be just linked at the end.
+  trg   *:Fil       ## Output binary to build
+  cc    *:Compiler  ## Compiler that will be used to build the app.
+  flags *:Flags     ## Set of flags to send to each compiler stage
+  root  *:Dir       ## Root folder of the output
+  syst  *:System    ## Target system of the build object  (eg: linux.x86_64)
 

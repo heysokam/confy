@@ -17,6 +17,8 @@ license       = "MIT"
 requires "nim >= 1.9.3"
 requires "db_connector"
 requires "checksums"
+requires "jsony"
+requires "zippy"
 
 #_____________________________
 # Folders

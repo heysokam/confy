@@ -50,7 +50,7 @@ proc tableExists (db :DbConn; table :string= DbTable) :bool=  table in db.tables
   ## Returns true if the table exists in the given `db` database. Will search for `DbTable` when omitted.
 proc add (db :DbConn; trg :Fil; table :string= DbTable) :void=
   ## Adds the given `trg` file into the target database table, using its current time and MD5.
-  db.exec(sql"INSERT INTO ? (file, time, hash) VALUES (?, ?, ?)", table, trg, trg.getLastModificationTime, trg.hash)
+  db.exec(sql"INSERT INTO ? (file, time, hash) VALUES (?, ?, ?)", table, trg, trg.lastMod.`$`, trg.hash)
 proc rmv (db :DbConn; trg :Fil; table :string= DbTable) :void=
   ## Removes all entries of the given `trg` file from the target database table.
   db.exec(sql"DELETE FROM ? WHERE file=?", table, trg)
@@ -71,7 +71,7 @@ template with (trg :Fil; body :untyped) :void=
 #_____________________________
 # Modification Checks
 #___________________
-proc timestamp (db :DbConn; trg :Fil) :bool=  db.getTime(trg) != trg.getLastModificationTime.`$`
+proc timestamp (db :DbConn; trg :Fil) :bool=  db.getTime(trg) != trg.lastMod.`$`
   ## Returns true if the file has been modified since it was last tracked, using its timestamp.
 proc MD5 (db :DbConn; trg :Fil) :bool=  db.getMD5(trg) != trg.hash
   ## Returns true if the file has been modified since it was last tracked, using its MD5.

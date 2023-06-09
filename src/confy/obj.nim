@@ -9,19 +9,27 @@ import ./cfg as c
 
 
 proc new *(_ :typedesc[BuildTrg];
-    src  :seq[Path];
-    trg  :Path= Path("");
-    kind :BinKind= Program;
+    src   : seq[Path];
+    trg   : Path     = Path("");
+    kind  : BinKind  = Program;
+    root  : Dir      = Dir("");
+    flags : Flags    = c.flags;
+    cc    : Compiler = Zig;
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg(kind: kind, src: src, trg: trg)
+  let rDir = if root.string == "": c.binDir elif root.isAbsolute: root else: c.binDir/root
+  echo rDir
+  BuildTrg(kind: kind, src: src, trg: trg, flags: flags, root: rDir, cc: cc)
 
 proc new *(kind :BinKind;
-    src :seq[Path];
-    trg :Path= Path("");
+    src   : seq[Path];
+    trg   : Path     = Path("");
+    root  : Dir      = c.binDir;
+    flags : Flags    = c.flags;
+    cc    : Compiler = Zig;
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src, trg, kind)
+  BuildTrg.new(src, trg, kind, root, flags, cc)
 
 proc setup *(obj :BuildTrg) :void=  discard
   ## Setup the object data to be ready for compilation.

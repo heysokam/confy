@@ -4,12 +4,12 @@
 # std dependencies
 import std/os
 import std/strformat
-# when not defined(nimscript): import confy/RMV/osproc
+import std/times
 # confy dependencies
 import ../types
 import ../auto
 import ../cfg
-import ../logger
+import ./logger
 
 
 #_______________________________________
@@ -78,4 +78,14 @@ proc getHost *() :System=
   of   "riscv32":     result.cpu = CPU.riscv32
   of   "riscv64":     result.cpu = CPU.riscv64
   of   "alpha":       result.cpu = CPU.alpha
+
+
+#_____________________________
+proc lastMod *(trg :Fil) :times.Time=
+  ## Returns the last modification time of the file, or empty if it cannot be found.
+  try:    result = trg.getLastModificationTime
+  except: result = Time()
+#_____________________________
+proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
+  ## Returns true if the trg file hasn't been modified in the last N hours.
 
