@@ -1,3 +1,4 @@
+## Dependency Files
 https://programmer.group/gcc-m-mm-mmd-mf-mt.html
 
 for small projects the build system setup is fairly arbitrary. stuff everything into the same translation unit (i.e. concat sources) or don't, up to you.
@@ -20,4 +21,7 @@ if you need to track dependencies between header files:
 It'll output a list of headers so you can check timestamps against those
 and know all the compilation units you need to rebuild
 you may want to use `-MMD` instead, which omits #import `<thing.h>` headers 
+
+## Named Modules
+https://blog.ecosta.dev/en/tech/cpp-modules-with-clang
 

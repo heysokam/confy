@@ -17,12 +17,14 @@ type Fil  * = Path
   ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
   ##       Very :NotLikeThis:
 type TU * = object
-  ## Data for a single Translation Unit   (? Might be the same as BuildTrg ?)
-  src  *:seq[Path]
-  trg  *:Path
+  ## Data for a single Translation Unit
+  src  *:seq[Fil]
+  trg  *:Fil
 
 type CompileError * = object of IOError
   ## For exceptions during the compile process
+type GeneratorError * = object of IOError
+  ## For exceptions during code generation.
 
 type Opt  * = bool
   ## Command line ShortOptions / Switches

@@ -4,6 +4,7 @@
 # std dependencies
 import std/os
 import std/strformat
+import std/strutils
 import std/times
 # confy dependencies
 import ../types
@@ -88,4 +89,11 @@ proc lastMod *(trg :Fil) :times.Time=
 #_____________________________
 proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
   ## Returns true if the trg file hasn't been modified in the last N hours.
+
+#_______________________________________
+# std Extension
+#___________________
+proc startsWith *(entry :string; args :varargs[string, `$`]) :bool=
+  for arg in args:
+    if strutils.startsWith(entry, arg): return true
 

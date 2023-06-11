@@ -2,8 +2,17 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # confy dependencies
+import ../types
 import ../cfg
+#___________________
+# std extensions
+func toString *(args :varargs[string]) :string=
+  ## Converts the given string varargs to a single string.
+  var msg :string
+  for arg in args:  msg.add arg
 
+
+#___________________
 proc log0 *(msg :string) :void=  echo cfg.prefix, msg
   ## Level0 log. For logging the title of a category of steps.
 proc log1 *(msg :string) :void=  echo cfg.tab, msg
@@ -17,5 +26,12 @@ proc log *(msg :varargs[string, `$`]) :void=
     if id == 0: continue
     log1 arg
 
-template cerr*(msg :string) :void=  raise newException(CompileError, msg)
+proc wrn *(args :varargs[string, `$`]) :void=  echo cfg.prefix & " ! WRN ! " & args.toString
+  ## Reports a warning message to console.
+
+template cerr*(args :varargs[string, `$`]) :void=  raise newException(CompileError, args.toString)
   ## Raises a compile exception error with the given message.
+template gerr*(args :varargs[string, `$`]) :void=  raise newException(GeneratorError, args.toString)
+  ## Raises a compile exception error with the given message.
+  
+
