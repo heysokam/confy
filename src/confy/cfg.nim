@@ -2,9 +2,9 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
 # std dependencies
+import std/os except `/`
 when not defined(nimscript):
-  import std/os
-  import std/paths except `/`
+  import std/paths
 import std/strformat
 import std/cpuinfo
 # confy dependencies
@@ -22,7 +22,7 @@ else:
   ## Total cores to use for compiling.  (default = 80% of max)
 var verbose *:Opt=     off
   ## Output will be fully verbose when active.
-var quiet   *:Opt=     off
+var quiet   *:Opt=     on
   ## Output will be formatted in a minimal clean style when active.
 var prefix  *:string=  "confy: "
   ## Prefix that will be added at the start of every command output.
@@ -44,9 +44,9 @@ var fakeRun  *:Opt=  off
 #_____________________________
 # Project: Folders
 #___________________
-var rootDir *:Dir=
-  when defined(nimscript):  Dir(".")               # Assumes the nims  file is in root/, and is called from that folder.
-  else:                     Dir(getAppDir()/"..")  # Assumes the builder is inside root/bin/
+var rootDir *:Dir=  Dir(".")  # Assumes the nims  file is in root/, and is called from that folder.
+when not defined(nimscript):
+  rootDir = Dir(getAppDir()/"..")  # Assume the builder is inside root/bin/
 # Root Folders
 var srcDir       *:Dir=  rootDir/"src"
 var binDir       *:Dir=  rootDir/"bin"

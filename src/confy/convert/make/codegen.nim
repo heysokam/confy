@@ -49,7 +49,7 @@ var {trgName}Trg  = {trg.kind}.new(
     cc: {trgCFlags}
     ld: {trgLFlags}
   root = {trgName}Root,
-  syst = System(os: OS.{trg.syst.os.symbolName}, cpu: CPU.{trg.syst.cpu.symbolName})
+  syst = System(os: OS.{trg.syst.os.symbolName}, cpu: CPU.{trg.syst.cpu.symbolName}),
   ) # << {trgName}.new({trg.kind}, ... )
 #_____________________________
 # {trgName}: Task
@@ -65,7 +65,7 @@ proc toFormat (list :seq[Path | string]; name,field :string; level :SomeInteger=
   for file in list:
     if file.string == "": continue
     result.add &"\"{file.string}\",\n{tab}"
-  result.add &"], # << {name}.{field}( ... )"
+  result.add &"] # << {name}.{field}( ... )\n"
 
 
 #___________________

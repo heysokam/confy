@@ -6,10 +6,11 @@
 # into your project.nims file.                         |
 # Import dependencies are solved globally.             |
 #_______________________________________________________
+include ./nims/guard
 
 # nims confy task
 include ./nims/task
-# confy dependencies for nimble
+# confy dependencies for nims
 from    ./nims/confy as c import nil
 
 --nimcache:c.cacheDir

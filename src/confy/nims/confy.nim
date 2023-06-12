@@ -1,9 +1,10 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
 #:_____________________________________________________
-
+import ./guard
 # confy dpendencies, specifically for nims
-import ../cfg   ; export cfg
+import ../cfg         ; export cfg
+import ../tool/logger ; export logger
 
 
 #_________________________________________________________________________

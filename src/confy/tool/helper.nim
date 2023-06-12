@@ -17,12 +17,10 @@ import ./logger
 # General Tools
 #_____________________________
 proc sh *(cmd :string; dbg :bool= false) :void=
-  ## Runs the given command in a shell.
+  ## Runs the given command in a shell (binary).
   if dbg: log cmd
-  when defined(nimscript): exec cmd
-  else:
-    if cfg.fakeRun: return
-    discard execShellCmd cmd
+  if cfg.fakeRun: return
+  discard execShellCmd cmd
 #_____________________________
 ##[
 proc sh *(cmds: openArray[string]; cores :int) :void=
@@ -47,6 +45,10 @@ proc with *(os :OS; cpu :CPU) :System=
   ## Returns a System object for the given os and cpu.
   result.os  = os
   result.cpu = cpu
+#_____________________________
+proc setExec *(trg :Fil) :void=  trg.setFilePermissions({FilePermission.fpUserExec}, followSymlinks = false)
+  ## Sets the given `trg` binary flags to be executable for the current user.
+
 
 #_____________________________
 proc getHost *() :System=
@@ -81,14 +83,15 @@ proc getHost *() :System=
   of   "alpha":       result.cpu = CPU.alpha
 
 
-#_____________________________
-proc lastMod *(trg :Fil) :times.Time=
-  ## Returns the last modification time of the file, or empty if it cannot be found.
-  try:    result = trg.getLastModificationTime
-  except: result = Time()
-#_____________________________
-proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
-  ## Returns true if the trg file hasn't been modified in the last N hours.
+when not defined(nimscript):
+  #_____________________________
+  proc lastMod *(trg :Fil) :times.Time=
+    ## Returns the last modification time of the file, or empty if it cannot be found.
+    try:    result = trg.getLastModificationTime
+    except: result = Time()
+  #_____________________________
+  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
+    ## Returns true if the trg file hasn't been modified in the last N hours.
 
 #_______________________________________
 # std Extension

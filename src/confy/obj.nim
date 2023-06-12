@@ -5,36 +5,51 @@
 import std/paths
 # confy dependencies
 import ./types
-import ./cfg as c
+import ./cfg
+import ./info
+import ./tool/helper
 
 
+
+#_____________________________
 proc new *(_ :typedesc[BuildTrg];
-    src   : seq[Path];
-    trg   : Path     = Path("");
-    kind  : BinKind  = Program;
-    root  : Dir      = Dir("");
-    flags : Flags    = c.flags;
-    cc    : Compiler = Zig;
+    src     : seq[Path];
+    trg     : Path      = Path("");
+    kind    : BinKind   = Program;
+    cc      : Compiler  = Zig;
+    flags   : Flags     = cfg.flags;
+    syst    : System    = getHost();
+    root    : Dir       = Dir("");
+    sub     : Dir       = Dir("");
+    remotes : seq[Path] = @[];
+    version : string    = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  let rDir = if root.string == "": c.binDir elif root.isAbsolute: root else: c.binDir/root
-  echo rDir
-  BuildTrg(kind: kind, src: src, trg: trg, flags: flags, root: rDir, cc: cc)
-
+  # note: Main constructor logic unified here. Other constructors should call this one.
+  #     : Exposed for ergonomics, but not needed by the user.
+  if verbose: cfg.quiet = off  # Disable quiet when verbose is active.
+  let rDir = if root.string == "": cfg.binDir elif root.isAbsolute: root else: cfg.binDir/root
+  BuildTrg(
+    kind : kind, src   : src,   trg     : trg,
+    cc   : cc,   flags : flags, syst    : syst,
+    root : rDir, sub   : sub,   remotes : remotes, version : version,
+    ) # << BuildTrg( ... )
+#_____________________________
 proc new *(kind :BinKind;
-    src   : seq[Path];
-    trg   : Path     = Path("");
-    root  : Dir      = c.binDir;
-    flags : Flags    = c.flags;
-    cc    : Compiler = Zig;
+    src     : seq[Path];
+    trg     : Path     = Path("");
+    cc      : Compiler = Zig;
+    flags   : Flags    = cfg.flags;
+    syst    : System   = getHost();
+    root    : Dir      = cfg.binDir;
+    sub     : Dir      = Dir("");
+    remotes : seq[Path] = @[];
+    version : string = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src, trg, kind, root, flags, cc)
+  BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, version)
 
-proc setup *(obj :BuildTrg) :void=  discard
-  ## Setup the object data to be ready for compilation.
-proc clone *(obj :BuildTrg) :BuildTrg=  result = obj
-  ## Returns a copy of the object, so it can be duplicated.
-proc print *(obj :BuildTrg) :void=  echo obj
+#_____________________________
+proc print *(obj :BuildTrg) :void=  info.report(obj)
   ## Prints all contents of the object to the command line.
 

@@ -11,6 +11,9 @@ func toString *(args :varargs[string]) :string=
   var msg :string
   for arg in args:  msg.add arg
 
+var stdout {.importc: "stdout", header: "<stdio.h>".} :File
+proc prnt *(args :varargs[string, `$`]) :void=  stdout.write toString(args)
+  ## Prints the input to console, without "\n" at the end.
 
 #___________________
 proc log0 *(msg :string) :void=  echo cfg.prefix, msg

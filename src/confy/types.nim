@@ -7,6 +7,7 @@ when defined(nimscript):
   proc `/`*(p1,p2 :string) :string=  p1 & DirSep & p2
   type Path * = string
 else:
+  import std/os
   import std/paths
 
 type Dir  * = Path
@@ -66,11 +67,15 @@ type Compiler * = enum Zig, GCC, Clang
   ## Known compiler names.
 
 type BuildTrg * = object
-  kind  *:BinKind   ## Type of build target
-  src   *:seq[Fil]  ## Sequence of source files to build with. Any `.o` files will be just linked at the end.
-  trg   *:Fil       ## Output binary to build
-  cc    *:Compiler  ## Compiler that will be used to build the app.
-  flags *:Flags     ## Set of flags to send to each compiler stage
-  root  *:Dir       ## Root folder of the output
-  syst  *:System    ## Target system of the build object  (eg: linux.x86_64)
+  kind     *:BinKind   ## Type of build target
+  src      *:seq[Fil]  ## Sequence of source files to build with. Any `.o` files will be just linked at the end.
+  trg      *:Fil       ## Output binary to build
+  cc       *:Compiler  ## Compiler that will be used to build the app.
+  # Optional fields
+  flags    *:Flags     ## Set of flags to send to each compiler stage
+  syst     *:System    ## Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
+  root     *:Dir       ## Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
+  sub      *:Dir       ## Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
+  remotes  *:seq[Dir]  ## Remote folders to search for files (in order), when they are not found in the main folder.
+  version  *:string    ## Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
 
