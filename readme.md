@@ -1,3 +1,4 @@
+![Confy](./res/banner.png)
 # confy: Comfortable and Configurable buildsystem for C Compilers
 Confy is a Buildsystem for compiling C code with Zig, GCC, Clang  _(todo: MinGW and Nim)_  
 Inspired by SCons, without the issues of a typeless language.  
