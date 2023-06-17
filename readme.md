@@ -6,7 +6,7 @@ You can expect:
 - Ergonomic, readable and minimal/simple syntax.  
 - Behaves as a library. Builds your own binary that runs the compilation commands.  
 - Sane project configuration defaults, unless explicitely changed.   
-- Builds with `zig cc` when compiler choice is omitted. Auto-downloads the latest version for the current host.  
+- Builds with `zig cc` when compiler choice is omitted. Auto-downloads the latest version for the host.  
 
 Minimal build file:
 ```nim

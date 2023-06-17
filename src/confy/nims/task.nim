@@ -29,7 +29,7 @@ proc confy *() :void=
   ## This is the default confy task
   beforeConfy
   let builder = &"{cfg.srcDir.string}/{cfg.file.string}"
-  sh &"{cfg.nimc} --outDir:{cfg.binDir.string} {builder}"   # nim -c --outDir:binDir srcDir/build.nim
+  sh &"{cfg.nimc} -d:ssl --outDir:{cfg.binDir.string} {builder}"   # nim -c -d:ssl --outDir:binDir srcDir/build.nim
   withDir cfg.binDir: sh &"./{cfg.file.string.splitFile.name}"
   afterConfy
 
