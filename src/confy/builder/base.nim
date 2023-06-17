@@ -23,6 +23,7 @@ const ext = Extensions(
   win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj"),
   mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o"),
   )
+proc isLib *(file :Fil) :bool=  file.splitFile.ext in [ext.unix.lib, ext.win.lib, ext.mac.lib]
 #_____________________________
 const validExt = [".cpp", ".cc", ".c", ext.unix.obj, ext.win.obj, ext.mac.obj]
 proc isValid (src :string) :bool=  src.splitFile.ext in validExt
@@ -45,7 +46,7 @@ proc toObj (file :Fil; os :OS) :Fil=
 proc isObj (trg :Fil) :bool=  trg.splitFile.ext in [ext.unix.obj, ext.win.obj, ext.mac.obj]
   ## Returns true if the `trg` file is already a compiled object.
 #_____________________________
-proc isBin (file :Fil) :bool= 
+proc isBin *(file :Fil) :bool= 
   ## Returns true if the target `file` is considered to have a known binary file extension.
   if file.isValid: return false  # Never set binary flags for valid compilation unit extensions .o .a .c .cc .cpp
   case file.splitFile.ext

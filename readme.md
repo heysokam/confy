@@ -5,7 +5,7 @@ You can expect:
 - Ergonomic, readable and minimal/simple syntax.  
 - Behaves as a library. Builds your own binary that runs the compilation commands.  
 - Sane project configuration defaults, unless explicitely changed.   
-- Builds with `zig cc` by default. Auto-downloads the latest version for the current host.  
+- Builds with `zig cc` when compiler choice is omitted. Auto-downloads the latest version for the current host.  
 
 Minimal build file:
 ```nim
@@ -38,14 +38,15 @@ import confy
 cfg.srcDir  = "./code"   # Changes the source code folder from its default `rootDir/"src"`.  
 cfg.binDir  = "./build"  # Changes the binaries output folder from its default `rootDir/"bin"`.  
 cfg.verbose = on         # Makes the cli output information completely verbose. (for debugging)
-cfg.quiet   = on         # Makes the cli output information to be as minimal as possible.  (for cleaner cli output)  
-                         # Note: verbose = on will ignore quiet being active.
+cfg.quiet   = on         # Makes the cli output information to be as minimal as possible.  (for cleaner cli output)  (default: on)  
+                         # Note: verbose = on will ignore quiet being active.  (default: off)  
 ```
 
 ---
 **Done**:
 - [x] Remote folders _(same concept as Repositories in SCons)_
-- [x] make-to-confy converter
+- [x] make-to-confy: Generation of confy globs, diffs and reference code lists for each target
+- [x] make-to-confy: Converter
 - [x] SharedLibrary build
 - [x] Per-file formatted progress bar for binaries on quiet
 - [x] BuildInfo report when not quiet (if not quiet)
@@ -53,6 +54,8 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
   - [x] Automatic download into the configured `cfg.binDir` folder.
   - [x] Automatic updates from the latest stable version.
   - [x] C and C++ support
+  - [x] Skips confy database caching of files. `zig cc` has file caching as a default feature.
+  - [x] Skips `-d` dependencies files management for headers. `zig cc` already has it
 - [x] partial compiles: file cache database (sqlite3)
 - [x] multi-object build
 - [x] strip final binary on release vers
@@ -65,11 +68,14 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 
 **TODO**:
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
-- [ ] `-d` dependencies files management for headers.
-      Rebuild the file if one of the header files in its .d file has been modified, but the file itself hasn't
-- [ ] fix: need to force rebuild
+- [ ] (non-zigcc) `-d` dependencies files management for headers.
+- [ ] fix: need to force rebuild on non-zig compilers
 - [ ] fix: make-to-confy missing ld flags
-- [ ] select object to build by key
+- [ ] Options/arguments auto parser  (to avoid the user needing to implement accessing the info themselves)
+  - [ ] select object to build by keyword
+  - [ ] argument variables support   `key=val`
+- [ ] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
+      You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
 - [ ] confy clean
 - [ ] StaticLibrary build
 - [ ] Cross compilation support _(most likely will only support with Zig)_

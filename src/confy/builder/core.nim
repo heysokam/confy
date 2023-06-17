@@ -37,8 +37,11 @@ proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not quiet: info.report(obj)      # Report build information to console when not quiet
   obj.adjustRemotes()                 # Search for files in the remote folders, when they are missing in current.
   obj.root.setup()                    # Setup the root folder of the project.
-  cfg.db.init()                       # Initialize the database
-  var modif = cfg.db.update(obj.src)  # Find all the files that have been modified
+  var modif :seq[Fil]
+  if obj.cc == Zig: modif = obj.src   # Skip database management for Zig. It already has its own file cache manager.
+  else:
+    cfg.db.init()                     # Initialize the database
+    modif = cfg.db.update(obj.src)    # Find all the files that have been modified
   if force: compile(obj.src, obj)     # Force building all files
   else:
     if modif.len == 0:  log &"{obj.trg} is already up to date."; return

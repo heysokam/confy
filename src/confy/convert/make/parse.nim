@@ -20,12 +20,13 @@ import ../../builder/zig
 
 
 type Lines * = object
-  cc*, info*, mk*, loop*, mkdirs*, clean*, wrn* :seq[string]
+  cc*, info*, mk*, loop*, mkdirs*, clean*, cp*, wrn* :seq[string]
   id *:int
-func isCC    (line :string) :bool=  line.startsWith("cc") or line.startsWith("gcc") or "q3lcc" in line or "stringify" in line or "q3asm" in line or "lburg" in line
+func isCC    (line :string) :bool=  line.startsWith("cc") or line.startsWith("gcc") or (line.startsWith("/") and "gcc" in line) or "osxcross" in line or "q3lcc" in line or "windres" in line or "stringify" in line or "q3asm" in line or "lburg" in line
 func isMake  (line :string) :bool=  line.startsWith("make") or line.startsWith("cat")
 func isMkDir (line :string) :bool=  line.startsWith("if [ ! -d") or line.startsWith("mkdir") or "mkdir" in line
 func isClean (line :string) :bool=  line.startsWith("rm")
+func isCopy  (line :string) :bool=  line.startsWith("cp")
 func isInfo  (line :string) :bool=  line.startsWith("echo") or line.startsWith("\techo") or line.startsWith("Entering")
 func isLoop  (line :string) :bool=  line.startsWith("for") or line.startsWith("do") or line.startsWith("done")
 proc isWrn   (line :string) :bool=
@@ -49,6 +50,7 @@ proc toLines *(cli :string) :Lines=
     elif curr.isMake:  result.mk.add curr
     elif curr.isMkDir: result.mkDirs.add curr
     elif curr.isClean: result.clean.add curr
+    elif curr.isCopy:  result.cp.add curr
     elif curr.isWrn:   result.wrn.add curr
     elif curr.isEmpty: continue
     else: other.add curr
@@ -59,8 +61,8 @@ proc toLines *(cli :string) :Lines=
       of ' ':  "Starts with WhiteSpace"
       of '\t': "Starts with tab"
       of '\n': "Starts with newl"
-      else:    "Starts with something else-> ",it[0]
-    gerr "Others should be empty, but it contains ",other.len," elements: \n",other.join("\n")
+      else:    "Starts with something else-> ",it[0], "  -> ",it
+    echo "Others should be empty, but it contains ",other.len," elements: \n",other.join("\n"); gerr ""
 
 
 #_______________________________________
@@ -138,14 +140,17 @@ proc parseCC (cmd :string) :CC=
   result.bin = false
   result.obj.inp  = result.src.hasObjs()
   result.obj.outp = result.trg.isObj()
+  var addnextCC = false # toggle for force-adding the next entry after some flags
   for id,entry in cmd.split(" ").pairs():
     if id == 0: result.cmd = entry
+    if addNextCC: result.flags.ld.add entry; addnextCC = false; continue
     if entry.startsWith("-"):
       if entry.startsWith( "-c", "-o", "-MMD" ): continue
-      if entry.startsWith( "-std", "-D", "-I", "-W", "-f", "-g", "-O", "-l", "-M", "-pipe", "-march", "-mmmx", "-msse" ):
+      if entry.startsWith( "-std", "-D", "-I", "-W", "-f", "-g", "-O", "-l", "-M", "-pipe", "-m" ):
         result.flags.cc.add entry
       elif entry.startsWith( "-L" ): gerr "Interpreting command ",cmd," as a CC command, but it contails -L flags"
-      else: gerr "Interpreting CC command ",cmd," hit an entry starting with `-`, but the flag ",entry," is not registered"
+      elif entry.startsWith( "-arch" ): addNextCC = true; result.flags.cc.add entry
+      else: echo "Interpreting CC command ",cmd," hit an entry starting with `-`, but the flag ",entry," is not registered"; gerr ""
       if   entry.startsWith("-l"): result.libs.add entry
       elif "-D" in entry:          result.defs.add entry
       elif "-I" in entry:          result.paths.add entry
@@ -158,13 +163,16 @@ proc parseLD (cmd :string) :CC=
   result.bin = true
   result.obj.inp  = result.src.hasObjs()
   result.obj.outp = result.trg.isObj()
+  var addnextLD = false # toggle for force-adding the next entry after some flags
   for id,entry in cmd.split(" ").pairs():
     if id == 0: result.cmd = entry; continue
+    if addNextLD: result.flags.ld.add entry; addnextLD = false; continue
     if entry.startsWith("-"):
-      if entry.startsWith( "-c", "-o", "-MMD" ): continue
-      if entry.startsWith( "-std", "-D", "-I", "-W", "-f", "-g", "-O", "-l", "-pipe", "-rdynamic", "-shared", "-march" ):
+      if entry.startsWith( "-c", "-o", "-MMD", "-i" ): continue
+      if entry.startsWith( "-std", "-D", "-I", "-L", "-W", "-f", "-g", "-O", "-l", "-pipe", "-rdynamic", "-shared", "-dynamiclib", "-m" ):
         result.flags.ld.add entry
-      else: gerr "Interpreting LD command ",cmd," hit an entry starting with `-`, but the flag ",entry," is not registered"
+      elif entry.startsWith( "-arch" ): addnextLD = true; result.flags.ld.add entry
+      else: echo "Interpreting LD command ",cmd," hit an entry starting with `-`, but the flag ",entry," is not registered"; gerr ""
       if   entry.startsWith("-l"): result.libs.add entry
       elif "-D" in entry:          result.defs.add entry
       elif "-I" in entry:          result.paths.add entry
@@ -180,6 +188,7 @@ proc parse *(list :Lines) :seq[CC]=
     elif entry.isMkDir: continue
     elif entry.isLoop:  continue
     elif entry.isClean: continue
+    elif entry.isCopy:  log "WRN: Copy Command\n  {entry}    should probably be processed."; continue
     # elif entry.isWarn:  echo "____WARNING_______________\n",entry,"____________________END___"
     # Important checks last, for dodging some control flow hell issues.
     elif entry.isBin:   result.add entry.parseCC
