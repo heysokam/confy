@@ -51,6 +51,7 @@ var {trgName}Trg  = {trg.kind}.new(
   flags = Flags(
     cc: {trgCFlags}
     ld: {trgLFlags}
+    ), # << {trgName}.Flags( ... )
   root = {trgName}Root,
   syst = System(os: OS.{trg.syst.os.symbolName}, cpu: CPU.{trg.syst.cpu.symbolName}),
   ) # << {trgName}.new({trg.kind}, ... )
@@ -76,8 +77,8 @@ proc toCode *(trg :BuildTrg; name :string) :string=
   ## Returns the code string entry for a single BuildTrg object.
   let trgName   = name
   var trgSrc    = trg.src.toFormat(name,"src", 1)
-  var trgCFlags = trg.flags.cc.toFormat(name,"Flags.cc", 3)
-  var trgLFlags = trg.flags.ld.toFormat(name,"Flags.ld", 3)
+  var trgCFlags = trg.flags.cc.toFormat(name,"Flags.cc", 3) & ","
+  var trgLFlags = trg.flags.ld.toFormat(name,"Flags.ld", 3) & ","
   result = fmt( CodeTemplate )
   result = result.replace( &"\"build{os.DirSep}", &"binDir/\"" )
   result = result.replace( &"\"code{os.DirSep}",  &"srcDir/\"" )

@@ -3,8 +3,10 @@
 #:_____________________________________________________
 # std dependencies
 import std/os
+import std/osproc
 import std/strformat
 import std/strutils
+import std/sequtils
 import std/times
 # confy dependencies
 import ../types
@@ -22,15 +24,13 @@ proc sh *(cmd :string; dbg :bool= false) :void=
   if cfg.fakeRun: return
   discard execShellCmd cmd
 #_____________________________
-##[
-proc sh *(cmds: openArray[string]; cores :int) :void=
+proc sh *(cmds: openArray[string]; cores :int= cfg.cores) :void=
   ## Runs the given commands in parallel, using the given number of cores.
   ## When used with nimscript, it ignores cores and runs the commands one after the other.
   when defined(nimscript):
     for cmd in cmds: exec cmd
   else:
-    discard execProcesses(cmds, n = cores)
-]##
+    discard execProcesses(cmds, n=cores, options={poUsePath, poStdErrToStdOut, poParentStreams})
 
 #_____________________________
 proc touch *(trg :Fil) :void=

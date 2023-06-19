@@ -11,6 +11,7 @@ import db_connector/db_sqlite as sqlite
 # confy dependencies
 import ../types
 import ../cfg as c
+import ../dirs
 # Tools dependencies
 import ./helper
 import ./hash as md5
@@ -41,7 +42,7 @@ proc entries (db :DbConn; table :string= DbTable) :seq[string]=
 proc get (db :DbConn; col :Col; trg :Fil; table :string= DbTable) :string=
   ## Gets the last `col` value of the given `trg` entry in the `db` database `table`.
   for row in db.fastRows(sql"SELECT * FROM ?", table):
-    if row[Col.file.ord] == trg: result = row[col.ord]
+    if row[Col.file.ord] == trg.string: result = row[col.ord]
 proc getTime (db :DbConn; trg :Fil; table :string= DbTable) :string=  db.get(Col.time, trg, table)
   ## Returns the stored modification time of the given `trg` file.
 proc getMD5  (db :DbConn; trg :Fil; table :string= DbTable) :string=  db.get(Col.hash, trg, table)
@@ -122,7 +123,7 @@ proc add *(trg :Fil; src :seq[Fil]) :void=
     for file in src:  db.rmv(file); db.add(file)
     db.exec(sql"COMMIT")
 #___________________
-proc update *(src :Fil; trg :seq[Fil]) :seq[Fil]=
+proc update *(src :Fil; trg :seq[DirFile]) :seq[DirFile]=
   ## Updates the database with the files that have been modified from the given `trg` file list.
   ## - Runs `chk(src, trg)` on all files in the `trg` list.
   ## - Files that are not tracked yet are just added to the list.
@@ -131,6 +132,6 @@ proc update *(src :Fil; trg :seq[Fil]) :seq[Fil]=
   if not fileExists dbFile: dbFile.init()
   with dbFile:
     for file in trg:
-      if file notin db: db.add(file); result.add(file)
+      if file.path notin db: db.add(file.path); result.add(file)
       # else:            result.add file.changeFileExt(".o")
 

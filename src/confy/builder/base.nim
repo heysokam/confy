@@ -8,6 +8,7 @@ import std/paths
 import std/dirs
 import std/strformat
 import std/strutils
+import std/sequtils
 # confy dependencies
 import ../types
 import ../tool/logger
@@ -18,11 +19,6 @@ import ../flags as fl
 
 
 #_____________________________
-const ext = Extensions(
-  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o"),
-  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj"),
-  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o"),
-  )
 proc isLib *(file :Fil) :bool=  file.splitFile.ext in [ext.unix.lib, ext.win.lib, ext.mac.lib]
 #_____________________________
 const validExt = [".cpp", ".cc", ".c", ext.unix.obj, ext.win.obj, ext.mac.obj]
@@ -62,7 +58,7 @@ proc isBin *(file :Fil) :bool=
 # Direct compilation
 #___________________
 proc direct * (
-    src      : Fil;
+    src      : DirFile;
     trg      : Fil;
     CC       : string;
     flags    : seq[string];
@@ -71,14 +67,14 @@ proc direct * (
   ## Builds the `src` file directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
   let flg   = flags.join(" ")
-  let cmd   = &"{CC} {flg} {src} -o {trg}"
+  let cmd   = &"{CC} {flg} {src.path} -o {trg}"
   if quiet: echo &"{quietStr} {trg}"
   else:     echo cmd
   sh cmd
   if trg.isBin: trg.setExec()  # Set executable flags on the resulting binary.
 #___________________
 proc direct * (
-    src      : seq[Fil];
+    src      : seq[DirFile];
     trg      : Fil;
     CC       : string;
     flags    : seq[string];
@@ -86,7 +82,7 @@ proc direct * (
   ) :void=
   ## Builds the `src` list of files directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step.
-  let files = src.join(" ")
+  let files = src.mapIt(it.path).join(" ")
   let flg   = flags.join(" ")
   let cmd   = &"{CC} {files} {flg} -o {trg}"
   if not quiet: echo &"{quietStr} {trg}"
@@ -100,7 +96,7 @@ proc direct * (
 # GCC: Linker
 #___________________
 proc link *(
-    src   : seq[Fil];
+    src   : seq[DirFile];
     trg   : Fil;
     CC    : string;
     flags : Flags;
@@ -112,7 +108,7 @@ proc link *(
 # GCC: Compiler
 #___________________
 proc compileNoObj *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     trg      : Fil;
     CC       : string;
     flags    : Flags;
@@ -123,7 +119,7 @@ proc compileNoObj *(
   direct(src, trg, CC, flags.cc, quietStr)
 #___________________
 proc compileToObj *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     dir      : Dir;
     CC       : string;
     flags    : Flags;
@@ -131,11 +127,11 @@ proc compileToObj *(
   ) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".o")
+    let trg = file.chgDir(dir).path.changeFileExt(".o")
     file.direct(trg, CC&" -c", flags.cc, quietStr)
 #___________________
 proc compileToMod *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     dir      : Dir;
     CC       : string;
     flags    : Flags;
@@ -143,45 +139,47 @@ proc compileToMod *(
   ) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".pcm")
+    let trg = file.chgDir(dir).path.changeFileExt(".pcm")
     file.direct(trg, CC&" -c", flags.cc, quietStr)
 
 #___________________
 proc compile *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     trg      : Fil;
+    root     : Dir;
+    syst     : System;
     CC       : string;
     flags    : Flags;
     quietStr : string;
   ) :void=
   ## Compiles the given `src` list of files using `gcc`
   ## Assumes the paths given are already relative/absolute in the correct way.
-  var objs :seq[Fil]
+  var objs :seq[DirFile]
   var cmds :seq[string]
   var cfl  = flags.cc.join(" ")
   log &"Building {trg} ..."
   if quiet: stdmsg.write &"{tab}|" # add | to start the line of the silent case
   for file in src:
-    var trg  = file.chgDir(srcDir, binDir)
-    if trg.isObj:  # File is already an object. Add to objs and continue
-      objs.add(trg); continue
-    trg = trg.toObj(OS.Linux)
-    let dir = trg.splitFile.dir
-    let cmd = &"{CC} -MMD {cfl} -c {file} -o {trg}"
+    if file.path.isObj:  # File is already an object. Add to objs and continue
+      objs.add(file); continue
+    let trg = DirFile.new(file.dir, file.file.toObj(syst.os)).chgDir(root)
+    let dir = trg.path.splitFile.dir
+    let cmd = &"{CC} -MMD {cfl} -c {file.path} -o {trg.path}"
     if   quiet:   stdmsg.write "."
     elif verbose: echo cmd
-    else:         echo &"{Cstr} {trg}"
+    else:         echo &"{quietStr} {trg.path}"
     objs.add trg
     if not dir.dirExists: createDir dir
     sh cmd
     # cmds.add cmd
   if quiet: echo "Done." # add \n to end the line of the silent case
-  # sh cmds, c.cores
+  # sh cmds, cfg.cores
   objs.link(trg, CC, flags)
 #___________________
 proc compileShared *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     trg      : Fil;
+    root     : Dir;
     CC       : string;
     flags    : Flags;
     syst     : System;
@@ -189,20 +187,20 @@ proc compileShared *(
   ) :void=
   ## Compiles the given `src` list of files as a SharedLibrary, using `gcc`.
   ## Assumes the paths given are already relative/absolute in the correct way.
-  src.compile(trg.toLib(syst.os), CC, Flags(cc: flags.cc, ld: flags.ld & "-shared"), quietStr)
+  src.compile(trg.toLib(syst.os), root, syst, CC, Flags(cc: flags.cc, ld: flags.ld & "-shared"), quietStr)
 
 #___________________
 proc compile *(
-    src      : seq[Fil];
+    src      : seq[DirFile];
     obj      : BuildTrg;
     CC       : string;
     flags    : Flags;
     quietStr : string;
   ) :void=
   case obj.kind
-  of Program:        src.compile(obj.trg, CC, obj.flags, quietStr)
+  of Program:        src.compile(obj.trg, obj.root, obj.syst, CC, obj.flags, quietStr)
   of Object:         src.compileToObj(obj.root, CC, obj.flags, quietStr)
   of Module:         src.compileToMod(obj.root, CC, obj.flags, quietStr)
-  of SharedLibrary:  src.compileShared(obj.trg, CC, obj.flags, obj.syst, quietStr)
+  of SharedLibrary:  src.compileShared(obj.trg, obj.root, CC, obj.flags, obj.syst, quietStr)
   of StaticLibrary:  cerr "Compiling as StaticLibrary is not implemented."
 

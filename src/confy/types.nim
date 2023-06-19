@@ -17,10 +17,10 @@ type Fil  * = Path
   ## Note: Name chosen based on the etymology of the word File, which comes from latin Fillum.
   ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
   ##       Very :NotLikeThis:
-type TU * = object
-  ## Data for a single Translation Unit
-  src  *:seq[Fil]
-  trg  *:Fil
+type DirFile * = object
+  ## Internal Data Type for a single file, so that dir can be adjusted separately without issues. file is always relative to dir
+  dir   *:Dir
+  file  *:Fil
 
 type CompileError * = object of IOError
   ## For exceptions during the compile process
@@ -62,20 +62,24 @@ type Extensions * = object
   unix  *:Extension
   win   *:Extension
   mac   *:Extension
+const ext * = Extensions(
+  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o"),
+  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj"),
+  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o"),  )
 
 type Compiler * = enum Zig, GCC, Clang
   ## Known compiler names.
 
 type BuildTrg * = object
-  kind     *:BinKind   ## Type of build target
-  src      *:seq[Fil]  ## Sequence of source files to build with. Any `.o` files will be just linked at the end.
-  trg      *:Fil       ## Output binary to build
-  cc       *:Compiler  ## Compiler that will be used to build the app.
+  kind     *:BinKind       ## Type of build target
+  src      *:seq[DirFile]  ## Sequence of source files to build with. Object files (aka `.o`, etc) will be linked at the end and their path won't be adjusted.
+  trg      *:Fil           ## Output binary to build
+  cc       *:Compiler      ## Compiler that will be used to build the app.
   # Optional fields
-  flags    *:Flags     ## Set of flags to send to each compiler stage
-  syst     *:System    ## Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
-  root     *:Dir       ## Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
-  sub      *:Dir       ## Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
-  remotes  *:seq[Dir]  ## Remote folders to search for files (in order), when they are not found in the main folder.
-  version  *:string    ## Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
+  flags    *:Flags         ## Set of flags to send to each compiler stage
+  syst     *:System        ## Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
+  root     *:Dir           ## Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
+  sub      *:Dir           ## Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
+  remotes  *:seq[Dir]      ## Remote folders to search for files (in order), when they are not found in the main folder.
+  version  *:string        ## Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
 

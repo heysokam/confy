@@ -21,14 +21,14 @@ proc setCC *(trg :Fil) :void=
   zcfg.cc  = trg & " cc"
   zcfg.ccp = trg & " c++"
 #___________________
-proc getCC *(src :Fil) :string=
+proc getCC *(src :DirFile) :string=
   ## Gets the correct CC command for the given source file extension.
-  case src.splitFile.ext
+  case src.file.splitFile.ext
   of ".c":           result = zcfg.cc
   of ".cpp", ".cc":  result = zcfg.ccp
   else:              result = "echo"
 #___________________
-proc getCC *(src :seq[Fil]) :string=
+proc getCC *(src :seq[DirFile]) :string=
   ## Gets the correct CC command for the given source files list extension.
   var cmds :seq[string]
   for file in src:  cmds.add file.getCC
@@ -45,12 +45,12 @@ proc initOrExists *() :bool=  bin.initOrExists()
 #_____________________________
 # Direct compilation
 #___________________
-proc direct * (src :Fil; trg :Fil; flags :seq[string]; quietStr :string) :void=
+proc direct * (src :DirFile; trg :Fil; flags :seq[string]; quietStr :string) :void=
   ## Builds the `src` file directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
   base.direct(src,trg, src.getCC, flags, quietStr)
 #___________________
-proc direct * (src :seq[Fil]; trg :Fil; flags :seq[string]; quietStr :string) :void=
+proc direct * (src :seq[DirFile]; trg :Fil; flags :seq[string]; quietStr :string) :void=
   ## Builds the `src` list of files directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step.
   base.direct(src,trg, src.getCC, flags, quietStr)
@@ -58,32 +58,32 @@ proc direct * (src :seq[Fil]; trg :Fil; flags :seq[string]; quietStr :string) :v
 #_____________________________
 # GCC: Linker
 #___________________
-proc link *(src :seq[Fil]; trg :Fil; flags :Flags) :void=
+proc link *(src :seq[DirFile]; trg :Fil; flags :Flags) :void=
   ## Links the given `src` list of files into the `trg` binary.
   base.link(src, trg, src.getCC, flags)
 
 #_____________________________
 # GCC: Compiler
 #___________________
-proc compileNoObj *(src :seq[Fil]; trg :Fil; flags :Flags) :void=
+proc compileNoObj *(src :seq[DirFile]; trg :Fil; flags :Flags) :void=
   ## Compiles the given `src` list of files using the given CC into the `trg` binary.
   ## Doesn't compile an intermediate `.o` step.
   base.compileNoObj(src, trg, src.getCC, flags, cfg.Cstr)
 #___________________
-proc compileToObj *(src :seq[Fil]; dir :Dir; flags :Flags) :void=
+proc compileToObj *(src :seq[DirFile]; dir :Dir; flags :Flags) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   base.compileToObj(src, dir, src.getCC, flags, cfg.Cstr)
 #___________________
-proc compileToMod *(src :seq[Fil]; dir :Dir; flags :Flags) :void=
+proc compileToMod *(src :seq[DirFile]; dir :Dir; flags :Flags) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   base.compileToMod(src, dir, src.getCC, flags, cfg.Cstr)
 
 #___________________
-proc compile *(src :seq[Fil]; trg :Fil; flags :Flags) :void=
+proc compile *(src :seq[DirFile]; trg :Fil; root :Dir; syst :System; flags :Flags) :void=
   ## Compiles the given `src` list of files using `gcc`
   ## Assumes the paths given are already relative/absolute in the correct way.
-  base.compile(src, trg, src.getCC, flags, cfg.Cstr)
+  base.compile(src, trg, root, syst, src.getCC, flags, cfg.Cstr)
 #___________________
-proc compile *(src :seq[Fil]; obj :BuildTrg) :void=
+proc compile *(src :seq[DirFile]; obj :BuildTrg) :void=
   base.compile(src, obj, src.getCC, obj.flags, cfg.Cstr)
 

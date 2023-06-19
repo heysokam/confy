@@ -9,7 +9,7 @@ import std/strutils
 # confy dependencies
 import ../types
 import ../tools
-import ../cfg as c
+import ../cfg
 import ../tool/logger
 import ../dirs
 import ../flags as fl
@@ -18,10 +18,10 @@ import ./base
 
 
 #_____________________________
-let   gcc    = if c.verbose: "gcc -v" else: "gcc"
-let   gccp   = if c.verbose: "g++ -v" else: "g++"
-let   clang  = if c.verbose: "clang -v"   else: "clang"
-let   clangp = if c.verbose: "clang++ -v" else: "clang++"
+let   gcc    = if cfg.verbose: "gcc -v" else: "gcc"
+let   gccp   = if cfg.verbose: "g++ -v" else: "g++"
+let   clang  = if cfg.verbose: "clang -v"   else: "clang"
+let   clangp = if cfg.verbose: "clang++ -v" else: "clang++"
 #_____________________________
 proc exists *(c :Compiler) :bool=
   ## Returns true if the given compiler exists in the system.
@@ -115,12 +115,12 @@ proc compileNoObj *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP) :void=  dir
 proc compileToObj *(src :seq[Fil]; dir :Dir; flags :Flags= fl.allPP; quietStr :string= Cstr) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".o")
+    let trg = file.toDirFile(cfg.srcDir).chgDir(dir).path.changeFileExt(".o")
     file.direct(trg, flags.cc, quietStr, file.getCC()&" -c")
 proc compileToMod *(src :seq[Fil]; dir :Dir; flags :Flags= fl.allPP; quietStr :string= Cstr) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(file.splitFile.dir, dir).changeFileExt(".pcm")
+    let trg = file.toDirFile(cfg.srcDir).chgDir(dir).path.changeFileExt(".pcm")
     file.direct(trg, flags.cc, quietStr, file.getCC()&" -c")
 
 proc compile *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP) :void=
@@ -131,7 +131,7 @@ proc compile *(src :seq[Fil]; trg :Fil; flags :Flags= fl.allPP) :void=
   var cmds :seq[string]
   var cfl  = flags.cc.join(" ")
   for file in src:
-    var trg  = file.chgDir(srcDir, binDir)
+    var trg  = file.toDirFile(cfg.srcDir).chgDir(binDir).path
     if trg.isObj:  # File is already an object. Add to objs and continue
       objs.add(trg); continue
     trg = trg.toObj(OS.Linux)

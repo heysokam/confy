@@ -4,6 +4,7 @@
 # std dependencies
 import std/strformat
 import std/strutils
+import std/sequtils
 # confy dependencies
 import ../types
 import ../cfg
@@ -24,11 +25,11 @@ proc exists (c :Compiler) :bool=
   of GCC:   cc.exists(c)
   of Clang: cc.exists(c)
 #_____________________________
-proc compile (src :seq[Fil]; obj :BuildTrg) :void=
+proc compile (src :seq[DirFile]; obj :BuildTrg) :void=
   case obj.cc
   of Zig:   z.compile(src, obj)
-  of GCC:   cc.compile(src, obj)
-  of Clang: cc.compile(src, obj)
+  of GCC:   cc.compile(src.mapIt(it.path), obj)
+  of Clang: cc.compile(src.mapIt(it.path), obj)
 
 #_____________________________
 proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
@@ -37,7 +38,7 @@ proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not quiet: info.report(obj)      # Report build information to console when not quiet
   obj.adjustRemotes()                 # Search for files in the remote folders, when they are missing in current.
   obj.root.setup()                    # Setup the root folder of the project.
-  var modif :seq[Fil]
+  var modif :seq[DirFile]
   if obj.cc == Zig: modif = obj.src   # Skip database management for Zig. It already has its own file cache manager.
   else:
     cfg.db.init()                     # Initialize the database

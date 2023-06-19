@@ -68,7 +68,11 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 - [x] multi-file build
 
 **TODO**:
+- [ ] Correctly select `C` or `C++` compiler inside a seq (works globally for the entire sequence, but should be per file)
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
+- [ ] windres 
+  - [ ] with zig cc  (milestone feature for zig 0.11/0.12, request accepted on 2022.apr.09. https://github.com/ziglang/zig/issues/9564)
+  - [ ] with mingw   (note: only if/when mingw support is implemented)
 - [ ] (non-zigcc) `-d` dependencies files management for headers.
 - [ ] fix: need to force rebuild on non-zig compilers
 - [ ] fix: make-to-confy missing ld flags
@@ -79,7 +83,7 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
       You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
 - [ ] confy clean
 - [ ] StaticLibrary build
-- [ ] Cross compilation support _(most likely will only support with Zig)_
+- [ ] Cross compilation support _(most likely will only support with `zig cc`)_
 - [ ] URL file `requires`
 - [ ] Libs management as git.Submodules
 - [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
