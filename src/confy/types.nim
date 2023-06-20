@@ -30,6 +30,8 @@ type GeneratorError * = object of IOError
 type Opt  * = bool
   ## Command line ShortOptions / Switches
 
+type Lang *{.pure.}= enum Unknown, C, Cpp, Nim
+  ## Language of a code file, based on its extension
 type BinKind * = enum Program, SharedLibrary, StaticLibrary, Object, Module
   ## Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc
 

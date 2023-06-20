@@ -14,7 +14,7 @@ import ./tool/helper
 
 #_____________________________
 proc new *(_ :typedesc[BuildTrg];
-    src     : seq[Path];
+    src     : seq[DirFile];
     trg     : Path      = Path("");
     kind    : BinKind   = Program;
     cc      : Compiler  = Zig;
@@ -31,13 +31,13 @@ proc new *(_ :typedesc[BuildTrg];
   if verbose: cfg.quiet = off  # Disable quiet when verbose is active.
   let rDir = if root.string == "": cfg.binDir elif root.isAbsolute: root else: cfg.binDir/root
   BuildTrg(
-    kind : kind, src   : src.toDirFile,   trg     : trg,
-    cc   : cc,   flags : flags,           syst    : syst,
-    root : rDir, sub   : sub,             remotes : remotes, version : version,
+    kind : kind, src   : src,   trg     : trg,
+    cc   : cc,   flags : flags, syst    : syst,
+    root : rDir, sub   : sub,   remotes : remotes, version : version,
     ) # << BuildTrg( ... )
 #_____________________________
 proc new *(kind :BinKind;
-    src     : seq[Path];
+    src     : seq[DirFile];
     trg     : Path     = Path("");
     cc      : Compiler = Zig;
     flags   : Flags    = cfg.flags;

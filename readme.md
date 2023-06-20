@@ -50,13 +50,12 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 - [x] make-to-confy: Converter
 - [x] SharedLibrary build
 - [x] Per-file formatted progress bar for binaries on quiet
+- [x] Correctly select `C` or `C++` compiler inside a seq (found for each file, instead of globally for the whole list)
 - [x] BuildInfo report when not quiet (if not quiet)
 - [x] Zig compiler:
   - [x] Automatic download into the configured `cfg.binDir` folder.
   - [x] Automatic updates from the latest stable version.
   - [x] C and C++ support
-  - [x] Skips confy database caching of files. `zig cc` has file caching as a default feature.
-  - [x] Skips `-d` dependencies files management for headers. `zig cc` already has it
 - [x] partial compiles: file cache database (sqlite3)
 - [x] multi-object build
 - [x] strip final binary on release vers
@@ -68,13 +67,12 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 - [x] multi-file build
 
 **TODO**:
-- [ ] Correctly select `C` or `C++` compiler inside a seq (works globally for the entire sequence, but should be per file)
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
 - [ ] windres 
   - [ ] with zig cc  (milestone feature for zig 0.11/0.12, request accepted on 2022.apr.09. https://github.com/ziglang/zig/issues/9564)
   - [ ] with mingw   (note: only if/when mingw support is implemented)
-- [ ] (non-zigcc) `-d` dependencies files management for headers.
-- [ ] fix: need to force rebuild on non-zig compilers
+- [ ] `-d` dependencies files management for headers.
+- [ ] fix: need to force rebuild
 - [ ] fix: make-to-confy missing ld flags
 - [ ] Options/arguments auto parser  (to avoid the user needing to implement accessing the info themselves)
   - [ ] select object to build by keyword

@@ -7,8 +7,10 @@ import std/os
 import ../types
 import ../auto
 import ../cfg
+# builder dependencies
 import ./base
-# zig dependencies
+import ./helper as bhelp
+# zig-builder dependencies
 import ./zig/json
 import ./zig/zcfg as zcfg
 import ./zig/bin
@@ -56,34 +58,34 @@ proc direct * (src :seq[DirFile]; trg :Fil; flags :seq[string]; quietStr :string
   base.direct(src,trg, src.getCC, flags, quietStr)
 
 #_____________________________
-# GCC: Linker
+# Zig: Linker
 #___________________
-proc link *(src :seq[DirFile]; trg :Fil; flags :Flags) :void=
+proc link *(src :seq[DirFile]; trg :Fil; lang :Lang; flags :Flags) :void=
   ## Links the given `src` list of files into the `trg` binary.
-  base.link(src, trg, src.getCC, flags)
+  base.link(src, trg, lang, Zig, flags)
 
 #_____________________________
-# GCC: Compiler
+# Zig: Compiler
 #___________________
 proc compileNoObj *(src :seq[DirFile]; trg :Fil; flags :Flags) :void=
   ## Compiles the given `src` list of files using the given CC into the `trg` binary.
   ## Doesn't compile an intermediate `.o` step.
-  base.compileNoObj(src, trg, src.getCC, flags, cfg.Cstr)
+  base.compileNoObj(src, trg, Zig, flags, cfg.Cstr)
 #___________________
 proc compileToObj *(src :seq[DirFile]; dir :Dir; flags :Flags) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
-  base.compileToObj(src, dir, src.getCC, flags, cfg.Cstr)
+  base.compileToObj(src, dir, Zig, flags, cfg.Cstr)
 #___________________
 proc compileToMod *(src :seq[DirFile]; dir :Dir; flags :Flags) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
-  base.compileToMod(src, dir, src.getCC, flags, cfg.Cstr)
+  base.compileToMod(src, dir, Zig, flags, cfg.Cstr)
 
 #___________________
 proc compile *(src :seq[DirFile]; trg :Fil; root :Dir; syst :System; flags :Flags) :void=
-  ## Compiles the given `src` list of files using `gcc`
+  ## Compiles the given `src` list of files using `Zig`
   ## Assumes the paths given are already relative/absolute in the correct way.
-  base.compile(src, trg, root, syst, src.getCC, flags, cfg.Cstr)
+  base.compile(src, trg, root, syst, Zig, flags, cfg.Cstr)
 #___________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg) :void=
-  base.compile(src, obj, src.getCC, obj.flags, cfg.Cstr)
+  base.compile(src, obj, Zig, cfg.Cstr)
 

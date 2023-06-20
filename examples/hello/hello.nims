@@ -16,8 +16,8 @@ var license       = "CC0-1.0"
 
 #_____________________________
 # Folders
-srcDir       = c.srcDir
-binDir       = c.binDir
+system.srcDir = c.srcDir
+system.binDir = c.binDir
 
 #_____________________________
 # Run Builder

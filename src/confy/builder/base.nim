@@ -16,48 +16,14 @@ import ../tool/helper
 import ../cfg as c
 import ../dirs
 import ../flags as fl
-
-
-#_____________________________
-proc isLib *(file :Fil) :bool=  file.splitFile.ext in [ext.unix.lib, ext.win.lib, ext.mac.lib]
-#_____________________________
-const validExt = [".cpp", ".cc", ".c", ext.unix.obj, ext.win.obj, ext.mac.obj]
-proc isValid (src :string) :bool=  src.splitFile.ext in validExt
-  ## Returns true if the given src file has a valid known file extension.
-#_____________________________
-proc toLib (file :Fil; os :OS) :Fil=
-  case os
-  of   OS.Linux:    file.changeFileExt ext.unix.lib
-  of   OS.Windows:  file.changeFileExt ext.win.lib
-  of   OS.Mac:      file.changeFileExt ext.mac.lib
-  else: raise newException(CompileError, &"Support for {os} is currently not implemented.")
-#_____________________________
-proc toObj (file :Fil; os :OS) :Fil=
-  case os
-  of   OS.Linux:    file.changeFileExt ext.unix.obj
-  of   OS.Windows:  file.changeFileExt ext.win.obj
-  of   OS.Mac:      file.changeFileExt ext.mac.obj
-  else: raise newException(CompileError, &"Support for {os} is currently not implemented.")
-#_____________________________
-proc isObj (trg :Fil) :bool=  trg.splitFile.ext in [ext.unix.obj, ext.win.obj, ext.mac.obj]
-  ## Returns true if the `trg` file is already a compiled object.
-#_____________________________
-proc isBin *(file :Fil) :bool= 
-  ## Returns true if the target `file` is considered to have a known binary file extension.
-  if file.isValid: return false  # Never set binary flags for valid compilation unit extensions .o .a .c .cc .cpp
-  case file.splitFile.ext
-  of ext.unix.bin, ext.win.bin, ext.mac.bin:  return true   # Known binary extensions
-  of ext.unix.lib, ext.win.lib, ext.mac.lib:  return false  # dynamic libs are not binaries
-  of ext.unix.obj, ext.win.obj:               return false  # objects are not binaries
-  else: return true  # Custom extensions (perfectly valid for linux) will be considered binaries.
-  # wrn: File extensions for unknown os'es will always return true. Add the os to the `ext` list if this is an issue.
-
+# builder dependencies
+import ./helper as bhelp
 
 
 #_____________________________
 # Direct compilation
 #___________________
-proc direct * (
+proc direct *(
     src      : DirFile;
     trg      : Fil;
     CC       : string;
@@ -73,7 +39,7 @@ proc direct * (
   sh cmd
   if trg.isBin: trg.setExec()  # Set executable flags on the resulting binary.
 #___________________
-proc direct * (
+proc direct *(
     src      : seq[DirFile];
     trg      : Fil;
     CC       : string;
@@ -93,54 +59,55 @@ proc direct * (
 
 
 #_____________________________
-# GCC: Linker
+# Base: Linker
 #___________________
 proc link *(
     src   : seq[DirFile];
     trg   : Fil;
-    CC    : string;
+    lang  : Lang;
+    CC    : Compiler;
     flags : Flags;
   ) :void=
   ## Links the given `src` list of files into the `trg` binary.
-  direct(src, trg, CC, flags.ld, Lstr)
+  direct(src, trg, lang.getCC(CC), flags.ld, Lstr)
 
 #_____________________________
-# GCC: Compiler
+# Base: Compiler
 #___________________
 proc compileNoObj *(
     src      : seq[DirFile];
     trg      : Fil;
-    CC       : string;
+    CC       : Compiler;
     flags    : Flags;
     quietStr : string;
   ) :void=
   ## Compiles the given `src` list of files using the given CC into the `trg` binary.
   ## Doesn't compile an intermediate `.o` step.
-  direct(src, trg, CC, flags.cc, quietStr)
+  direct(src, trg, src.getCC(CC), flags.cc, quietStr)
 #___________________
 proc compileToObj *(
     src      : seq[DirFile];
     dir      : Dir;
-    CC       : string;
+    CC       : Compiler;
     flags    : Flags;
     quietStr : string;
   ) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   for file in src:
     let trg = file.chgDir(dir).path.changeFileExt(".o")
-    file.direct(trg, CC&" -c", flags.cc, quietStr)
+    file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
 #___________________
 proc compileToMod *(
     src      : seq[DirFile];
     dir      : Dir;
-    CC       : string;
+    CC       : Compiler;
     flags    : Flags;
     quietStr : string;
   ) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
     let trg = file.chgDir(dir).path.changeFileExt(".pcm")
-    file.direct(trg, CC&" -c", flags.cc, quietStr)
+    file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
 
 #___________________
 proc compile *(
@@ -148,11 +115,11 @@ proc compile *(
     trg      : Fil;
     root     : Dir;
     syst     : System;
-    CC       : string;
+    CC       : Compiler;
     flags    : Flags;
     quietStr : string;
   ) :void=
-  ## Compiles the given `src` list of files using `gcc`
+  ## Compiles the given `src` list of files using the given `CC` command.
   ## Assumes the paths given are already relative/absolute in the correct way.
   var objs :seq[DirFile]
   var cmds :seq[string]
@@ -164,7 +131,7 @@ proc compile *(
       objs.add(file); continue
     let trg = DirFile.new(file.dir, file.file.toObj(syst.os)).chgDir(root)
     let dir = trg.path.splitFile.dir
-    let cmd = &"{CC} -MMD {cfl} -c {file.path} -o {trg.path}"
+    let cmd = &"{file.getCC(CC)} -MMD {cfl} -c {file.path} -o {trg.path}"
     if   quiet:   stdmsg.write "."
     elif verbose: echo cmd
     else:         echo &"{quietStr} {trg.path}"
@@ -174,18 +141,18 @@ proc compile *(
     # cmds.add cmd
   if quiet: echo "Done." # add \n to end the line of the silent case
   # sh cmds, cfg.cores
-  objs.link(trg, CC, flags)
+  objs.link(trg, src.getLang(), CC, flags)
 #___________________
 proc compileShared *(
     src      : seq[DirFile];
     trg      : Fil;
     root     : Dir;
-    CC       : string;
+    CC       : Compiler;
     flags    : Flags;
     syst     : System;
     quietStr : string;
   ) :void=
-  ## Compiles the given `src` list of files as a SharedLibrary, using `gcc`.
+  ## Compiles the given `src` list of files as a SharedLibrary, using the given `CC` command.
   ## Assumes the paths given are already relative/absolute in the correct way.
   src.compile(trg.toLib(syst.os), root, syst, CC, Flags(cc: flags.cc, ld: flags.ld & "-shared"), quietStr)
 
@@ -193,8 +160,7 @@ proc compileShared *(
 proc compile *(
     src      : seq[DirFile];
     obj      : BuildTrg;
-    CC       : string;
-    flags    : Flags;
+    CC       : Compiler;
     quietStr : string;
   ) :void=
   case obj.kind
@@ -202,5 +168,5 @@ proc compile *(
   of Object:         src.compileToObj(obj.root, CC, obj.flags, quietStr)
   of Module:         src.compileToMod(obj.root, CC, obj.flags, quietStr)
   of SharedLibrary:  src.compileShared(obj.trg, obj.root, CC, obj.flags, obj.syst, quietStr)
-  of StaticLibrary:  cerr "Compiling as StaticLibrary is not implemented."
+  of StaticLibrary:  raise newException(CompileError, "Compiling as StaticLibrary is not implemented.")
 

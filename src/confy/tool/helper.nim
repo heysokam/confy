@@ -27,6 +27,7 @@ proc sh *(cmd :string; dbg :bool= false) :void=
 proc sh *(cmds: openArray[string]; cores :int= cfg.cores) :void=
   ## Runs the given commands in parallel, using the given number of cores.
   ## When used with nimscript, it ignores cores and runs the commands one after the other.
+  # todo:  https://github.com/mratsim/constantine/blob/master/helpers/pararun.nim
   when defined(nimscript):
     for cmd in cmds: exec cmd
   else:

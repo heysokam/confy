@@ -16,20 +16,14 @@ import ../info
 # Builder module dependencies
 from   ./C   as cc import nil
 from   ./zig as z  import nil
+import ./helper as bhelp
 
-#_____________________________
-proc exists (c :Compiler) :bool=
-  ## Returns true if the given compiler exists in the system.
-  case c
-  of Zig:   z.initOrExists()
-  of GCC:   cc.exists(c)
-  of Clang: cc.exists(c)
 #_____________________________
 proc compile (src :seq[DirFile]; obj :BuildTrg) :void=
   case obj.cc
   of Zig:   z.compile(src, obj)
-  of GCC:   cc.compile(src.mapIt(it.path), obj)
-  of Clang: cc.compile(src.mapIt(it.path), obj)
+  of GCC:   cc.compile(src, obj)
+  of Clang: cc.compile(src, obj)
 
 #_____________________________
 proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
@@ -38,11 +32,8 @@ proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not quiet: info.report(obj)      # Report build information to console when not quiet
   obj.adjustRemotes()                 # Search for files in the remote folders, when they are missing in current.
   obj.root.setup()                    # Setup the root folder of the project.
-  var modif :seq[DirFile]
-  if obj.cc == Zig: modif = obj.src   # Skip database management for Zig. It already has its own file cache manager.
-  else:
-    cfg.db.init()                     # Initialize the database
-    modif = cfg.db.update(obj.src)    # Find all the files that have been modified
+  cfg.db.init()                       # Initialize the database
+  var modif = cfg.db.update(obj.src)  # Find all the files that have been modified
   if force: compile(obj.src, obj)     # Force building all files
   else:
     if modif.len == 0:  log &"{obj.trg} is already up to date."; return
