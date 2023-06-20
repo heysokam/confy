@@ -49,6 +49,20 @@ proc new *(kind :BinKind;
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
   BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, version)
+#_____________________________
+proc new *(kind :BinKind;
+    src     : seq[Path];
+    trg     : Path     = Path("");
+    cc      : Compiler = Zig;
+    flags   : Flags    = cfg.flags;
+    syst    : System   = getHost();
+    root    : Dir      = cfg.binDir;
+    sub     : Dir      = Dir("");
+    remotes : seq[Path] = @[];
+    version : string = "";
+  ) :BuildTrg=
+  ## Creates a new BuildTrg with the given data.
+  BuildTrg.new(src.toDirFile, trg, kind, cc, flags, syst, root, sub, remotes, version)
 
 #_____________________________
 proc print *(obj :BuildTrg) :void=  info.report(obj)
