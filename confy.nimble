@@ -38,8 +38,8 @@ task demo, "Executes confy inside the demo folder":
 #_________________________________________________
 # Manage git tags for confy
 #___________________
-taskRequires "tag", "https://github.com/beef331/graffiti.git"
+taskRequires "push", "https://github.com/beef331/graffiti.git"
 task push, "Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
   ## Does nothing when local and remote versions are the same.
   exec "git push"  # Requires local auth
-  exec "graffitti ./confy.nimble"
+  exec "graffiti ./confy.nimble"
