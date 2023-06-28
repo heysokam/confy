@@ -1,6 +1,6 @@
 ![Confy](./res/banner.png)
-# confy: Comfortable and Configurable buildsystem for C Compilers
-Confy is a Buildsystem for compiling C code with Zig, GCC, Clang  _(todo: MinGW and Nim)_  
+# confy: Comfortable and Configurable buildsystem for C and Nim
+Confy is a Buildsystem for compiling C code with Zig, GCC, Clang  _(todo: MinGW)_  
 Inspired by SCons, without the issues of a typeless language.  
 You can expect: 
 - Ergonomic, readable and minimal/simple syntax.  
@@ -45,6 +45,10 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 
 ---
 **Done**:
+- [x] Cross compilation for Nim, with the same Zig-confy toolchain
+- [x] Nim code support
+- [x] Optional: custom build filename when calling for the confy task 
+      (was default "build.nim", configurable from the `cfg.file` variable, but can be any name when calling the confy task)
 - [x] Remote folders _(same concept as Repositories in SCons)_
 - [x] make-to-confy: Generation of confy globs, diffs and reference code lists for each target
 - [x] make-to-confy: Converter

@@ -25,10 +25,10 @@ import ./helper
 #___________________
 template beforeConfy= log "Building the current project with confy ..."
 template afterConfy=  log "Done building."
-proc confy *() :void=
+proc confy *(file :string= cfg.file.string) :void=
   ## This is the default confy task
   beforeConfy
-  let builder = &"{cfg.srcDir.string}/{cfg.file.string}"
+  let builder = (&"{cfg.srcDir.string}/{file}").addFileExt(".nim")
   sh &"{cfg.nimc} -d:ssl --outDir:{cfg.binDir.string} {builder}"   # nim -c -d:ssl --outDir:binDir srcDir/build.nim
   withDir cfg.binDir: sh &"./{cfg.file.string.splitFile.name}"
   afterConfy

@@ -44,6 +44,9 @@ proc toDirFile *(files :seq[Fil]; dir :Dir= cfg.srcDir) :seq[DirFile]=
   for file in files: result.add file.toDirFile(dir)
 proc path *(file :DirFile) :Fil=  file.dir/file.file
   ## Converts a DirFile to its complete path representation.
+proc join *(files :seq[DirFile]; sep :string= " ") :string=
+  ## Converts a list of DirFiles into a single string containing all their paths merged together
+  for file in files: result.add file.path.string & sep
 
 #_____________________________
 # Dir Setup

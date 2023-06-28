@@ -106,4 +106,16 @@ proc getCC *(list :seq[DirFile]; compiler :Compiler) :string=  list.getLang.getC
   ## Returns the correct command string to build the input list of files with the given compiler.
   ## Its language will be decided by its file extension.
   ## Lang will be cpp first if one of the files has .cpp or .cc extension.
+#_____________________________
+func toNim *(syst :System) :SystemStr=  (os: $syst.os, cpu: $syst.cpu)
+  ## Converts a system object into an (os,cpu) string pair, usable with nimc as --os:OS --cpu:CPU
+func toZig *(syst :System) :SystemStr=
+  ## Converts a sytem object into an (os,cpu) string pair, usable with `zig cc` as `-target CPU-OS`
+  result.os = case syst.os
+    of Mac: "macos" # Remove the x from default
+    else:   $syst.os
+  result.cpu = case syst.cpu
+    of x86, x86_64: syst.cpu.symbolName
+    of arm64:       "aarch64"
+    else:           $syst.cpu
 
