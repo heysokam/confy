@@ -8,6 +8,7 @@ import std/os
 import std/strutils
 import std/strformat
 import std/sets
+import std/enumutils
 # confy dependencies
 import ../types
 # builder dependencies

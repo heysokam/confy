@@ -7,14 +7,14 @@ import std/strformat
 #_____________________________
 # Package
 packageName   = "confy"
-version       = "0.0.4"
+version       = "0.0.5"
 author        = "sOkam"
 description   = "confy buildsystem"
 license       = "MIT"
 
 #_____________________________
 # Dependencies
-requires "nim >= 1.9.3"
+requires "nim >= 2.0.0"
 requires "db_connector"
 requires "checksums"
 requires "jsony"

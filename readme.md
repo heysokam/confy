@@ -1,6 +1,6 @@
 ![Confy](./res/banner.png)
 # confy: Comfortable and Configurable buildsystem for C and Nim
-Confy is a Buildsystem for compiling C code with Zig, GCC, Clang  _(todo: MinGW)_  
+Confy is a Buildsystem for compiling code with ZigCC, GCC, Clang  _(todo: MinGW)_  
 Inspired by SCons, without the issues of a typeless language.  
 You can expect: 
 - Ergonomic, readable and minimal/simple syntax.  
@@ -20,17 +20,13 @@ var bin  = Program.new(    # Build an executable program
 
 bin.build()                # Order to build
 ```
-See the [examples](./examples) folder for more ways to use the buildsystem.
+See the [examples](./examples) folder for more ways to use the buildsystem.  
+
+_Note: ZigCC is the main compiler used, but this doesn't mean we build Zig code._  
+_This project can build C, C++ and Nim projects._  
 
 
 ```md
-# warning
-Depends on Nim2.0, which is on RC2 as of today.
-Install nim with choosenim, and run:
-> choosenim update devel
-
-This step won't be needed when 2.0 becomes stable.
-```
 ## Configuration
 All the configuration variables are stored in [confy/cfg.nim](./src/confy/cfg.nim).  
 To change them, just add `cfg.theVariable = value` at the top of your `build.nim` file.  
@@ -46,7 +42,7 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 ---
 **Done**:
 - [x] Cross compilation for Nim, with the same Zig-confy toolchain
-- [x] Nim code support
+- [x] Nim code support (with ZigCC)
 - [x] Optional: custom build filename when calling for the confy task 
       (was default "build.nim", configurable from the `cfg.file` variable, but can be any name when calling the confy task)
 - [x] Remote folders _(same concept as Repositories in SCons)_
@@ -60,6 +56,7 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
   - [x] Automatic download into the configured `cfg.binDir` folder.
   - [x] Automatic updates from the latest stable version.
   - [x] C and C++ support
+  - [x] Nim support
 - [x] partial compiles: file cache database (sqlite3)
 - [x] multi-object build
 - [x] strip final binary on release vers
@@ -77,20 +74,21 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
   - [ ] with mingw   (note: only if/when mingw support is implemented)
 - [ ] `-d` dependencies files management for headers.
 - [ ] fix: need to force rebuild
-- [ ] fix: make-to-confy missing ld flags
+- [ ] confy clean
+- [ ] StaticLibrary build
+**Less important, but todo**:
+- [ ] More examples:
+  - [ ] Advanced usage
+  - [ ] Fully verbose example, changing everything that can be changed.
 - [ ] Options/arguments auto parser  (to avoid the user needing to implement accessing the info themselves)
   - [ ] select object to build by keyword
   - [ ] argument variables support   `key=val`
 - [ ] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
       You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
-- [ ] confy clean
-- [ ] StaticLibrary build
-- [ ] Cross compilation support _(most likely will only support with `zig cc`)_
+- [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
+- [ ] fix: make-to-confy missing ld flags
+
+**Maybes**:
 - [ ] URL file `requires`
 - [ ] Libs management as git.Submodules
-- [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
-
-- [ ] More examples:
-  - [ ] Advanced usage
-  - [ ] Fully verbose example, changing everything that can be changed.
-
+- [ ] Cross compilation support for C with non-ZigCC compiler
