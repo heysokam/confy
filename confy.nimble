@@ -6,7 +6,7 @@ import std/[ os,strformat ]
 #_____________________________
 # Package
 packageName   = "confy"
-version       = "0.0.6"
+version       = "0.0.7"
 author        = "sOkam"
 description   = "confy buildsystem"
 license       = "MIT"

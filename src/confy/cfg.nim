@@ -32,6 +32,10 @@ var Cstr    *:string=  "CC"
   ## Prefix used for formatting the quiet output calls to the Compiler.
 var Lstr    *:string=  "LD"
   ## Prefix used for formatting the quiet output calls to the Linker.
+var zigSystemBin * = on  # default:on
+  ## Uses the System's ZigCC path, without downloading a new version from the web.
+  ## When on : Uses the system's zig like `zig cc file.c
+  ## When off: Runs the zig compiler setup logic and executes the zig compiler like `cfg.zigDir/zig cc file.c`
 
 
 #_________________________________________________
@@ -44,7 +48,7 @@ var fakeRun  *:Opt=  off
 #_____________________________
 # Project: Folders
 #___________________
-var rootDir *:Dir=  Dir(".")  # Assumes the nims  file is in root/, and is called from that folder.
+var rootDir *:Dir=  Dir(".")  # Assumes the nimble/nims file is in root/, and is called from that folder.
 when not defined(nimscript):
   rootDir = Dir(getAppDir()/"..")  # Assume the builder is inside root/bin/
 # Root Folders
@@ -77,12 +81,12 @@ let switchVerbose   = if cfg.verbose: "--verbose" else: ""
 let switchVerbosity = if cfg.verbose: "--verbosity:2" else: ""
 # Commands
 var nimble * = &"nimble {switchVerbose}"
-var nimc   * = &"nim c {switchVerbosity} -d:release --mm:orc"
+var nimc   * = &"nim c {switchVerbosity} -d:release"
 
 
 #_________________________________________________
-# Compiler Flags
+# Compiler Configuration
 #___________________
+# Flags
 var flagsC * = fl.allC
 var flags  * = fl.allPP
-
