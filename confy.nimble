@@ -1,13 +1,12 @@
 #:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-import std/os
-import std/strformat
+import std/[ os,strformat ]
 
 #_____________________________
 # Package
 packageName   = "confy"
-version       = "0.0.5"
+version       = "0.0.6"
 author        = "sOkam"
 description   = "confy buildsystem"
 license       = "MIT"
@@ -33,17 +32,18 @@ let helloNimDir = examplesDir/"nim_hello"
 #___________________
 before helloC: echo packageName,": This is happening before helloC.task."
 after  helloC: echo packageName,": This is happening after helloC.task."
-task helloC, "Executes confy inside the helloC folder":
+task helloC, "Example C:  Executes confy inside the helloC folder":
   withDir helloDir: exec "nim hello.nims"
 #___________________
-task helloNim, "Executes confy inside the helloNim folder":
+task helloNim, "Example Nim:  Executes confy inside the helloNim folder":
   withDir helloNimDir: exec "nimble confy"
 
 #_________________________________________________
 # Manage git tags for confy
 #___________________
-taskRequires "push", "https://github.com/beef331/graffiti.git"
-task push, "Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
+task push, "Internal:  Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
   ## Does nothing when local and remote versions are the same.
+  requires "https://github.com/beef331/graffiti.git"
   exec "git push"  # Requires local auth
-  exec "graffiti ./confy.nimble"
+  exec "graffiti ./{packageName}.nimble"
+

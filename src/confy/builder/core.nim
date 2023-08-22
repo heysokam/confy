@@ -1,5 +1,5 @@
 #:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # std dependencies
 import std/strformat
@@ -26,9 +26,9 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
       n.compile(src, obj, force)
       return
   case obj.cc
-  of GCC:        cc.compile(src, obj)
-  of Clang:      cc.compile(src, obj)
-  of Zig:        z.compile(src, obj)
+  of GCC   : cc.compile(src, obj)
+  of Clang : cc.compile(src, obj)
+  of Zig   : z.compile(src, obj)
 
 
 #_____________________________

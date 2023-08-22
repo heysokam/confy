@@ -23,12 +23,11 @@ bin.build()                # Order to build
 See the [examples](./examples) folder for more ways to use the buildsystem.  
 
 _Note: ZigCC is the main compiler used, but this doesn't mean we build Zig code._  
-_This project can build C, C++ and Nim projects._  
+_This project is used to build C, C++ and Nim projects._  
 
 
-```md
 ## Configuration
-All the configuration variables are stored in [confy/cfg.nim](./src/confy/cfg.nim).  
+All the configuration variables are stored @[confy/cfg.nim](./src/confy/cfg.nim).  
 To change them, just add `cfg.theVariable = value` at the top of your `build.nim` file.  
 ```nim
 import confy
@@ -38,13 +37,22 @@ cfg.verbose = on         # Makes the cli output information completely verbose. 
 cfg.quiet   = on         # Makes the cli output information to be as minimal as possible.  (for cleaner cli output)  (default: on)  
                          # Note: verbose = on will ignore quiet being active.  (default: off)  
 ```
+See the @[config.md](./doc/config.md) doc file, or @[confy/cfg.nim](./src/confy/cfg.nim) for the complete list of variables that can be modified.
 
 ---
-**Done**:
+```md
+# Done:
+- [x] cfg: New configuration option:  `cfg.zigSystemBin`  (default:on)
+         : ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
+         : When off, a local-only version is downloaded and used for the project like before.
+- [x] Nim: zigcc and zigcpp aliases:
+  - [x]  : Now call for the system's `zig` command when `cfg.zigSystemBin = on`
+  - [x]  : Are ordered to rebuild every run (in case the project is moved or the config options change).
+         : Its a tiny file, so this process consumes less than a second in total.
 - [x] Cross compilation for Nim, with the same Zig-confy toolchain
 - [x] Nim code support (with ZigCC)
-- [x] Optional: custom build filename when calling for the confy task 
-      (was default "build.nim", configurable from the `cfg.file` variable, but can be any name when calling the confy task)
+- [x] cfg: custom build filename when calling for the confy task 
+         : (was default "build.nim", configurable from the `cfg.file` variable, but can be any name when calling the confy task)
 - [x] Remote folders _(same concept as Repositories in SCons)_
 - [x] make-to-confy: Generation of confy globs, diffs and reference code lists for each target
 - [x] make-to-confy: Converter
@@ -66,8 +74,10 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
 - [x] support for grabbing all files contained in a folder (aka glob)
 - [x] autocreate subdirs to compile into
 - [x] multi-file build
+```
 
-**TODO**:
+```md
+# TODO:
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
 - [ ] windres 
   - [ ] with zig cc  (milestone feature for zig 0.11/0.12, request accepted on 2022.apr.09. https://github.com/ziglang/zig/issues/9564)
@@ -87,8 +97,11 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
       You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
 - [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] fix: make-to-confy missing ld flags
+```
 
+```md
 **Maybes**:
 - [ ] URL file `requires`
 - [ ] Libs management as git.Submodules
 - [ ] Cross compilation support for C with non-ZigCC compiler
+```

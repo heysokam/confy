@@ -1,5 +1,5 @@
 #:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # std dependencies
 import std/os except `/`
@@ -12,28 +12,30 @@ import ../dirs
 import ../tool/logger
 import ../tool/helper as h
 import ./helper
-
+import ./zig/bin as z
+import ./zig/zcfg
 
 #_____________________________________________________
 # Nim: General Config
 #_____________________________
-let nimc      = if cfg.verbose: "nim c --verbosity:3" else: "nim c"
-let zigcc     = cfg.zigDir/"zigcc"
-let zigcpp    = cfg.zigDir/"zigcpp"
-let zigccSrc  = cfg.cacheDir/"zigcc.nim"
-let zigcppSrc = cfg.cacheDir/"zigcpp.nim"
+let nimc       = if cfg.verbose: "nim c --verbosity:3" else: "nim c"
+let zigcc      = cfg.zigDir/"zigcc"
+let zigcpp     = cfg.zigDir/"zigcpp"
+let zigccSrc   = cfg.cacheDir/"zigcc.nim"
+let zigcppSrc  = cfg.cacheDir/"zigcpp.nim"
 
 
 #_____________________________________________________
 # NimZ Compiler : Alias Manager
 #_____________________________
+const nimcZ = "nim c -d:release --hint:Conf:off --hint:Link:off" # Base nimc command to build zigcc and zigcpp binaries with
 const ZigccTemplate = """
 # From: https://github.com/enthus1ast/zigcc
 import std/os
 import std/osproc
 # Set the zig compiler to call, append args, and Start the process
 let process = startProcess(
-  command = "{cfg.zigDir}"/"zig",             # Path of the real Zig binary
+  command = "{zcfg.realBin}",                 # Path of the real Zig binary
   args    = @["{CC}"] & commandLineParams(),  # Add the suffix and all commandLineParams to the command
   options = {{poStdErrToStdOut, poUsePath, poParentStreams}},
   ) # << startProcess( ... )
@@ -43,37 +45,38 @@ let exitCode = process.waitForExit()
 close process
 quit exitCode
 """
-proc writeZigcc=
+proc writeZigcc(rebuild:bool)=
   ## Write the zigcc source code file if it doesn't exist
   let CC = "cc"
-  if not zigccSrc.fileExists:
+  if rebuild or not zigccSrc.fileExists:
     if verbose: log &"{zigccSrc} does not exist. Writing it..."
     writeFile( zigccSrc,  fmt(ZigccTemplate) )
-proc writeZigcpp=
+proc writeZigcpp(rebuild:bool)=
   ## Write the zigcpp source code file if it doesn't exist
   let CC = "c++"
-  if not zigcppSrc.fileExists:
+  if rebuild or not zigcppSrc.fileExists:
     if verbose: log &"{zigccSrc} does not exist. Writing it..."
     writeFile( zigcppSrc, fmt(ZigccTemplate) )
-proc buildZigcc=
+proc buildZigcc(rebuild:bool)=
   ## Build the zigcc binary if it doesn't exist
-  if not zigcc.fileExists:
-    let cmd = &"nim c -d:release --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc}"
+  if rebuild or not zigcc.fileExists:
+    let cmd = &"{nimcZ} --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc}"
     if verbose: log &"{zigcc} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcc.lastPathPart} is up to date."
-proc buildZigcpp=
+proc buildZigcpp(rebuild:bool)=
   ## Build the zigcpp binary if it doesn't exist
-  if not zigcpp.fileExists:
-    let cmd = &"nim c -d:release --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc}"
+  if rebuild or not zigcpp.fileExists:
+    let cmd = &"{nimcZ} --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc}"
     if verbose: log &"{zigcpp} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcpp.lastPathPart} is up to date."
 #_____________________________
-proc buildNimZ  *() :void=
+proc buildNimZ  *(force=false) :void=
   ## Writes and builds the source code of both NimZ aliases when they do not exist.
-  writeZigcc() ; writeZigcpp()
-  buildZigcc() ; buildZigcpp()
+  let rebuild = z.initOrExists(force=force)
+  writeZigcc(rebuild) ; writeZigcpp(rebuild)
+  buildZigcc(rebuild) ; buildZigcpp(rebuild)
 
 
 #_____________________________________________________
@@ -86,7 +89,7 @@ proc buildNimZ  *() :void=
 const ZigTemplate = "{cc} -d:zig --cc:clang --clang.exe=\"{zigcc}\" --clang.linkerexe=\"{zigcc}\" --clang.cppCompiler=\"{zigcpp}\" --clang.cppXsupport=\"-std=c++20\" {zigTarget}"
 #_____________________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
-  buildNimZ() # Build the NimZ aliases when they do not exist
+  buildNimZ(force=force) # Build the NimZ aliases when they do not exist
   var zigTarget :string
   if obj.syst != getHost():
     let zigSyst = obj.syst.toZig

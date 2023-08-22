@@ -1,13 +1,10 @@
 #:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # std dependencies
 when defined(nimscript):
-  from std/os import DirSep
-  proc `/`*(p1,p2 :string) :string=  p1 & DirSep & p2
   type Path * = string
 else:
-  import std/os
   import std/paths
 
 type Dir  * = Path

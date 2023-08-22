@@ -1,5 +1,5 @@
 #:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  |
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # std dependencies
 import std/os
@@ -39,7 +39,7 @@ proc getCC *(src :seq[DirFile]) :string=
 #_____________________________
 # Setup/Download
 #___________________
-proc initOrExists *() :bool=  bin.initOrExists()
+proc initOrExists *(force=false) :bool=  bin.initOrExists(force=force)
   ## Initializes the zig compiler binary, or returns true if its already initialized.
 
 
