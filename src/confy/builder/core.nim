@@ -49,5 +49,5 @@ proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
     compile(modif, obj, force)        # Compile only the modified files.
   if run and obj.kind == Program:
     log &"Finished building {obj.trg}. Running..."
-    sh obj.root/obj.trg
+    sh obj.root/obj.sub/obj.trg
 
