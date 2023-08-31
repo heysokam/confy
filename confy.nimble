@@ -45,5 +45,5 @@ task push, "Internal:  Pushes the git repository, and orders to create a new git
   ## Does nothing when local and remote versions are the same.
   requires "https://github.com/beef331/graffiti.git"
   exec "git push"  # Requires local auth
-  exec "graffiti ./{packageName}.nimble"
+  exec &"graffiti ./{packageName}.nimble"
 
