@@ -7,11 +7,14 @@
 ##       and use `when nims` checks inside the proc definitions instead.
 #_______________________________________________________________________
 
-const nims = try: gorgeEx("echo").exitCode.bool except: false
+const nims =
+  when defined(nimscript): true
+  else:
+    try: gorgeEx("echo").exitCode.bool except: false
   ## Big hack, should be `when defined(nimscript)`, but it seems to fail and this just works.
   ## TODO: Move to a global confy const.
 
-when nims:
+when not nims:
   when defined(debug):
     {.warning: "Tried to add a nimscript only module into a binary app.".}
   else:
