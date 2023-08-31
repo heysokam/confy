@@ -17,8 +17,7 @@ let tarxz = if cfg.verbose: "tar -xvf" else: "tar -xf"
 
 proc xunzip (file, trgDir :string; force :bool= false) :void=
   when not defined(unix):
-    {.warning: &"Extracting .tar.xz files with {tarxz} is only tested on unix. Download and extract the zig compiler manually."}
-    return
+    {.warning: &"Extracting .tar.xz files with \"tar -xf\" is only tested on unix. Use `cfg.zigSystemBin = on` or download and extract the zig compiler manually if you have issues with the local installer version."}
   let subDir = file.lastPathPart.splitFile.name.splitFile.name  # Basename of the file, without extensions
   let xDir   = trgDir.parentDir()  # Extract dir. The tar command will create a subdir in here.
   let resDir = xDir/subDir         # Resulting dir of the tar command.

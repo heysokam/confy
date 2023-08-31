@@ -8,6 +8,9 @@ You can expect:
 - Sane project configuration defaults, unless explicitely changed.   
 - Builds with `zig cc` when compiler choice is omitted. Auto-downloads the latest version for the host.  
 
+_Note: ZigCC is the main compiler used, but this doesn't mean we build Zig code._  
+_This project is used to build C, C++ and Nim projects._  
+
 Minimal build file:
 ```nim
 import confy
@@ -20,13 +23,12 @@ var bin  = Program.new(    # Build an executable program
 
 bin.build()                # Order to build
 ```
-See the [examples](./examples) folder for more ways to use the buildsystem.  
 
-_Note: ZigCC is the main compiler used, but this doesn't mean we build Zig code._  
-_This project is used to build C, C++ and Nim projects._  
+## How to Use
+There is a full **how-to** guide @[doc/howto](./doc/howto.md)  
+See also the [examples](./examples) folder for more ways to use and setup the buildsystem.  
 
-
-## Configuration
+### Configuration
 All the configuration variables are stored @[confy/cfg.nim](./src/confy/cfg.nim).  
 To change them, just add `cfg.theVariable = value` at the top of your `build.nim` file.  
 ```nim
@@ -38,6 +40,31 @@ cfg.quiet   = on         # Makes the cli output information to be as minimal as 
                          # Note: verbose = on will ignore quiet being active.  (default: off)  
 ```
 See the @[config.md](./doc/config.md) doc file, or @[confy/cfg.nim](./src/confy/cfg.nim) for the complete list of variables that can be modified.
+
+
+## Disclaimer / Notes
+Please read the @[how to](./doc/howto.md) doc before reading this section:
+
+### `build.nim` is NOT a buildscript
+Confy is a buildsystem **library**.  
+The default setup provides you with an easy way to run it as if it had a binary...
+but confy is actually **not** a binary app, and this is by design.  
+
+The `build.nim` file is **your** binary application, that you build with the nim compiler to build your project, from the Caller Script.  
+
+Because of this, there is no weird make-specific shell-only language problematic restrictions in here.  
+There is no interpreted-language-only-things restriction either, like python.  
+There is no "only runs on the VM" problems either.  
+The Builder App is a full-blown binary that can do literally anything you want.  
+
+In make-related buildsystems, you **do not own** the control flow.  
+If you want to do extra things that the `make` creators didn't think of, you are on your own.  
+And have to call for external applications and make your buildsystem overly complicated for no reason.  
+
+Confy, instead, provides you with a -library- of functions and types to build your project.  
+It is created to make this process seamless and ergonomic, as if it was a regular buildscript.  
+But the Builder app is compiled systems binary.  
+It can do literally -anything- a normal compiled systems binary can do.  
 
 ---
 ```md

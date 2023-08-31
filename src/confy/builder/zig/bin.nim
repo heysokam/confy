@@ -15,7 +15,9 @@ import ./zcfg
 #_____________________________
 proc exists (force=false) :bool=
   ## Returns true if the zig compiler file exists.
-  if cfg.zigSystemBin and zcfg.realBin.lastPathPart == zcfg.name: return true  # Using system bin
+  if cfg.zigSystemBin and zcfg.realBin.lastPathPart == zcfg.name:
+    if not execShellCmd( &"{zcfg.realBin} version" ).bool: raise newException(OSError, "Please install the Zig compiler before continuing, or configure the option `cfg.zigSystemBin = off` so that a local compiler is automatically downloaded for your project.")
+    return true  # Using system bin, and it was found correctly
   if force: return false                           # Skip searching when we are forcing a redownload
   result =                                         # Search for the binary
     zcfg.realBin.fileExists or                     # Search for the file first
