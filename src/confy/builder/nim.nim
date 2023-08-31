@@ -104,8 +104,8 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
   of    GCC:    cc &= " --cc:gcc"
   of    Clang:  cc &= " --cc:clang"
   else: discard
-  let cmd = &"{cc} {obj.args} --outdir:{obj.root} --out:{obj.trg} {obj.src.join()}"
-  if not quiet: echo &"{cfg.Cstr} {obj.trg}"
-  elif verbose: echo cmd
+  let cmd = &"{cc} --out:{obj.trg} --outdir:\"{obj.root/obj.sub}\" {obj.args} {obj.src.join()}"
+  if verbose     : echo cmd
+  elif not quiet : echo &"{cfg.Cstr} {obj.trg}"
   sh cmd
 
