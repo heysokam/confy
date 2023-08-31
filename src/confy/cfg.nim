@@ -2,9 +2,9 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # std dependencies
-import std/os except `/`
+import std/os
 when not defined(nimscript):
-  import std/paths
+  import std/paths except `/`
 import std/strformat
 import std/cpuinfo
 # confy dependencies
