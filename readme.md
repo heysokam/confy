@@ -42,6 +42,7 @@ See the @[config.md](./doc/config.md) doc file, or @[confy/cfg.nim](./src/confy/
 ---
 ```md
 # Done:
+- [x] Nim: Support for sending extra arguments to the compiler.
 - [x] cfg: New configuration option:  `cfg.zigSystemBin`  (default:on)
          : ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
          : When off, a local-only version is downloaded and used for the project like before.
@@ -97,6 +98,7 @@ See the @[config.md](./doc/config.md) doc file, or @[confy/cfg.nim](./src/confy/
       You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
 - [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] fix: make-to-confy missing ld flags
+- [ ] C: Support for sending extra arguments (not flags) to the compiler. (required for nim, might not be needed at all for C)
 ```
 
 ```md

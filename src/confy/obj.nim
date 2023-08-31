@@ -25,6 +25,7 @@ proc new *(_ :typedesc[BuildTrg];
     sub     : Dir       = Dir("");
     remotes : seq[Path] = @[];
     version : string    = "";
+    args    : string    = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
   # note: Main constructor logic unified here. Other constructors should call this one.
@@ -36,50 +37,53 @@ proc new *(_ :typedesc[BuildTrg];
     kind    : kind,    src   : src,   trg     : trg,
     cc      : cc,      flags : flags, syst    : syst,
     root    : rDir,    sub   : sub,   remotes : remotes,
-    version : version, lang  : lang,
+    version : version, args  : args,  lang    : lang,
     ) # << BuildTrg( ... )
 #_____________________________
 proc new *(kind :BinKind;
     src     : seq[DirFile];
-    trg     : Path     = Path("");
-    cc      : Compiler = Zig;
-    flags   : Flags    = cfg.flags;
-    syst    : System   = getHost();
-    root    : Dir      = cfg.binDir;
-    sub     : Dir      = Dir("");
+    trg     : Path      = Path("");
+    cc      : Compiler  = Zig;
+    flags   : Flags     = cfg.flags;
+    syst    : System    = getHost();
+    root    : Dir       = cfg.binDir;
+    sub     : Dir       = Dir("");
     remotes : seq[Path] = @[];
-    version : string = "";
+    version : string    = "";
+    args    : string    = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, version)
+  BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, version, args)
 #_____________________________
 proc new *(kind :BinKind;
     src     : seq[Path];
-    trg     : Path     = Path("");
-    cc      : Compiler = Zig;
-    flags   : Flags    = cfg.flags;
-    syst    : System   = getHost();
-    root    : Dir      = cfg.binDir;
-    sub     : Dir      = Dir("");
+    trg     : Path      = Path("");
+    cc      : Compiler  = Zig;
+    flags   : Flags     = cfg.flags;
+    syst    : System    = getHost();
+    root    : Dir       = cfg.binDir;
+    sub     : Dir       = Dir("");
     remotes : seq[Path] = @[];
-    version : string = "";
+    version : string    = "";
+    args    : string    = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src.toDirFile, trg, kind, cc, flags, syst, root, sub, remotes, version)
+  BuildTrg.new(src.toDirFile, trg, kind, cc, flags, syst, root, sub, remotes, version, args)
 #_____________________________
 proc new *(kind :BinKind;
     src     : Path;
-    trg     : Path     = Path("");
-    cc      : Compiler = Zig;
-    flags   : Flags    = cfg.flags;
-    syst    : System   = getHost();
-    root    : Dir      = cfg.binDir;
-    sub     : Dir      = Dir("");
+    trg     : Path      = Path("");
+    cc      : Compiler  = Zig;
+    flags   : Flags     = cfg.flags;
+    syst    : System    = getHost();
+    root    : Dir       = cfg.binDir;
+    sub     : Dir       = Dir("");
     remotes : seq[Path] = @[];
-    version : string = "";
+    version : string    = "";
+    args    : string    = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(@[src.Fil.toDirFile], trg, kind, cc, flags, syst, root, sub, remotes, version)
+  BuildTrg.new(@[src.Fil.toDirFile], trg, kind, cc, flags, syst, root, sub, remotes, version, args)
 
 #_____________________________
 proc print *(obj :BuildTrg) :void=  info.report(obj)

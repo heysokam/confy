@@ -83,6 +83,7 @@ type BuildTrg * = object
   sub      *:Dir           ## Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
   remotes  *:seq[Dir]      ## Remote folders to search for files (in order), when they are not found in the main folder.
   version  *:string        ## Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
+  args     *:string        ## Extra arguments to send to the compiler command. Will be added right at the end.
   # Internals
   lang     *:Lang          ## Main language of the app. Having any cpp files will make the app be Cpp
 
