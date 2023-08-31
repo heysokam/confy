@@ -8,7 +8,7 @@ _Important Note:_
 Unlike other buildsystems, Confy is -not- a binary that you call.  
 It is a **library** that you use from inside your Builder App.  
 This is much more than a semantic difference.   
-More details about this in the `Builder App` section, and the disclaimer section @[the confy readme](../readme.md] file.  
+More details about this in the `Builder App` section, and the disclaimer section @[the confy readme](../readme.md) file.  
 
 ## Basics
 Confy has sane defaults preconfigured.  
