@@ -133,4 +133,5 @@ It can do literally -anything- a normal compiled systems binary can do.
 - [ ] URL file `requires`
 - [ ] Libs management as git.Submodules
 - [ ] Cross compilation support for C with non-ZigCC compiler
+- [ ] Linux: mold support  (unlikely, but might revisit) https://github.com/rui314/mold
 ```
