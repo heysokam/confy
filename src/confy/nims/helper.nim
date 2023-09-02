@@ -34,7 +34,7 @@ let nimcr * = &"nim c -r --outdir:{cfg.binDir}"
   ## Compile and run, outputting to binDir.
 proc runFile *(dir, file, args :string) :void=  exec &"{nimcr} {dir/file} {args}"
   ## Runs file from the given dir, using the nimcr command.
-proc build *(args :string) :void=  runFile( cfg.srcDir, "build.nim", args )
+proc build *(args :string) :void=  runFile( cfg.srcDir, cfg.file, args )
   ## Orders to build the project, passing the given args to the builder app.
 proc sh *(cmd :string; dir :string= ".") :void=
   ## Runs the given command and a shell.
