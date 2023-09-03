@@ -29,8 +29,8 @@ proc getCC *(src :seq[DirFile]) :string=
   ## Gets the correct CC command for the given source files list extension.
   var cmds :seq[string]
   for file in src:  cmds.add file.getCC
-  if zcfg.getRealCCP() in cmds:   return ccp
-  else:                           return cc
+  if zcfg.getRealCCP() in cmds:   return zcfg.getRealCCP()
+  else:                           return zcfg.getRealCC()
 #_____________________________
 # Setup/Download
 #___________________
