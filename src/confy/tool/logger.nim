@@ -8,8 +8,7 @@ import ../cfg
 # std extensions
 func toString *(args :varargs[string]) :string=
   ## Converts the given string varargs to a single string.
-  var msg :string
-  for arg in args:  msg.add arg
+  for arg in args:  result.add arg
 
 var stdout {.importc: "stdout", header: "<stdio.h>".} :File
 proc prnt *(args :varargs[string, `$`]) :void=  stdout.write toString(args)

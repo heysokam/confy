@@ -35,7 +35,7 @@ import std/os
 import std/osproc
 # Set the zig compiler to call, append args, and Start the process
 let process = startProcess(
-  command = "{zcfg.realBin}",                 # Path of the real Zig binary
+  command = r"{zcfg.getRealBin()}",                 # Path of the real Zig binary
   args    = @["{CC}"] & commandLineParams(),  # Add the suffix and all commandLineParams to the command
   options = {{poStdErrToStdOut, poUsePath, poParentStreams}},
   ) # << startProcess( ... )

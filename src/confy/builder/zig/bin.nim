@@ -15,13 +15,13 @@ import ./zcfg
 proc exists (force=false) :bool=
   ## Returns true if the zig compiler file exists.
   if cfg.zigSystemBin:
-    let found = findExe( zcfg.realBin ) != ""
+    let found = findExe( zcfg.getRealBin() ) != ""
     if not found: raise newException(OSError, "Please install the Zig compiler before continuing, or configure the option `cfg.zigSystemBin = off` so that a local compiler is automatically downloaded for your project.")
     return found
-  elif force : return false            # Skip searching when we are forcing a redownload
-  else:                                # cfg.zigSystemBin:off -> Search for the binary
-    return zcfg.realBin.fileExists or  # Search for the file first
-           zcfg.realBin.findExe != ""  # Or run it if that failed (could be just `zig` without a path)
+  elif force : return false  # Skip searching when we are forcing a redownload
+  else:                      # cfg.zigSystemBin:off -> Search for the binary
+    return zcfg.getRealBin().fileExists or  # Search for the file first
+           zcfg.getRealBin().findExe != ""  # Or run it if that failed (could be just `zig` without a path)
 
 #_____________________________
 proc download *(trg :string= cfg.zigJson.string; dir :string= cfg.zigDir; tmpDir :string= cfg.binDir; force :bool= false) :void=

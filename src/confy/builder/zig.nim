@@ -18,24 +18,19 @@ import ./zig/bin
 #_______________________________________
 # Configuration
 #_____________________________
-proc setCC *(trg :Fil) :void=
-  ## Sets the cc and cpp compiler commands, based on the given zig input binary.
-  zcfg.cc  = trg & " cc"
-  zcfg.ccp = trg & " c++"
-#___________________
 proc getCC *(src :DirFile) :string=
   ## Gets the correct CC command for the given source file extension.
   case src.file.splitFile.ext
-  of ".c":           result = zcfg.cc
-  of ".cpp", ".cc":  result = zcfg.ccp
+  of ".c":           result = zcfg.getRealCC()
+  of ".cpp", ".cc":  result = zcfg.getRealCCP()
   else:              result = "echo"
 #___________________
 proc getCC *(src :seq[DirFile]) :string=
   ## Gets the correct CC command for the given source files list extension.
   var cmds :seq[string]
   for file in src:  cmds.add file.getCC
-  if ccp in cmds:   return ccp
-  else:             return cc
+  if zcfg.getRealCCP() in cmds:   return ccp
+  else:                           return cc
 #_____________________________
 # Setup/Download
 #___________________

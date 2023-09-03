@@ -86,13 +86,13 @@ proc getCC *(lang :Lang; compiler :Compiler) :string=
   case lang 
   of Lang.C:
     case compiler
-    of Zig:   result = zcfg.cc
+    of Zig:   result = zcfg.getRealCC()
     of GCC:   result = ccfg.gcc
     of Clang: result = ccfg.clang
     else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
   of Lang.Cpp:
     case compiler
-    of Zig:   result = zcfg.ccp
+    of Zig:   result = zcfg.getRealCCP()
     of GCC:   result = ccfg.gpp
     of Clang: result = ccfg.clangpp
     else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
