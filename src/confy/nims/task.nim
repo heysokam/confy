@@ -11,9 +11,6 @@ import ./guard
 import std/os
 import std/strformat
 import std/strutils
-# confy dependencies
-import ./confy
-import ./helper
 # nims dependencies
 import ./types
 import ./confy
