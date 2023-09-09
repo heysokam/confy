@@ -12,6 +12,25 @@ from ./nims/confy as c import nil
 # std dependencies
 import std/[ os,strformat,strutils ]
 
+
+#_________________________________________________
+# Internal Types
+#___________________
+type Nimble = object
+  packageName :string
+  version     :string
+  author      :string
+  description :string
+  license     :string
+#___________________
+type Keyword = object
+  name  :string
+  descr :string
+  file  :string
+proc hash *(obj :Keyword) :Hash=  hash(obj.name)
+proc `==` *(a,b :Keyword) :bool=  a.name == b.name
+
+
 #_________________________________________________
 # Configuration
 #___________________
@@ -24,13 +43,6 @@ template info2 *(msg :string)= echo confyTab    & msg
 
 #_________________________________________________
 # Nimble information
-#___________________
-type Nimble = object
-  packageName :string
-  version     :string
-  author      :string
-  description :string
-  license     :string
 #___________________
 func getContent(line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getNimbleInfo() :Nimble=
@@ -67,6 +79,8 @@ template clearRequires *()=  system.requiresData = @[]
 #___________________
 # Keywords
 #___________________
+var keywordList = initOrderedSet[Keyword]()
+#___________________
 template docgen *()=
   ## Internal keyword
   ## Generates the package documentation using Nim's docgen tools.
@@ -92,12 +106,14 @@ template push *()=
   exec &"graffiti ./{system.packageName}.nimble"
 #___________________
 template keyword *(name,descr :static string; file :string)=
-  ## Generates a task to build+run the given example
-  ## TODO: These are definitions, not calls. Store them.
-  discard
+  ## Generates a keyword to send to the confy builder as input
+  keywordList.incl Keyword(name:name, descr:descr, file:file)
   # let sname = astToStr(name)  # string name
   # if   sname == "docgen" : docgen()
   # elif sname == "tests"  : tests()
+template keyword *(name :static string)=  keyword name, "NoDescription", "NoFile"
+  ## Generates a keyword to send to the confy builder as input
+
 
 #_________________________________________________
 # Build Helpers
@@ -123,7 +139,7 @@ template example (name :untyped; descr,file :static string)=
 
 
 #___________________
-# nims confy task
+# nims confy+any tasks
 include ./nims/task
 
 
@@ -160,4 +176,3 @@ system.backend     = "c"
 #___________________
 # Terminate and send control to the user script
 info "Done setting up."
-

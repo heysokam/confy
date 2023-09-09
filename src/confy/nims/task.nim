@@ -11,6 +11,7 @@ import ./guard
 import std/os
 import std/strformat
 import std/strutils
+import std/sequtils
 # nims dependencies
 import ./types
 import ./confy
@@ -35,7 +36,8 @@ proc confy *(file :string= cfg.file.string) :void=
 # Task: any
 #___________________
 var anyc :Cfg
-anyc.src = if cliArgs.len > 2: cliArgs[2] else: ""
+let anyArgs = cliArgs()
+anyc.src = if anyArgs.len > 2: anyArgs[2] else: ""
 let name = anyc.src.splitFile.name
 anyc.bin = cfg.binDir/name
 anyc.run = &"{anyc.bin} {anyc.opts}"
@@ -51,7 +53,7 @@ proc afterAny  () :void=
 proc any *() :void=
   ## Builds any given source code file into binDir. Useful for testing/linting individual files.
   beforeAny()
-  if cliArgs.len < 2: cerr "The any command expects a source file as its first argument after they `any` keyword."
+  if anyArgs.len < 2: cerr "The any command expects a source file as its first argument after they `any` keyword."
   exec anyc.bld
   afterAny()
 

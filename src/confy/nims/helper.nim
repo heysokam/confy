@@ -15,19 +15,16 @@ import ./confy
 
 #___________________
 proc cliParams *() :seq[string]=
-  ## Returns the list of Command Line Parameters passed to the script.
-  ## TODO: Fix the issues. Why is this not getting all of the items??
-  var start = true
-  for id in 0..<paramCount(): 
+  ## Returns the list of all Command Line Parameters passed to the script.
+  var valid :bool= false
+  for id in 0..paramCount(): 
     let curr = paramStr( id )
-    if projectName() in curr: start = false
-    if start: continue
-    result.add paramStr( id )
-var cliOpts * = cliParams().filterIt( it.startsWith('-') )
-  ## List of command line options passed to the nims script.
-var cliArgs * = cliParams().filterIt( not it.startsWith('-') )
+    if   valid                  : result.add curr
+    elif curr.endsWith(".nims") : valid = true  # add everything after we found the first .nims file
+proc cliArgs *() :seq[string]=  cliParams().filterIt( not it.startsWith('-') )
   ## List of command line arguments passed to the nims script.
-
+proc cliOpts *() :seq[string]=  cliParams().filterIt( it.startsWith('-') )
+  ## List of command line options passed to the nims script.
 
 #___________________
 let nimcr * = &"nim c -r --outdir:{cfg.binDir}"
@@ -37,7 +34,7 @@ proc runFile *(dir, file, args :string) :void=  exec &"{nimcr} {dir/file} {args}
 proc build *(args :string) :void=  runFile( cfg.srcDir, cfg.file, args )
   ## Orders to build the project, passing the given args to the builder app.
 proc sh *(cmd :string; dir :string= ".") :void=
-  ## Runs the given command and a shell.
+  ## Runs the given command with a shell.
   if not quiet: log &"Running {cmd} from {dir} ..."
   withDir dir: exec cmd
   if not quiet: log &"Done running {cmd}."
