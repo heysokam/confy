@@ -27,22 +27,22 @@ template info2 *(msg :string)= echo confyTab    & msg
 # Package information
 #___________________
 type Package = object
-  name    :string
-  version :string
-  author  :string
-  descr   :string
-  license :string
+  packageName :string
+  version     :string
+  author      :string
+  description :string
+  license     :string
 #___________________
 func getContent(line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getPackageInfo() :Package=
   if debug: info &"Getting .nimble data information from {projectDir()}"
   let data :seq[string]= gorgeEx( &"cd {projectDir()}; nimble dump" ).output.splitLines()
   for line in data:
-    if   line.startsWith("name:")    : result.name    = line.getContent("name")
-    elif line.startsWith("version:") : result.version = line.getContent("version")
-    elif line.startsWith("author:")  : result.author  = line.getContent("author")
-    elif line.startsWith("desc:")    : result.descr   = line.getContent("desc")
-    elif line.startsWith("license:") : result.license = line.getContent("license")
+    if   line.startsWith("name:")    : result.packageName = line.getContent("name")
+    elif line.startsWith("version:") : result.version     = line.getContent("version")
+    elif line.startsWith("author:")  : result.author      = line.getContent("author")
+    elif line.startsWith("desc:")    : result.description = line.getContent("desc")
+    elif line.startsWith("license:") : result.license     = line.getContent("license")
     #ignored: skipDirs, skipFiles, skipExt, installDirs, installFiles, installExt, requires, bin, binDir, srcDir, backend
   if debug: info2 &"found ->  {result}"
 
@@ -78,15 +78,18 @@ installRequires()
 #___________________
 # Package information
 var nimble :Package= getPackageInfo()
-template asignOrFail (v1,v2,name :string) :string=
-  if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, "Tried to assign values for required variable "&name&" but none of the options are defined.")
+func asignOrFail (v1,v2,name :string) :string= result = if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, "Tried to assign values for required variable "&name&" but none of the options are defined.")
 #___________________
 # Package Config
-system.packageName = asignOrFail(system.packageName, nimble.name,    "packageName")
-system.version     = asignOrFail(system.version,     nimble.version, "version")
-system.author      = asignOrFail(system.author,      nimble.author,  "author")
-system.description = asignOrFail(system.description, nimble.descr,   "description")
-system.license     = asignOrFail(system.license,     nimble.license, "license")
+when debug:
+  info "Asigning Package information variables..."
+  for name,field in nimble.fieldPairs:
+    if field == "": info2 "package."&name&" was not found in .nimble"
+system.packageName = asignOrFail(system.packageName, nimble.packageName, "packageName")
+system.version     = asignOrFail(system.version,     nimble.version,     "version")
+system.author      = asignOrFail(system.author,      nimble.author,      "author")
+system.description = asignOrFail(system.description, nimble.description, "description")
+system.license     = asignOrFail(system.license,     nimble.license,     "license")
 #___________________
 # Folders Config
 system.binDir      = c.binDir
