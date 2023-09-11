@@ -9,6 +9,7 @@ import ./confy/builder     ; export builder
 import ./confy/dirs        ; export dirs
 import ./confy/obj as cObj ; export cObj
 import ./confy/flags       ; export flags
+import ./confy/tasks       ; export tasks
 
 ## WARNING:
 ## This seamlessly converts from string to Path without the compiler saying anything about it.

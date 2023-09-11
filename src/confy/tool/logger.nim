@@ -28,6 +28,9 @@ proc log *(msg :varargs[string, `$`]) :void=
     if id == 0: continue
     log1 arg
 
+proc info  *(msg :string) :void= log0 msg
+proc info2 *(msg :string) :void= log1 msg
+
 proc wrn *(args :varargs[string, `$`]) :void=  echo cfg.prefix & " ! WRN ! " & args.toString
   ## Reports a warning message to console.
 

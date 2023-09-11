@@ -11,4 +11,5 @@ when not defined(nimscript):
   import ./tool/logger as tLogger ; export tLogger
   import ./tool/zip    as tZip    ; export tZip
   import ./tool/dl     as tDL     ; export tDL
+  import ./tool/opts   as tOpts   ; export tOpts
 

@@ -13,7 +13,6 @@ import std/strformat
 import std/strutils
 import std/sequtils
 # nims dependencies
-import ./types
 import ./confy
 import ./helper
 
@@ -30,30 +29,3 @@ proc confy *(file :string= cfg.file.string) :void=
   sh &"{cfg.nimc} -d:ssl --outDir:{cfg.binDir.string} {builder}"   # nim -c -d:ssl --outDir:binDir srcDir/build.nim
   sh &"./{cfg.file.string.splitFile.name}", cfg.binDir
   afterConfy
-
-
-#_________________________________________________
-# Task: any
-#___________________
-var anyc :Cfg
-let anyArgs = cliArgs()
-anyc.src = if anyArgs.len > 2: anyArgs[2] else: ""
-let name = anyc.src.splitFile.name
-anyc.bin = cfg.binDir/name
-anyc.run = &"{anyc.bin} {anyc.opts}"
-anyc.bld = &"nim c {anyc.nimc} -o:{anyc.bin} {anyc.src}"
-#____________________________________________
-proc beforeAny () :void=
-  log " Building  ",anyc.src,"  file into   ",cfg.binDir.string
-proc afterAny  () :void=
-  log "Done building. Running...  ",anyc.run
-  exec anyc.run
-  anyc.bin.rmFile  # Remove the binary output file when done
-#____________________________________________
-proc any *() :void=
-  ## Builds any given source code file into binDir. Useful for testing/linting individual files.
-  beforeAny()
-  if anyArgs.len < 2: cerr "The any command expects a source file as its first argument after they `any` keyword."
-  exec anyc.bld
-  afterAny()
-
