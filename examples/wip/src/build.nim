@@ -25,46 +25,7 @@ var wip = Program.new(           # Configure the target options common to all sy
   sub     = Dir(""),
   args    = "",                   # Extra Arguments to send to the Nim compiler
   ) # Doesn't build. Stores the configuration for calling .build() later
-
-#_____________________
-# Normal Compilation |
-#____________________|
-when not defined(CrossCompile):
-  wip.syst = confy.getHost()          # This is the default value set when not specified. Explicit just for clarity of the example.
-  wip.build( run=true, force=false )  # Order to build. Defaults when omitted: (run=false, force=false)
-
-#_____________________
-# Cross Compilation  |
-#____________________|
-elif defined(CrossCompile):
-  # Build the target for Linux x86_64
-  var lnx  = wip
-  lnx.trg  = wip.trg&"-x64"
-  lnx.syst = System(os: OS.Linux, cpu: CPU.x86_64)
-  lnx.build( run=false, force=false )
-
-  # Build the target for Windows x86_64
-  var win  = wip
-  win.trg  = wip.trg&".exe"
-  win.syst = System(os: OS.Windows, cpu: CPU.x86_64)
-  win.build( run=false, force=false )
-
-  # Build the target for mac.x64
-  var macx64  = wip
-  macx64.trg  = wip.trg&".app"
-  macx64.syst = System(os: OS.Mac, cpu: CPU.x86_64)
-  macx64.build( run=false, force=false )
-
-  # Build the target for mac.arm64
-  var macarm  = wip
-  macarm.trg  = wip.trg&".app"
-  macarm.syst = System(os: OS.Mac, cpu: CPU.arm64)
-  macarm.build( run=false, force=false )
-
-
-
-
-
+wip.build( run=true, force=false )  # Order to build. Defaults when omitted: (run=false, force=false)
 
 
 
