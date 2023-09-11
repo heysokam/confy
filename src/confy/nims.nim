@@ -78,7 +78,8 @@ installRequires()
 #___________________
 # Package information
 var nimble :Package= getPackageInfo()
-template asignOrFail (v1,v2,name :string) :string=  result = if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, &"Tried to assign values for required variable {name}, but none of the options are defined."
+template asignOrFail (v1,v2,name :string) :string=
+  if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, "Tried to assign values for required variable "&name&" but none of the options are defined.")
 #___________________
 # Package Config
 system.packageName = asignOrFail(system.packageName, nimble.name,    "packageName")
