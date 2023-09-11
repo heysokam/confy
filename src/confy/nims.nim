@@ -78,14 +78,14 @@ installRequires()
 #___________________
 # Package information
 var nimble :Package= getPackageInfo()
-const Undefined = "Undefined Variable -> Must Declare"
+template asignOrFail (v1,v2,name :string) :string=  result = if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, &"Tried to assign values for required variable {name}, but none of the options are defined."
 #___________________
 # Package Config
-system.packageName = if nimble.name    != "": nimble.name    else: Undefined
-system.version     = if nimble.version != "": nimble.version else: Undefined
-system.author      = if nimble.author  != "": nimble.author  else: Undefined
-system.description = if nimble.descr   != "": nimble.descr   else: Undefined
-system.license     = if nimble.license != "": nimble.license else: Undefined
+system.packageName = asignOrFail(system.packageName, nimble.name,    "packageName")
+system.version     = asignOrFail(system.version,     nimble.version, "version")
+system.author      = asignOrFail(system.author,      nimble.author,  "author")
+system.description = asignOrFail(system.description, nimble.descr,   "description")
+system.license     = asignOrFail(system.license,     nimble.license, "license")
 #___________________
 # Folders Config
 system.binDir      = c.binDir
