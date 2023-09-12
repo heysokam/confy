@@ -124,16 +124,17 @@ It can do literally -anything- a normal compiled systems binary can do.
 ```md
 # TODO:
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
+- [ ] fix: need to force rebuild
+- [ ] StaticLibrary build
+- [ ] Nim: docgen task -> remove hardcoded repository. Add cfg.gitURL variable
+- [ ] Nim: test   task:
+  - [ ] Should create and run with confy.BuildTrg instead of just nimc
+  - [ ] Test template support inside build.nim. Allows to quickly declare a test with ergonomic syntax.
 - [ ] windres 
   - [ ] with zig cc  (milestone feature for zig 0.11/0.12, request accepted on 2022.apr.09. https://github.com/ziglang/zig/issues/9564)
   - [ ] with mingw   (note: only if/when mingw support is implemented)
 - [ ] `-d` dependencies files management for headers.
-- [ ] fix: need to force rebuild
-- [ ] StaticLibrary build
-- [ ] Nim: docgen task -> remove hardcoded repository. Add cfg.gitURL variable
-- [ ] Nim: tests  task -> should create and run with confy.BuildTrg instead of just nimc
 **Less important, but todo**:
-- [ ] Nim: Tests template support inside build.nim. Allows to quickly declare a test with ergonomic syntax.
 - [ ] More examples:
   - [ ] Advanced usage
 - [ ] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
@@ -144,9 +145,6 @@ It can do literally -anything- a normal compiled systems binary can do.
 
 ```md
 **Maybes**:
-- [ ] URL file `requires`
 - [ ] Libs management as git.Submodules
 - [ ] Cross compilation support for C with non-ZigCC compiler
-- [ ] Linux: mold support  (unlikely, but might revisit) https://github.com/rui314/mold
-- [ ] C: Support for sending extra arguments (not flags) to the compiler. (required for nim, may not be needed at all for C)
 ```
