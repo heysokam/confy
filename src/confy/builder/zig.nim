@@ -9,9 +9,7 @@ import ../auto
 import ../cfg
 # builder dependencies
 import ./base
-import ./helper as bhelp
 # zig-builder dependencies
-import ./zig/json
 import ./zig/zcfg as zcfg
 import ./zig/bin
 

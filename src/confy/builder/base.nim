@@ -15,7 +15,6 @@ import ../tool/logger
 import ../tool/helper
 import ../cfg as c
 import ../dirs
-import ../flags as fl
 # builder dependencies
 import ./helper as bhelp
 
@@ -122,7 +121,7 @@ proc compile *(
   ## Compiles the given `src` list of files using the given `CC` command.
   ## Assumes the paths given are already relative/absolute in the correct way.
   var objs :seq[DirFile]
-  var cmds :seq[string]
+  # var cmds :seq[string]
   var cfl  = flags.cc.join(" ")
   log &"Building {trg} ..."
   if quiet: stdmsg.write &"{tab}|" # add | to start the line of the silent case

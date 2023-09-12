@@ -3,8 +3,6 @@
 #:_____________________________________________________
 # Configuration specific to Clang and GCC  |
 #__________________________________________|
-# std dependencies
-import std/os
 # confy dependencies
 import ../../cfg
 

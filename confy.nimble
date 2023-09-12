@@ -6,7 +6,7 @@ import std/[ os,strformat ]
 #_____________________________
 # Package
 packageName   = "confy"
-version       = "0.0.24"
+version       = "0.1.0"
 author        = "sOkam"
 description   = "confy | Buildsystem for Nim & C"
 license       = "MIT"
@@ -26,6 +26,7 @@ binDir          = "bin"
 let examplesDir = "examples"
 let helloDir    = examplesDir/"hello"
 let helloNimDir = examplesDir/"nim_hello"
+let helloNimFullDir = examplesDir/"nim_full"
 
 #_________________________________________________
 # Run the example demo projects
@@ -35,8 +36,10 @@ after  helloC: echo packageName,": This is happening after helloC.task."
 task helloC, "Example C:  Executes confy inside the helloC folder":
   withDir helloDir: exec "nim hello.nims"
 #___________________
-task helloNim, "Example Nim:  Executes confy inside the helloNim folder":
+task helloNim, "Example Nim:  Executes confy inside the nim_hello folder":
   withDir helloNimDir: exec "nimble confy"
+task helloNimFull, "Example Nim (Full):  Executes confy inside the nim_full folder":
+  withDir helloNimFullDir: exec "nimble confy"
 
 #_________________________________________________
 # Manage git tags for confy

@@ -3,8 +3,8 @@
 #:_____________________________________________________
 # std dependencies
 import std/os
-when not defined(nimscript):
-  import std/paths except `/`
+# when not defined(nimscript):
+#   import std/paths except `/`
 import std/strformat
 import std/cpuinfo
 # confy dependencies

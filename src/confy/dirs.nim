@@ -6,12 +6,12 @@ import std/os except `/`
 import std/paths ; export paths
 import std/dirs
 import std/strutils
-import std/sequtils
 import std/strformat
 # confy dependencies
 import ./types
 import ./tool/git
 import ./tool/logger
+import ./tool/helper
 import ./cfg
 
 #_____________________________
@@ -35,7 +35,7 @@ proc toDirFile *(file :Fil; dir :Dir= cfg.srcDir) :DirFile=
   ## Converts a file path to its internal confy representation, as a separate dir and file.
   ## A file is always represented internally as a relative path, plus its dir, so that remotes and output dir can be swapped without issues.
   if file.isObj: return DirFile(file: file, dir: Dir("")) # Do not adjust object files at all, since they don't need to be compiled.
-  if dir.string notin file.string: echo &"The file {file} has been sent with an incorrect structure. It should be relative to {dir}, but isn't."; cerr ""
+  if dir.string notin file.string: cerr &"The file {file} has been sent with an incorrect structure. It should be relative to {dir}, but isn't."
   result.dir  = dir
   result.file = file.replace(if not dir.endsWith(os.DirSep): dir & os.DirSep else: dir, "")
 proc toDirFile *(files :seq[Fil]; dir :Dir= cfg.srcDir) :seq[DirFile]=
@@ -47,6 +47,18 @@ proc path *(file :DirFile) :Fil=  file.dir/file.file
 proc join *(files :seq[DirFile]; sep :string= " ") :string=
   ## Converts a list of DirFiles into a single string containing all their paths merged together
   for file in files: result.add file.path.string & sep
+proc findNoExt *(file :DirFile; lang :Lang) :DirFile=
+  ## Find a file that has no extension, and return it readjusted when possible.
+  ## Returns the same file when the process fails.
+  let filepath = file.dir/file.file
+  let langExt  = lang.defaultExt
+  for found in file.dir.walkDir:
+    if filepath in found.path:
+      let res = found.path.splitFile()
+      if langExt != res.ext: continue  # A file matched, but its extension is incorrect
+      return DirFile(dir: res.dir, file: res.name & res.ext)
+  # Failed the search. Return the same file
+  result = file
 
 #_____________________________
 # Dir Setup
@@ -54,10 +66,10 @@ proc join *(files :seq[DirFile]; sep :string= " ") :string=
 proc setup *(trg :Dir) :void=
   if not quiet: log0 &"Setting up folder {trg}"
   let curr = if not trg.isAbsolute: cfg.binDir/trg else: trg
-  block:
+  block setupDir:
     if curr.dirExists and "bin" notin curr:
       if not quiet: log1 &"Folder {curr.absolutePath} already exists. Ignoring its setup."
-      break
+      break setupDir
     createDir curr
   if cfg.binDir in curr:  (curr/".gitignore").writeFile(git.ignore)
   # elif cfg.libDir in curr:  (curr/".gitignore").writeFile(git.ignoreAll)
@@ -101,15 +113,22 @@ proc adjustRemotes *(obj :var BuildTrg) :void=
   ## Files will be:
   ## - Searched for in `cfg.srcDir` first.
   ## - Adjusted to come from the folders stored in the obj.remotes list when the local file is missing.
-  if verbose: log &"Adjusting remotes for {obj.trg}."
+  if cfg.verbose: log &"Adjusting remotes for {obj.trg}."
   for file in obj.src.mitems:
+    # Dont adjust if the file exists
     if file.path.fileExists:
-      if verbose: log &"Local file exists. Not adjusting :  {file.path}"
+      if cfg.verbose: log &"Local file exists. Not adjusting :  {file.path}"
       continue
-    if obj.remotes.len < 1: echo &"The source code file {file.path} couldn't be found."; cerr ""
-    if verbose: echo " ... "; log1 &"File {file.file} doesn't exist in local. Searching for it in the remote folders list."
+    # Adjust for a missing extension with Nim
+    elif obj.lang == Lang.Nim and (not file.path.endsWith(".nim")):
+      log &"Nim file was sent without extension. Searching for it at  {file.path}"
+      file = file.findNoExt(Lang.Nim)
+      continue
+    # Search for the file in the remotes
+    if obj.remotes.len < 1: cerr &"The source code file {file.path} couldn't be found."
+    if cfg.verbose: echo " ... "; log1 &"File {file.file} doesn't exist in local. Searching for it in the remote folders list."
     for dir in obj.remotes:  # Search for the file in the remotes
       let adj = file.fromRemote(dir, obj.sub)
-      if verbose: log1 &"File:  {file.path}\n{tab}Becomes:  {adj.path}"
+      if cfg.verbose: log1 &"File:  {file.path}\n{tab}Becomes:  {adj.path}"
       file = adj
 

@@ -3,8 +3,7 @@
 #:_____________________________________________________
 # std dependencies
 import std/strformat
-import std/strutils
-import std/sequtils
+import std/sets
 # confy dependencies
 import ../types
 import ../cfg
@@ -13,6 +12,7 @@ import ../tool/db
 import ../tool/helper
 import ../dirs
 import ../info
+import ../tasks
 # Builder module dependencies
 from   ./C   as cc import nil
 from   ./zig as z  import nil
@@ -32,8 +32,7 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
 
 
 #_____________________________
-proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
-  if verbose: cfg.quiet = off       # Disable quiet when verbose is active.
+proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
   if not quiet: info.report(obj)      # Report build information to console when not quiet
   cfg.cacheDir.setup()                # Setup the cache folder for confy.
@@ -50,4 +49,31 @@ proc build *(obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if run and obj.kind == Program:
     log &"Finished building {obj.trg}. Running..."
     sh obj.root/obj.sub/obj.trg
+
+#_____________________________
+proc build *(obj :var BuildTrg; keywords :seq[string]= @[]; run :bool= false; force :bool= false) :void=
+  if cfg.verbose: cfg.quiet = off  # Disable quiet when verbose is active.
+  block checkKeywords:
+    # Search for "all" and empty cases
+    if tasks.keywordList.len == 0   : break checkKeywords # Build all targets marked with `all` when user didn't request keywords
+    elif "all" in tasks.keywordList : break checkKeywords # Search for `all` keyword (always build when all is requested)
+    # Search each keyword in the user-requested list
+    for key in keywords:
+      # Search inside the list of user-requested keyword
+      if key in tasks.keywordList: break checkKeywords
+      # Search for the `examples` or `tests` cases
+      case key
+      of "examples":
+        if "examples" notin tasks.keywordList: continue
+        for file in obj.src: # Object is considered an example if one of its files is contained in cfg.examplesDir
+          if cfg.examplesDir in file.path: break checkKeywords
+      of "tests": # Object is considered a test if one of its files is contained in cfg.testsDir
+        if "tests" notin tasks.keywordList: continue
+        for file in obj.src:
+          if cfg.testsDir in file.path: break checkKeywords
+      else:discard
+    # Key was not requested, and not a preset key. Return without doing anything
+    return
+  # Key was found. Continue building
+  obj.build(run,force)
 

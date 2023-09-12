@@ -34,4 +34,4 @@ proc report *(obj :BuildTrg) :void=
   let remotes = if obj.remotes.len > 0:  $obj.remotes  else: NoValue
   let subdir  = if obj.sub != "":        $obj.sub      else: NoValue
   echo fmt( InfoTemplate )
-  
+

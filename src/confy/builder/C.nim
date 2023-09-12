@@ -4,27 +4,19 @@
 # GCC and Clang specific builder.  |
 #__________________________________|
 # std dependencies
-import std/paths
-import std/dirs
-import std/strformat
-import std/strutils
 # confy dependencies
 import ../types
-import ../tools
 import ../cfg
-import ../tool/logger
-import ../dirs
 import ../flags as fl
 # Builder Module dependencies
 import ./base
-import ./C/ccfg
 import ./helper
 
 
 #_____________________________
 # GCC/Clang: Internal
 #___________________
-proc direct (
+proc direct *(
     src      : DirFile;
     trg      : Fil;
     flags    : seq[string];
@@ -34,7 +26,7 @@ proc direct (
   ## Doesn't compile an intermediate `.o` step.
   base.direct(src, trg, src.getCC(GCC), flags, quietStr)
 #___________________
-proc direct (
+proc direct *(
     src      : seq[DirFile];
     trg      : Fil;
     flags    : seq[string];

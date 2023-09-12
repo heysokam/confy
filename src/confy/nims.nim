@@ -19,7 +19,7 @@ import std/[ os,strformat,strutils,sets ]
 # Internal Config
 const confyPrefix * = "confy: "
 const confyTab    * = "     : "
-const debug       * = not (defined(release) or defined(danger))
+const debug       * = not (defined(release) or defined(danger)) or defined(debug)
 template info  *(msg :string)= echo confyPrefix & msg
 template info2 *(msg :string)= echo confyTab    & msg
 
@@ -27,7 +27,7 @@ template info2 *(msg :string)= echo confyTab    & msg
 # Package information
 #___________________
 type Package = object
-  packageName :string
+  name        :string
   version     :string
   author      :string
   description :string
@@ -35,21 +35,22 @@ type Package = object
 #___________________
 func getContent(line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getPackageInfo() :Package=
-  if debug: info &"Getting .nimble data information from {projectDir()}"
+  when debug: info &"Getting .nimble data information from {projectDir()}"
   let data :seq[string]= gorgeEx( &"cd {projectDir()}; nimble dump" ).output.splitLines()
   for line in data:
-    if   line.startsWith("name:")    : result.packageName = line.getContent("name")
+    if   line.startsWith("name:")    : result.name        = line.getContent("name")
     elif line.startsWith("version:") : result.version     = line.getContent("version")
     elif line.startsWith("author:")  : result.author      = line.getContent("author")
     elif line.startsWith("desc:")    : result.description = line.getContent("desc")
     elif line.startsWith("license:") : result.license     = line.getContent("license")
     #ignored: skipDirs, skipFiles, skipExt, installDirs, installFiles, installExt, requires, bin, binDir, srcDir, backend
-  if debug: info2 &"found ->  {result}"
+  when debug: info2 &"found ->  {result}"
 
 #_________________________________________________
 # Requirements list
 #___________________
-template installRequires *()=
+proc installRequires *() :void {.inline.}=
+  # remember "nimble list -i"
   info "Installing dependencies declared with `requires`"
   var confyID    :Natural
   var confyFound :bool
@@ -85,7 +86,7 @@ when debug:
   info "Asigning Package information variables..."
   for name,field in nimble.fieldPairs:
     if field == "": info2 "package."&name&" was not found in .nimble"
-system.packageName = asignOrFail(system.packageName, nimble.packageName, "packageName")
+system.packageName = asignOrFail(system.packageName, nimble.name,        "packageName")
 system.version     = asignOrFail(system.version,     nimble.version,     "version")
 system.author      = asignOrFail(system.author,      nimble.author,      "author")
 system.description = asignOrFail(system.description, nimble.description, "description")

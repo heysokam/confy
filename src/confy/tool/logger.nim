@@ -31,7 +31,7 @@ proc log *(msg :varargs[string, `$`]) :void=
 proc info  *(msg :string) :void= log0 msg
 proc info2 *(msg :string) :void= log1 msg
 
-proc wrn *(args :varargs[string, `$`]) :void=  echo cfg.prefix & " ! WRN ! " & args.toString
+proc wrn *(args :varargs[string, `$`]) :void=  echo cfg.prefix & "! WRN ! " & args.toString
   ## Reports a warning message to console.
 
 template cerr*(args :varargs[string, `$`]) :void=  raise newException(CompileError, args.toString)

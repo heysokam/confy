@@ -3,7 +3,6 @@
 #:_____________________________________________________
 # std dependencies
 import std/os
-import std/strutils
 import std/strformat
 import std/json
 # External dependencies
@@ -12,7 +11,6 @@ import pkg/jsony
 import ../../auto
 import ../../cfg
 import ../../tool/dl
-import ../../tool/zip
 import ../../tool/helper
 # zig dependencies
 import ./types
@@ -63,8 +61,6 @@ proc latestData (trg :ZigIndex) :ZigData=
     if result.version == "":
       result.version = ver.name  # Add entry name as version. Entries don't have subversion
     return                       # exit on first hit
-proc latestData (trg :string= cfg.zigJson.string) :ZigData=  trg.parse.latestData()
-  ## Returns the data object for the latest non-master version available, using the json file.
 proc latest (trg :ZigIndex) :string=
   ## Returns the name of the latest non-master version available in the given parsed index.
   result = trg.latestData.version

@@ -11,6 +11,8 @@ import std/sets
 import std/enumutils
 # confy dependencies
 import ../types
+import ../cfg
+import ../tool/logger
 # builder dependencies
 from   ./zig/bin as z import nil
 import ./zig/zcfg
@@ -63,15 +65,33 @@ proc exists *(c :Compiler) :bool=
   of Zig:   result = z.initOrExists()
   of GCC:   result = gorgeEx(ccfg.gcc   & " --version").exitCode == 0
   of Clang: result = gorgeEx(ccfg.clang & " --version").exitCode == 0
-  else:     result = false
+  # else:     result = false
+#_____________________________
+proc findExt *(file :DirFile) :string=
+  ## Finds the extension of a file that is sent without it.
+  ## Walks the file's dir, and matches all entries found against the full path of the given input file.
+  ## Raises an exception if the file does have an extension already.
+  if file.file.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
+  let filepath = file.dir/file.file
+  for found in file.dir.walkDir:
+    if filepath in found.path: return found.path.splitFile.ext
+  raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
+#_____________________________
+func getLangFromExt (ext :string) :Lang=
+  ## Returns the language of the given input extension. An empty extension will return Unknown lang.
+  ## Use `DirFile.findLangExt()` to find the extension when the file exists and its sent without it.
+  case ext
+  of ".c"          : result = Lang.C
+  of ".cpp", ".cc" : result = Lang.Cpp
+  of ".nim"        : result = Lang.Nim
+  else             : result = Lang.Unknown
 #_____________________________
 proc getLang *(file :DirFile) :Lang=
   ## Returns the language of the given input file, based on its extension.
-  case file.file.splitFile.ext
-  of ".c":           result = Lang.C
-  of ".cpp", ".cc":  result = Lang.Cpp
-  of ".nim":         result = Lang.Nim
-  else:              result = Lang.Unknown
+  let ext = file.file.splitFile.ext
+  if ext != "": return getLangFromExt( ext )
+  result = getLangFromExt( file.findExt() )
+  if cfg.verbose: wrn &"Found Lang.{$result} for DirFile {file}, but confy doesn't understand empty extensions. Must provide one."
 #_____________________________
 proc getLang *(list :seq[DirFile]) :Lang=
   var langs = initHashSet[Lang]()
@@ -89,13 +109,13 @@ proc getCC *(lang :Lang; compiler :Compiler) :string=
     of Zig:   result = zcfg.getRealCC()
     of GCC:   result = ccfg.gcc
     of Clang: result = ccfg.clang
-    else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
+    # else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
   of Lang.Cpp:
     case compiler
     of Zig:   result = zcfg.getRealCCP()
     of GCC:   result = ccfg.gpp
     of Clang: result = ccfg.clangpp
-    else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
+    # else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
   of Lang.Unknown: raise newException(CompileError, &"Tried to getCC with Lang.{lang}. The input lang is either uninitialized, or support for it is not implemented in confy.")
   else: raise newException(CompileError, &"Support for getCC with compiler {compiler} is currently not implemented.")
 #_____________________________

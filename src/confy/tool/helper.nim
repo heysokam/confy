@@ -4,9 +4,9 @@
 # std dependencies
 import std/os
 import std/osproc
-import std/strformat
+when defined(nimscript):
+  import std/strformat
 import std/strutils
-import std/sequtils
 import std/times
 # confy dependencies
 import ../types
@@ -49,6 +49,14 @@ proc with *(os :OS; cpu :CPU) :System=
 #_____________________________
 proc setExec *(trg :Fil) :void=  trg.setFilePermissions({FilePermission.fpUserExec}, followSymlinks = false)
   ## Sets the given `trg` binary flags to be executable for the current user.
+
+#_____________________________
+proc defaultExt *(lang :Lang) :string=
+  ## Returns the default extension for the given lang as a string  (contains the dot).
+  ## Result will be an empty string if the lang is Unknown
+  case lang
+  of Nim,C,Cpp : "." & ($lang).normalize
+  of Unknown   : ""
 
 
 #_____________________________

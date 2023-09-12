@@ -3,14 +3,10 @@
 #:_____________________________________________________
 # std dependencies
 import std/os
-import std/math
 import std/times
-import std/strformat
-import std/strutils
 import db_connector/db_sqlite as sqlite
 # confy dependencies
 import ../types
-import ../cfg as c
 import ../dirs
 # Tools dependencies
 import ./helper
@@ -33,12 +29,16 @@ CREATE TABLE confy_cache (
   time  VARCHAR(22) NOT NULL,
   hash  VARCHAR(16) NOT NULL
 )"""
+#[
 proc tables  (db :DbConn) :string=  db.getValue(sql"SELECT name FROM sqlite_master WHERE type='table'")
   ## Returns the list of tables stored in the given `db` database
+proc tableExists (db :DbConn; table :string= DbTable) :bool=  table in db.tables
+  ## Returns true if the table exists in the given `db` database. Will search for `DbTable` when omitted.
 proc entries (db :DbConn; table :string= DbTable) :seq[string]=
   ## Returns the list of entries in the given `db` at table `table`. Will search for `DbTable` when omitted.
   for row in db.fastRows(sql"SELECT * FROM ?", table):
     result.add row[Col.file.ord]
+]#
 proc get (db :DbConn; col :Col; trg :Fil; table :string= DbTable) :string=
   ## Gets the last `col` value of the given `trg` entry in the `db` database `table`.
   for row in db.fastRows(sql"SELECT * FROM ?", table):
@@ -47,8 +47,6 @@ proc getTime (db :DbConn; trg :Fil; table :string= DbTable) :string=  db.get(Col
   ## Returns the stored modification time of the given `trg` file.
 proc getMD5  (db :DbConn; trg :Fil; table :string= DbTable) :string=  db.get(Col.hash, trg, table)
   ## Returns the stored MD5 hash of the given `trg` file.
-proc tableExists (db :DbConn; table :string= DbTable) :bool=  table in db.tables
-  ## Returns true if the table exists in the given `db` database. Will search for `DbTable` when omitted.
 proc add (db :DbConn; trg :Fil; table :string= DbTable) :void=
   ## Adds the given `trg` file into the target database table, using its current time and MD5.
   db.exec(sql"INSERT INTO ? (file, time, hash) VALUES (?, ?, ?)", table, trg, trg.lastMod.`$`, trg.hash)

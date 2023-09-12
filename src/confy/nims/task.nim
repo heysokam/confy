@@ -27,5 +27,5 @@ proc confy *(file :string= cfg.file.string) :void=
   beforeConfy
   let builder = (&"{cfg.srcDir.string}/{file}").addFileExt(".nim")
   sh &"{cfg.nimc} -d:ssl --outDir:{cfg.binDir.string} {builder}"   # nim -c -d:ssl --outDir:binDir srcDir/build.nim
-  sh &"./{cfg.file.string.splitFile.name}", cfg.binDir
+  sh &"./{cfg.file.string.splitFile.name} {helper.cliParams().join(\" \")}", cfg.binDir
   afterConfy

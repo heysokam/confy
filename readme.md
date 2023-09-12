@@ -69,6 +69,23 @@ It can do literally -anything- a normal compiled systems binary can do.
 ---
 ```md
 # Done:
+- [x] all: Keyword support. Select object to build by keyword sent from CLI
+  - [x] Keyword.all
+  - [x] Nim: Keyword.examples
+  - [x] Nim: Keyword.tests
+- [x] all: Tasks support
+  - [x] Arbitrary User-defined tasks. Allows user-declared (project-specific) tasks like `clean`, etc  
+  - [x] Nim: Task.docgen
+  - [x] Nim: Task.push
+- [x] Options/arguments auto parser  (to avoid the user needing to implement parsing the info themselves)
+  - [x] Short option arguments
+  - [x] Long option arguments (variables) support   `key=val`
+  - [x] Arguments (non-files always interpreted as keywords)
+- [x] Nim: Nimble-like `require "package"`
+  - [x] in confy/nims caller script
+  - [x] in build.nim
+- [x] Nim: Examples template support inside build.nim. Allows to quickly declare an example with ergonomic syntax.
+- [x] Nim: Fully verbose example, changing everything that can be changed.
 - [x] Nim: Support for sending extra arguments to the compiler.
 - [x] cfg: New configuration option:  `cfg.zigSystemBin`  (default:on)
          : ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
@@ -112,20 +129,17 @@ It can do literally -anything- a normal compiled systems binary can do.
   - [ ] with mingw   (note: only if/when mingw support is implemented)
 - [ ] `-d` dependencies files management for headers.
 - [ ] fix: need to force rebuild
-- [ ] confy clean
 - [ ] StaticLibrary build
+- [ ] Nim: docgen task -> remove hardcoded repository. Add cfg.gitURL variable
+- [ ] Nim: tests  task -> should create and run with confy.BuildTrg instead of just nimc
 **Less important, but todo**:
+- [ ] Nim: Tests template support inside build.nim. Allows to quickly declare a test with ergonomic syntax.
 - [ ] More examples:
   - [ ] Advanced usage
-  - [ ] Fully verbose example, changing everything that can be changed.
-- [ ] Options/arguments auto parser  (to avoid the user needing to implement accessing the info themselves)
-  - [ ] select object to build by keyword
-  - [ ] argument variables support   `key=val`
 - [ ] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
-      You can specify your flags, and add the defaults explicitely, or just don't specify and use the fallback when omitted.  
+      You can specify your flags, and add the defaults explicitly, or just don't specify and use the fallback when omitted.  
 - [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] fix: make-to-confy missing ld flags
-- [ ] C: Support for sending extra arguments (not flags) to the compiler. (required for nim, might not be needed at all for C)
 ```
 
 ```md
@@ -134,4 +148,5 @@ It can do literally -anything- a normal compiled systems binary can do.
 - [ ] Libs management as git.Submodules
 - [ ] Cross compilation support for C with non-ZigCC compiler
 - [ ] Linux: mold support  (unlikely, but might revisit) https://github.com/rui314/mold
+- [ ] C: Support for sending extra arguments (not flags) to the compiler. (required for nim, may not be needed at all for C)
 ```
