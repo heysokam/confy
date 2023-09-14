@@ -102,6 +102,7 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
   of    Zig:    cc = fmt(ZigTemplate)
   of    GCC:    cc &= " --cc:gcc"
   of    Clang:  cc &= " --cc:clang"
+  if cfg.nimUnsafeFunctionPointers: cc.add " -Wno-incompatible-function-pointer-types"
   let cmd = &"{cc} --out:{obj.trg} --outdir:\"{obj.root/obj.sub}\" {obj.args} {obj.src.join()}"
   if verbose     : echo cmd
   elif not quiet : echo &"{cfg.Cstr} {obj.trg}"
