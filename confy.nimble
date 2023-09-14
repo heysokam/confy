@@ -21,12 +21,13 @@ requires "zippy"
 
 #_____________________________
 # Folders
-srcDir          = "src"
-binDir          = "bin"
-let examplesDir = "examples"
-let helloDir    = examplesDir/"hello"
-let helloNimDir = examplesDir/"nim_hello"
+srcDir              = "src"
+binDir              = "bin"
+let examplesDir     = "examples"
+let helloDir        = examplesDir/"hello"
+let helloNimDir     = examplesDir/"nim_hello"
 let helloNimFullDir = examplesDir/"nim_full"
+skipFiles           = @["nim.cfg"]
 
 #_________________________________________________
 # Run the example demo projects
