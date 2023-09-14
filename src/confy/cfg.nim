@@ -36,6 +36,11 @@ var zigSystemBin * = on  # default:on
   ## Uses the System's ZigCC path, without downloading a new version from the web.
   ## When on : Uses the system's zig like `zig cc file.c
   ## When off: Runs the zig compiler setup logic and executes the zig compiler like `cfg.zigDir/zig cc file.c`
+var nimUnsafeFunctionPointers * = off
+  ## When active, the flag `-Wno-incompatible-function-pointer-types` will be passed to ZigCC for compiling nim code.
+  ## The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.
+  ## This config option exists just for ergonomics, and the same behavior can be achieved by:
+  ## `someBuildTarget.args = "-Wno-incompatible-function-pointer-types"`
 
 
 #_________________________________________________
