@@ -59,14 +59,14 @@ proc writeZigcpp(rebuild:bool)=
 proc buildZigcc(rebuild:bool)=
   ## Build the zigcc binary if it doesn't exist
   if rebuild or not zigcc.fileExists:
-    let cmd = &"{nimcZ} --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc}"
+    let cmd = &"{nimcZ} --skipProjCfg --skipParentCfg --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc}"
     if verbose: log &"{zigcc} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcc.lastPathPart} is up to date."
 proc buildZigcpp(rebuild:bool)=
   ## Build the zigcpp binary if it doesn't exist
   if rebuild or not zigcpp.fileExists:
-    let cmd = &"{nimcZ} --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc}"
+    let cmd = &"{nimcZ} --skipProjCfg --skipParentCfg --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc}"
     if verbose: log &"{zigcpp} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcpp.lastPathPart} is up to date."
