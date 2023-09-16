@@ -13,14 +13,16 @@ import std/sequtils
 import ./confy
 
 
+const KnownAliases = ["confy"]
 #___________________
 proc cliParams *() :seq[string]=
   ## Returns the list of all Command Line Parameters passed to the script.
   var valid :bool= false
-  for id in 0..paramCount(): 
+  for id in 0..paramCount():
     let curr = paramStr( id )
-    if   valid                  : result.add curr
-    elif curr.endsWith(".nims") : valid = true  # add everything after we found the first .nims file
+    if   id == 0 and curr in KnownAliases : valid = true     # Special case for aliased script used as arg0
+    elif valid                            : result.add curr  # Everything is valid after arg0 was found
+    elif curr.endsWith(".nims")           : valid = true     # Add everything after we found arg0 (case: the first .nims file)
 proc cliArgs *() :seq[string]=  cliParams().filterIt( not it.startsWith('-') )
   ## List of command line arguments passed to the nims script.
 proc cliOpts *() :seq[string]=  cliParams().filterIt( it.startsWith('-') )

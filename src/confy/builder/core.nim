@@ -12,7 +12,7 @@ import ../tool/db
 import ../tool/helper
 import ../dirs
 import ../info
-import ../tasks
+import ../task/state
 # Builder module dependencies
 from   ./C   as cc import nil
 from   ./zig as z  import nil
@@ -55,20 +55,22 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @[]; run :bool= false; fo
   if cfg.verbose: cfg.quiet = off  # Disable quiet when verbose is active.
   block checkKeywords:
     # Search for "all" and empty cases
-    if tasks.keywordList.len == 0   : break checkKeywords # Build all targets marked with `all` when user didn't request keywords
-    elif "all" in tasks.keywordList : break checkKeywords # Search for `all` keyword (always build when all is requested)
+    if state.keywordList.len == 0 and "all" in keywords:
+      break checkKeywords # Build all targets marked with `all` when user didn't request keywords
+    elif "all" in state.keywordList and "examples" notin keywords and "tests" notin keywords:
+      break checkKeywords # Search for `all` keyword (always build when all is requested)
     # Search each keyword in the user-requested list
     for key in keywords:
       # Search inside the list of user-requested keyword
-      if key in tasks.keywordList: break checkKeywords
+      if key in state.keywordList: break checkKeywords
       # Search for the `examples` or `tests` cases
       case key
       of "examples":
-        if "examples" notin tasks.keywordList: continue
+        if "examples" notin state.keywordList: continue
         for file in obj.src: # Object is considered an example if one of its files is contained in cfg.examplesDir
           if cfg.examplesDir in file.path: break checkKeywords
       of "tests": # Object is considered a test if one of its files is contained in cfg.testsDir
-        if "tests" notin tasks.keywordList: continue
+        if "tests" notin state.keywordList: continue
         for file in obj.src:
           if cfg.testsDir in file.path: break checkKeywords
       else:discard

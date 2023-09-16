@@ -85,7 +85,7 @@ proc buildNimZ  *(force=false) :void=
 # clang.cppXsupport = "-std=C++20"
 # nim c --cc:clang --clang.exe="zigcc" --clang.linkerexe="zigcc" --opt:speed hello.nim
 #_____________________________
-const ZigTemplate = "{cc} -d:zig --cc:clang --clang.exe=\"{zigcc}\" --clang.linkerexe=\"{zigcc}\" --clang.cppCompiler=\"{zigcpp}\" --clang.cppXsupport=\"-std=c++20\" {zigTarget}"
+const ZigTemplate = "{cc} --nimcache:{cfg.cacheDir} -d:zig --cc:clang --clang.exe=\"{zigcc}\" --clang.linkerexe=\"{zigcc}\" --clang.cppCompiler=\"{zigcpp}\" --clang.cppXsupport=\"-std=c++20\" {zigTarget}"
 #_____________________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
   buildNimZ(force=force) # Build the NimZ aliases when they do not exist
