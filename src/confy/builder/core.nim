@@ -51,7 +51,7 @@ proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
     sh obj.root/obj.sub/obj.trg
 
 #_____________________________
-proc build *(obj :var BuildTrg; keywords :seq[string]= @[]; run :bool= false; force :bool= false) :void=
+proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
   if cfg.verbose: cfg.quiet = off  # Disable quiet when verbose is active.
   block checkKeywords:
     # Search for "all" and empty cases
