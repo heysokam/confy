@@ -163,9 +163,9 @@ make debug
 make mytarget
 make clean
 ```
-`debug` `clean` `mytarget` etc... are all **Keywords**
-In confy, those keywords are defined when you call to build the target
-If you say:
+`debug` `clean` `mytarget` etc... are all **Keywords**  
+In confy, those keywords are defined when you call to build the target  
+If you say:  
 ```nim
 bin.build( keywords = @["thing", "otherkeyword"], run=true )
 ```
