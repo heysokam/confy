@@ -5,6 +5,7 @@ Inspired by SCons, without the issues of a typeless language.
 You can expect: 
 - Ergonomic, readable and minimal/simple syntax.  
 - Behaves as a library. Builds your own binary that runs the compilation commands.  
+- Imperative, not declarative. You own the flow control of your builder.  
 - Sane project configuration defaults, unless explicitely changed.   
 - Builds with `zig cc` when compiler choice is omitted. Auto-downloads the latest version for the host.  
 
