@@ -19,6 +19,9 @@ type DepInfo = object
   versions :seq[DepVers]
 type Dependencies = seq[DepInfo]
 #___________________
+var firstRun :bool= on
+var depsData :Dependencies
+#___________________
 proc getInstalled () :Dependencies=
   ## Gets the list of already installed dependecies on the system.
   for it in execCmdEx( "nimble list -i" ).output.splitLines():
@@ -39,12 +42,13 @@ proc getInstalled () :Dependencies=
 proc isInstalled (dep :string) :bool=
   ## Returns true if the dependency is installed in the system.
   ## TODO -> conditions for version management
-  for it in getInstalled():
+  for it in depsData:
     if it.name in dep: return true
 #___________________
 proc require *(dep :string; force=false) :void {.inline.}=
   ## Installs the given dependency using nimble
   ## TODO Install when a new version exists  (currently downloads only when not installed)
+  if firstRun: depsData = deps.getInstalled(); firstRun = off
   if force or not dep.isInstalled(): discard os.execShellCmd &"nimble install {dep}"
 
 
@@ -52,12 +56,10 @@ proc require *(dep :string; force=false) :void {.inline.}=
 
 
 
-
+##[
 # TODO : Currently only nimscript does this
 #_________________________________________________
 # Build Requirements list
-#___________________
-var requiresData :seq[string]
 #___________________
 template installRequires *()=
   info "Installing dependencies declared with `requires`"
@@ -73,5 +75,5 @@ template installRequires *()=
   if confyFound: system.requiresData.delete(confyID) # Remove confy requires so we dont install it multiple times
 #___________________
 template clearRequires *()=  deps.requiresData = @[]
-
+]##
 

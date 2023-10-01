@@ -91,7 +91,7 @@ proc getLang *(file :DirFile) :Lang=
   let ext = file.file.splitFile.ext
   if ext != "": return getLangFromExt( ext )
   result = getLangFromExt( file.findExt() )
-  if cfg.verbose: wrn &"Found Lang.{$result} for DirFile {file}, but confy doesn't understand empty extensions. Must provide one."
+  if cfg.verbose and result != Lang.Nim: wrn &"Found Lang.{$result} for DirFile {file}, but confy doesn't understand empty extensions. Must provide one."
 #_____________________________
 proc getLang *(list :seq[DirFile]) :Lang=
   var langs = initHashSet[Lang]()

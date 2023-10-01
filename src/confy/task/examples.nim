@@ -21,7 +21,7 @@ template example *(name :untyped; descr,file :static string; deps :seq[string]; 
     trg  = sname,
     args = argl.join(" "),
     ) # Program.new( ... )
-  if not defined(nimble): # skip installing dependencies for non-nimble setups
+  if defined(nimble): # skip installing dependencies for non-nimble setups
     for dep in deps: require dep
   `name`.build(@["examples"], run=`runv`, force=`forcev`)
   cfg.srcDir = prevSrcDir
