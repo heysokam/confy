@@ -5,7 +5,6 @@
 import std/os
 import std/osproc
 import std/strformat
-import std/strutils
 import std/strscans
 # confy dependecies
 import ../tool/strings

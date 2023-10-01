@@ -8,8 +8,8 @@
 #_______________________________________________
 # strutils wrapper without empty string f*kery  |
 #_______________________________________________|
-import std/strutils as utils except contains ; export utils
-from   std/strutils as std   import nil
+import std/strutils as utils except contains ; export utils except contains
+from   std/strutils as std import nil
 #_______________________________________
 proc contains *(A,B :string) :bool=
   # The reason for this file to exist:
