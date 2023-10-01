@@ -8,6 +8,7 @@ import std/strformat
 import std/strutils
 import std/strscans
 # confy dependecies
+import ../tool/strings
 
 
 #___________________

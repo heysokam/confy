@@ -1,6 +1,8 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
+# Duplicate of nstd/opts to not depend on it  |
+#_____________________________________________|
 # std dependencies
 import std/os
 import std/parseopt
