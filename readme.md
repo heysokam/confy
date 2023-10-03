@@ -124,6 +124,7 @@ It can do literally -anything- a normal compiled systems binary can do.
 
 ```md
 # TODO:
+- [ ] nim: Support for the `cpp` nimc backend
 - [ ] Force-rebuild option for zigcc/zigcpp. Do not rebuild every time (becomes really repetitive to wait for them, even if short)
 - [ ] Silence all hint config options for zigcc/zigcpp/build, unless verbose
 - [ ] Simultaneous multi-file compiling (-jN)  (using execProcesses)
