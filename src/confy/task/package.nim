@@ -1,20 +1,22 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/osproc
-import std/strutils
 import std/strformat
-# confy dependencies
+# @deps confy
+import ../types
 import ../cfg
 import ../tool/logger
+import ../tool/strings
+# @deps confy.task
 import ./base
 
 #___________________
 func getContent(line,pattern :string) :string {.inline.}=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getInfo *() :Package=
   when debug: info &"Getting package information from {cfg.rootDir}"
-  let data :seq[string]= execProcess("nimble dump", workingDir=cfg.rootDir).splitLines()
+  let data :seq[string]= osproc.execProcess("nimble dump", workingDir=cfg.rootDir.string).splitLines()
   for line in data:
     if   line.startsWith("name:")    : result.name        = line.getContent("name")
     elif line.startsWith("version:") : result.version     = line.getContent("version")

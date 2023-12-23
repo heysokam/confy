@@ -3,6 +3,7 @@
 #:_____________________________________________________
 # @deps std
 import std/os
+import std/times
 # @deps confy
 import ../types
 import ../cfg
@@ -13,11 +14,23 @@ import ./logger
 #_______________________________________
 # General Tools
 #_____________________________
+# Bash
 proc sh *(cmd :string; dbg :bool= false) :void=
   ## Runs the given command in a shell (binary).
   if dbg: log cmd
   if cfg.fakeRun: return
   discard os.execShellCmd cmd
+#___________________
+# Access time
+when not nims:
+  #_____________________________
+  proc lastMod *(trg :Fil) :times.Time=
+    ## Returns the last modification time of the file, or empty if it cannot be found.
+    try:    result = os.getLastModificationTime( trg.string )
+    except: result = times.Time()
+  #_____________________________
+  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
+    ## Returns true if the trg file hasn't been modified in the last N hours.
 
 #_______________________________________
 # Compiler

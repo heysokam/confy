@@ -3,6 +3,7 @@
 #:_____________________________________________________
 # confy dependencies
 import ../../cfg
+import ../../tool/paths
 
 
 #___________________
@@ -11,10 +12,10 @@ const ext    = when defined(windows): ".exe" else: ""
 const zcc    = name&" cc"
 const zpp    = name&" c++"
 #___________________
-# Cannot be let/var, otherwise they are not configurable by zigSystemBin
+# Cannot be let/var, otherwise they are not configurable by zigcc.systemBin
 template getRealCC  *() :string=
-  if cfg.zigSystemBin: zcc  else: cfg.zigDir/( name & ext & " cc")
+  if cfg.zigcc.systemBin: zcc  else: string cfg.zigDir/( name & ext & " cc")
 template getRealCCP *() :string=
-  if cfg.zigSystemBin: zpp  else: cfg.zigDir/( name & ext & " c++")
+  if cfg.zigcc.systemBin: zpp  else: string cfg.zigDir/( name & ext & " c++")
 template getRealBin *() :string=
-  if cfg.zigSystemBin: name else: cfg.zigDir/( name & ext )
+  if cfg.zigcc.systemBin: name else: string cfg.zigDir/( name & ext )

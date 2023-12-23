@@ -17,8 +17,8 @@ requires "nim >= 2.0.0"
 # TODO:
 # requires "db_connector"
 # requires "checksums"
-# requires "jsony"
-# requires "zippy"
+requires "jsony"
+requires "zippy"
 
 #_____________________________
 # Folders

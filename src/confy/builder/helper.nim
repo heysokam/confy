@@ -13,10 +13,20 @@ import ../cfg
 import ../tool/paths
 import ../tool/strings
 import ../tool/logger
+# @deps confy.builder
+import ./zigcc as z
 
 
 #_________________________________________________
 # Compiler Helpers
+#_____________________________
+proc exists *(c :Compiler) :bool=
+  ## Returns true if the given compiler exists in the system.
+  case c
+  of Zig   : result = z.initOrExists()
+  of GCC   : cerr "GCC has been deprecated"   # result = gorgeEx(ccfg.gcc   & " --version").exitCode == 0
+  of Clang : cerr "Clang has been deprecated" # result = gorgeEx(ccfg.clang & " --version").exitCode == 0
+  # else:     result = false
 #_____________________________
 proc findExt *(file :DirFile) :string=
   ## Finds the extension of a file that is sent without it.

@@ -1,20 +1,8 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/hashes
-
-const debug * = not (defined(release) or defined(danger)) or defined(debug)
-
-#_________________________________________________
-# Package information
-#___________________
-type Package * = object
-  name        *:string
-  version     *:string
-  author      *:string
-  description *:string
-  license     *:string
 
 #_________________________________________________
 # Tasks List

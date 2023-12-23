@@ -8,3 +8,4 @@ import ./confy/tools       ; export tools
 import ./confy/dirs        ; export dirs
 import ./confy/flags       ; export flags
 import ./confy/obj         ; export obj
+import ./confy/builder     ; export builder

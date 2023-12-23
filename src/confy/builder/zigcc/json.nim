@@ -1,18 +1,18 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/os
 import std/strformat
 import std/json
-# External dependencies
+# @deps External
 import pkg/jsony
-# confy dependencies
-import ../../auto
+# @deps confy
+import ../../types
 import ../../cfg
 import ../../tool/dl
 import ../../tool/helper
-# zig dependencies
+# @deps zigcc
 import ./types
 
 
@@ -21,7 +21,7 @@ const index  = "https://ziglang.org/download/index.json"
 #_____________________________
 proc download (trg :string= cfg.zigJson.string) :void=  dl.file(index, trg)
   ## Downloads the latest zig json from the website.
-proc yesterday (trg :string= cfg.zigJson.string) :bool=  trg.noModSince(hours = 24)
+proc yesterday (trg :string= cfg.zigJson.string) :bool=  Fil(trg).noModSince(hours = 24)
   ## Returns true if the json file hasn't been updated in the last 24h.
 
 #_____________________________

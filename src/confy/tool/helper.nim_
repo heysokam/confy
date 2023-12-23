@@ -42,15 +42,15 @@ proc setExec *(trg :Fil) :void=  trg.setFilePermissions({FilePermission.fpUserEx
   ## Sets the given `trg` binary flags to be executable for the current user.
 
 
-when not defined(nimscript):
-  #_____________________________
-  proc lastMod *(trg :Fil) :times.Time=
-    ## Returns the last modification time of the file, or empty if it cannot be found.
-    try:    result = trg.getLastModificationTime
-    except: result = Time()
-  #_____________________________
-  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
-    ## Returns true if the trg file hasn't been modified in the last N hours.
+# when not defined(nimscript):
+#   #_____________________________
+#   proc lastMod *(trg :Fil) :times.Time=
+#     ## Returns the last modification time of the file, or empty if it cannot be found.
+#     try:    result = trg.getLastModificationTime
+#     except: result = Time()
+#   #_____________________________
+#   proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
+#     ## Returns true if the trg file hasn't been modified in the last N hours.
 
 #_______________________________________
 # std Extension

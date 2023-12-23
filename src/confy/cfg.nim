@@ -32,7 +32,7 @@ var Lstr    *:string=  "LD"
 #___________________
 # ZigCC
 var zigcc * = (
-  systemBin : on ,  # default:on
+  systemBin : off,  # default:off
   ) # << cfg.zigcc ( ... )
   ## @field systemBin
   ##  Uses the System's ZigCC path, without downloading a new version from the web.

@@ -54,13 +54,13 @@ proc isBin *(file :Fil) :bool=
 #_________________________________________________
 # Compiler Helpers
 #_____________________________
-proc exists *(c :Compiler) :bool=
-  ## Returns true if the given compiler exists in the system.
-  case c
-  of Zig:   result = z.initOrExists()
-  of GCC:   result = gorgeEx(ccfg.gcc   & " --version").exitCode == 0
-  of Clang: result = gorgeEx(ccfg.clang & " --version").exitCode == 0
-  # else:     result = false
+# proc exists *(c :Compiler) :bool=
+#   ## Returns true if the given compiler exists in the system.
+#   case c
+#   of Zig:   result = z.initOrExists()
+#   of GCC:   result = gorgeEx(ccfg.gcc   & " --version").exitCode == 0
+#   of Clang: result = gorgeEx(ccfg.clang & " --version").exitCode == 0
+#   # else:     result = false
 # #_____________________________
 # proc findExt *(file :DirFile) :string=
 #   ## Finds the extension of a file that is sent without it.
