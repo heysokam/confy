@@ -1,9 +1,4 @@
-#:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-#:_____________________________________________________
 
-import ./confy/types       ; export types
-import ./confy/cfg         ; export cfg
 import ./confy/tools       ; export tools
 import ./confy/builder     ; export builder
 import ./confy/dirs        ; export dirs

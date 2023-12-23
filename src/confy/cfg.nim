@@ -6,6 +6,8 @@ import std/os
 import std/cpuinfo as cpu
 # @deps confy
 import ./types
+import ./tool/paths
+import ./flags as fl
 
 #___________________
 # General
@@ -58,7 +60,11 @@ var nim * = (
   ##  This config option exists just for ergonomics, and the same behavior can be achieved by:
   ##  `someBuildTarget.args = "-Wno-incompatible-function-pointer-types"`
 
-
+#_________________________________________________
+# confy: Debugging
+#___________________
+var fakeRun *:bool=  off
+  ## @descr Everything will run normally, but commands will not really be executed.
 
 
 #_____________________________
@@ -83,10 +89,21 @@ var zigDir       *:Dir=  binDir/"zig"
 #_________________________________________________
 # Project: Files
 #___________________
-var file    *:Fil=  "build.nim"
+var file    *:Fil=  "build.nim".Fil
   ## File used for storing the builder config/app.
 var db      *:Fil=  binDir/".confy.db"
   ## File used for storing the builder database.
 var zigJson *:Fil=  binDir/".zig.json"
   ## Zig download index json file.
+
+
+#_________________________________________________
+# Compiler Configuration
+#___________________
+# Flags
+proc flags *(lang :Lang) :Flags=
+  case lang
+  of C   : return fl.all(C)
+  of Cpp : return fl.all(Cpp)
+  else: quit( "Tried to get the flags of a lang that doesn't have any." )
 

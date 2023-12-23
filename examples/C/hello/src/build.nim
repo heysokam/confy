@@ -5,7 +5,7 @@ let srcSub  = glob srcDir/"sub"
 var bin = Program.new(
   src   = srcCore & srcSub,
   trg   = "hello-x64",
-  flags = allC,
+  flags = cfg.flags(C),
 )
 
 bin.build( run=true )

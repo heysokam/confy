@@ -1,8 +1,3 @@
-#:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-#:_____________________________________________________
-# Helper code common to all builders  |
-#_____________________________________|
 # std dependencies
 import std/os
 import std/strutils
@@ -45,7 +40,7 @@ proc toObj *(file :Fil; os :OS) :Fil=
 proc isObj *(trg :Fil) :bool=  trg.splitFile.ext in [ext.unix.obj, ext.win.obj, ext.mac.obj]
   ## Returns true if the `trg` file is already a compiled object.
 #_____________________________
-proc isBin *(file :Fil) :bool= 
+proc isBin *(file :Fil) :bool=
   ## Returns true if the target `file` is considered to have a known binary file extension.
   if file.isValid: return false  # Never set binary flags for valid compilation unit extensions .o .a .c .cc .cpp
   case file.splitFile.ext
@@ -66,44 +61,44 @@ proc exists *(c :Compiler) :bool=
   of GCC:   result = gorgeEx(ccfg.gcc   & " --version").exitCode == 0
   of Clang: result = gorgeEx(ccfg.clang & " --version").exitCode == 0
   # else:     result = false
-#_____________________________
-proc findExt *(file :DirFile) :string=
-  ## Finds the extension of a file that is sent without it.
-  ## Walks the file's dir, and matches all entries found against the full path of the given input file.
-  ## Raises an exception if the file does have an extension already.
-  if file.file.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
-  let filepath = file.dir/file.file
-  for found in file.dir.walkDir:
-    if filepath in found.path: return found.path.splitFile.ext
-  raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
-#_____________________________
-func getLangFromExt (ext :string) :Lang=
-  ## Returns the language of the given input extension. An empty extension will return Unknown lang.
-  ## Use `DirFile.findLangExt()` to find the extension when the file exists and its sent without it.
-  case ext
-  of ".c"          : result = Lang.C
-  of ".cpp", ".cc" : result = Lang.Cpp
-  of ".nim"        : result = Lang.Nim
-  else             : result = Lang.Unknown
-#_____________________________
-proc getLang *(file :DirFile) :Lang=
-  ## Returns the language of the given input file, based on its extension.
-  let ext = file.file.splitFile.ext
-  if ext != "": return getLangFromExt( ext )
-  result = getLangFromExt( file.findExt() )
-  if cfg.verbose and result != Lang.Nim: wrn &"Found Lang.{$result} for DirFile {file}, but confy doesn't understand empty extensions. Must provide one."
-#_____________________________
-proc getLang *(list :seq[DirFile]) :Lang=
-  var langs = initHashSet[Lang]()
-  for src in list: langs.incl src.getLang()
-  if    Lang.Cpp in langs: result = Lang.Cpp
-  elif  Lang.C   in langs: result = Lang.C
-  elif  Lang.Nim in langs: result = Lang.Nim
-  else: raise newException(CompileError, &"Unimplemented language found in {langs} for files:\n{list}")
+# #_____________________________
+# proc findExt *(file :DirFile) :string=
+#   ## Finds the extension of a file that is sent without it.
+#   ## Walks the file's dir, and matches all entries found against the full path of the given input file.
+#   ## Raises an exception if the file does have an extension already.
+#   if file.file.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
+#   let filepath = file.dir/file.file
+#   for found in file.dir.walkDir:
+#     if filepath in found.path: return found.path.splitFile.ext
+#   raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
+# #_____________________________
+# func getLangFromExt (ext :string) :Lang=
+#   ## Returns the language of the given input extension. An empty extension will return Unknown lang.
+#   ## Use `DirFile.findLangExt()` to find the extension when the file exists and its sent without it.
+#   case ext
+#   of ".c"          : result = Lang.C
+#   of ".cpp", ".cc" : result = Lang.Cpp
+#   of ".nim"        : result = Lang.Nim
+#   else             : result = Lang.Unknown
+# #_____________________________
+# proc getLang *(file :DirFile) :Lang=
+#   ## Returns the language of the given input file, based on its extension.
+#   let ext = file.file.splitFile.ext
+#   if ext != "": return getLangFromExt( ext )
+#   result = getLangFromExt( file.findExt() )
+#   if cfg.verbose and result != Lang.Nim: wrn &"Found Lang.{$result} for DirFile {file}, but confy doesn't understand empty extensions. Must provide one."
+# #_____________________________
+# proc getLang *(list :seq[DirFile]) :Lang=
+#   var langs = initHashSet[Lang]()
+#   for src in list: langs.incl src.getLang()
+#   if    Lang.Cpp in langs: result = Lang.Cpp
+#   elif  Lang.C   in langs: result = Lang.C
+#   elif  Lang.Nim in langs: result = Lang.Nim
+#   else: raise newException(CompileError, &"Unimplemented language found in {langs} for files:\n{list}")
 #_____________________________
 proc getCC *(lang :Lang; compiler :Compiler) :string=
   ## Returns the correct command string to build with the given compiler for the given lang.
-  case lang 
+  case lang
   of Lang.C:
     case compiler
     of Zig:   result = zcfg.getRealCC()

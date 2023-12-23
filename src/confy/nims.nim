@@ -1,24 +1,37 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# WARNING:                                             |
-# This file is meant to be `include`d, not `import`ed, |
-# into your confy.nims file.                           |
-# Import dependencies are solved globally.             |
-#_______________________________________________________
-include ./nims/guard
+## @fileoverview
+##  Implements the nimscript-specific tools for confy.
+##  Provides tools to easily build your builder app.
+##  Use with `include confy/nims`
+##
+## @WARNING
+##  This file is meant to be `include`d, not `import`ed
+##  into your confy.nims file.
+##  @reason Import dependencies are solved globally.
+#_______________________________________________________|
+## @guard Will error when loading from non-nimscript.
+##  The nims section is completely isolated from confy.
+from ./types import nims
+when not nims:
+  const nimsMsg :string= "Tried to add a nimscript-only module into a binary app."
+  when defined(debug) : {.warning: nimsMsg.}
+  else                : {.error: nimsMsg.}
+#_________________________________________________
 # @deps std
 import std/[ os,strformat,strutils,sequtils,sets ]
 # @deps confy
 import ./types
 import ./cfg
 
+
 #_________________________________________________
 # General tools
 #___________________
-template info  *(msg :string)= echo cfg.prefix & msg
-template info2 *(msg :string)= echo cfg.tab    & msg
-template fail  *(msg :string)= quit cfg.prefix & msg
+template info  *(msg :string)= echo cfg.prefix & msg  ## @descr Logs a message to console
+template info2 *(msg :string)= echo cfg.tab    & msg  ## @descr Logs a tabbed message to console
+template fail  *(msg :string)= quit cfg.prefix & msg  ## @descr Logs a message to console and quits
 #___________________
 proc asignOrFail (v1,v2,name :string) :string=
   ## @descr Returns either the value of `v1` or `v2`, and fails if both of them are empty.
@@ -81,9 +94,10 @@ proc getPackageInfo () :Package=
 #_________________________________________________
 # Requirements list
 #___________________
-proc requires *(deps :varargs[string]) :void=
-  ## Nims support: Call this to set the list of requirements of your application.
-  for d in deps: requiresData.add(d)
+when not defined(nimble):
+  proc requires *(deps :varargs[string]) :void=
+    ## @descr Nims support: Call this to set the list of requirements of your application.
+    for d in deps: requiresData.add(d)
 #___________________
 proc installRequires *() :void {.inline.}=
   # remember "nimble list -i"
@@ -96,7 +110,7 @@ proc installRequires *() :void {.inline.}=
     elif req.endsWith("@#head") : dep = req
     elif req.endsWith("#head")  : dep = req.replace("#head", "@#head")
     when debug: info2 "Installing "&dep
-    exec "nimble install "&dep
+    sh "nimble install "&dep
   if confyFound: system.requiresData.delete(confyID) # Remove confy requires so we dont install it multiple times
 #___________________
 template clearRequires *()=  system.requiresData = @[]
