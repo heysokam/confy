@@ -1,32 +1,8 @@
-#:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-#:_____________________________________________________
-import std/[ os,strformat ]
-
-#_____________________________
-# Package
-packageName   = "confy"
-version       = "0.2.0"
-author        = "sOkam"
-description   = "confy | Buildsystem for Nim & C"
-license       = "MIT"
-
-#_____________________________
-# Dependencies
-requires "nim >= 2.0.0"
 requires "db_connector"
 requires "checksums"
 requires "jsony"
 requires "zippy"
 
-#_____________________________
-# Folders
-srcDir              = "src"
-binDir              = "bin"
-let examplesDir     = "examples"
-let helloDir        = examplesDir/"hello"
-let helloNimDir     = examplesDir/"nim_hello"
-let helloNimFullDir = examplesDir/"nim_full"
 skipFiles           = @["nim.cfg"]
 
 #_________________________________________________
