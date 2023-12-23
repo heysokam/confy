@@ -1,8 +1,3 @@
-requires "db_connector"
-requires "checksums"
-requires "jsony"
-requires "zippy"
-
 skipFiles           = @["nim.cfg"]
 
 #_________________________________________________
@@ -17,13 +12,3 @@ task helloNim, "Example Nim:  Executes confy inside the nim_hello folder":
   withDir helloNimDir: exec "nimble confy"
 task helloNimFull, "Example Nim (Full):  Executes confy inside the nim_full folder":
   withDir helloNimFullDir: exec "nimble confy"
-
-#_________________________________________________
-# Manage git tags for confy
-#___________________
-task push, "Internal:  Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
-  ## Does nothing when local and remote versions are the same.
-  requires "https://github.com/beef331/graffiti.git"
-  exec "git push"  # Requires local auth
-  exec &"graffiti ./{packageName}.nimble"
-

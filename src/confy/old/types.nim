@@ -1,23 +1,14 @@
-#:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-#:_____________________________________________________
-# std dependencies
-when defined(nimscript):
-  type Path * = string
-else:
-  import std/paths
-
-type Dir  * = Path
-  ## Path to a Directory
-type Fil  * = Path
-  ## Path to a File
-  ## Note: Name chosen based on the etymology of the word File, which comes from latin Fillum.
-  ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
-  ##       Very :NotLikeThis:
-type DirFile * = object
-  ## Internal Data Type for a single file, so that dir can be adjusted separately without issues. file is always relative to dir
-  dir   *:Dir
-  file  *:Fil
+# type Dir  * = Path
+#   ## Path to a Directory
+# type Fil  * = Path
+#   ## Path to a File
+#   ## Note: Name chosen based on the etymology of the word File, which comes from latin Fillum.
+#   ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
+#   ##       Very :NotLikeThis:
+# type DirFile * = object
+#   ## Internal Data Type for a single file, so that dir can be adjusted separately without issues. file is always relative to dir
+#   dir   *:Dir
+#   file  *:Fil
 
 type CompileError * = object of IOError
   ## For exceptions during the compile process

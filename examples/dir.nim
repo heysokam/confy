@@ -1,12 +1,20 @@
+#:_____________________________________________________
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
+#:_____________________________________________________
+## @fileoverview
+##  Folders configuration for the examples buildsystem.
+#_______________________________________________________|
 # @deps std
 import std/os
+
 # General
-const this   :string= currentSourcePath().parentDir()
+const thisDir :string= currentSourcePath().parentDir()
+const confy  *:string= thisDir/".."/"src"
 # Languages
-const C     *:string= this/"C"
-const cpp   *:string= this/"cpp"
-const nim   *:string= this/"nim"
+const C      *:string= thisDir/"C"
+const cpp    *:string= thisDir/"cpp"
+const nim    *:string= thisDir/"nim"
 # Examples   @note Suffixes for all langs
-const hello *:string= "hello"
-const cross *:string= "cross"
-const full  *:string= "full"
+const hello  *:string= "hello"
+const cross  *:string= "cross"
+const full   *:string= "full"

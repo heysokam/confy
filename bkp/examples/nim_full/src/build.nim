@@ -8,7 +8,7 @@ import std/cpuinfo       # Only for the example.
 import std/os except `/` # Only for the example.
 import std/strformat     # Only for the example.
 #_____________________________
-# Builld.nim starts here:
+# Build.nim starts here:
 
 #____________________________________________________
 import confy
