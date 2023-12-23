@@ -1,3 +1,9 @@
+> **Warning**:  
+> This library is in the process of deprecating support for multiple builder backends  
+> _(ie: gcc, clang, mingw, etc)_  
+> ZigCC will be the only builder remaining after the [PR#5](https://github.com/heysokam/confy/pull/5) refactor.  
+> _Nim, C and C++ compilation will continue to be supported._  
+
 ![Confy](./res/banner.png)
 # confy: Comfortable and Configurable buildsystem for C and Nim
 Confy is a Buildsystem for compiling code with ZigCC, GCC, Clang  _(todo: MinGW)_  
