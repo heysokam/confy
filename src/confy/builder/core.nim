@@ -2,6 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
+import std/os
 import std/strformat
 import std/sets
 # @deps confy
@@ -33,18 +34,12 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
 #_____________________________
 proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
-  if not quiet: info.report(obj)      # Report build information to console when not quiet
-  dirs.setup( cfg.cacheDir )          # Setup the cache folder for confy.
-  dirs.adjustRemotes( obj )           # Search for files in the remote folders, when they are missing in current.
-  obj.root.setup()                    # Setup the root folder of the project.
-  # cfg.db.init()                       # Initialize the database
-  var modif :seq[DirFile]
-  if obj.lang == Nim: modif = obj.src                 # Skip the database for Nim files
-  # else:               modif = cfg.db.update(obj.src)  # Find all the files that have been modified
-  if force: compile(obj.src, obj, force)              # Force building all files
-  else:
-    if modif.len == 0:  log &"{obj.trg} is already up to date."; return
-    compile(modif, obj, force)        # Compile only the modified files.
+  if not quiet: info.report(obj)  # Report build information to console when not quiet
+  dirs.setup( cfg.cacheDir )      # Setup the cache folder for confy.
+  dirs.adjustRemotes( obj )       # Search for files in the remote folders, when they are missing in current.
+  obj.root.setup()                # Setup the root folder of the project.
+  if force: os.removeDir cfg.cacheDir.string  # Force building all files by removing the cacheDir
+  compile(obj.src, obj, force)
   if run and obj.kind == Program:
     log &"Finished building {obj.trg}. Running..."
     sh string(obj.root/obj.sub/obj.trg)

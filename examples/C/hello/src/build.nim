@@ -8,5 +8,5 @@ var bin = Program.new(
   flags = cfg.flags(C),
 )
 
-bin.build( run=true )
+bin.build( @["all"], run=true )
 
