@@ -1,22 +1,21 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# Base internal funcionality for all builder modules  |
-#_____________________________________________________|
-# std dependencies
-import std/paths
-import std/dirs
+## @fileoverview Base internal funcionality for all builder modules
+#___________________________________________________________________|
+# @deps std
+import std/os
 import std/strformat
-import std/strutils
 import std/sequtils
-# confy dependencies
+# @deps confy
 import ../types
+import ../cfg
+import ../tool/strings
+import ../tool/helper as t
 import ../tool/logger
-import ../tool/helper
-import ../cfg as c
 import ../dirs
-# builder dependencies
-import ./helper as bhelp
+# @deps confy.builder
+import ./helper
 
 
 #_____________________________
@@ -31,12 +30,12 @@ proc direct *(
   ) :void=
   ## Builds the `src` file directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
-  let flg   = flags.join(" ")
-  let cmd   = &"{CC} {flg} {src.path} -o {trg}"
-  if quiet: echo &"{quietStr} {trg}"
-  else:     echo cmd
+  let flg = flags.join(" ")
+  let cmd = &"{CC} {flg} {src.path} -o {trg}"
+  if cfg.quiet : echo &"{quietStr} {trg}"
+  else         : echo cmd
   sh cmd
-  if trg.isBin: trg.setExec()  # Set executable flags on the resulting binary.
+  if helper.isBin(trg): trg.setExec()  # Set executable flags on the resulting binary.
 #___________________
 proc direct *(
     src      : seq[DirFile];
@@ -47,15 +46,14 @@ proc direct *(
   ) :void=
   ## Builds the `src` list of files directly into the `trg` file.
   ## Doesn't compile an intermediate `.o` step.
-  let files = src.mapIt(it.path).join(" ")
+  let files = src.mapIt(it.path.string).join(" ")
   let flg   = flags.join(" ")
   let cmd   = &"{CC} {files} {flg} -o {trg}"
   if not quiet: echo &"{quietStr} {trg}"
   elif verbose: echo cmd
   else:         log &"Linking {trg} ..."
   sh cmd
-  if trg.isBin: trg.setExec()  # Set executable flags on the resulting binary.
-
+  if helper.isBin(trg): trg.setExec()  # Set executable flags on the resulting binary.
 
 #_____________________________
 # Base: Linker
@@ -93,7 +91,7 @@ proc compileToObj *(
   ) :void=
   ## Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(dir).path.changeFileExt(".o")
+    let trg = file.chgDir(dir).path.string.changeFileExt(".o").Fil
     file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
 #___________________
 proc compileToMod *(
@@ -105,7 +103,7 @@ proc compileToMod *(
   ) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(dir).path.changeFileExt(".pcm")
+    let trg = file.chgDir(dir).path.string.changeFileExt(".pcm").Fil
     file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
 
 #___________________
@@ -129,7 +127,7 @@ proc compile *(
     if file.path.isObj:  # File is already an object. Add to objs and continue
       objs.add(file); continue
     let trg = DirFile.new(file.dir, file.file.toObj(syst.os)).chgDir(root)
-    let dir = trg.path.splitFile.dir
+    let dir = trg.path.string.splitFile.dir
     let cmd = &"{file.getCC(CC)} -MMD {cfl} -c {file.path} -o {trg.path}"
     if   quiet:   stdmsg.write "."
     elif verbose: echo cmd

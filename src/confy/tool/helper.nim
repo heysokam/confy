@@ -12,11 +12,16 @@ import ./strings
 import ./logger
 
 #_______________________________________
+# std Extension
+#___________________
+
+
+#_______________________________________
 # General Tools
 #_____________________________
 # Bash
 proc sh *(cmd :string; dbg :bool= false) :void=
-  ## Runs the given command in a shell (binary).
+  ## @descr Runs the given command in a shell (binary).
   if dbg: log cmd
   if cfg.fakeRun: return
   discard os.execShellCmd cmd
@@ -25,19 +30,31 @@ proc sh *(cmd :string; dbg :bool= false) :void=
 when not nims:
   #_____________________________
   proc lastMod *(trg :Fil) :times.Time=
-    ## Returns the last modification time of the file, or empty if it cannot be found.
+    ## @descr Returns the last modification time of the file, or empty if it cannot be found.
     try:    result = os.getLastModificationTime( trg.string )
     except: result = times.Time()
   #_____________________________
   proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
-    ## Returns true if the trg file hasn't been modified in the last N hours.
+    ## @descr Returns true if the trg file hasn't been modified in the last N hours.
+#_____________________________
+# Files
+proc touch *(trg :Fil) :void=
+  ## @descr Creates the target file if it doesn't exist.
+  when nims:
+    when defined linux:   exec &"touch {trg}"
+    elif defined windows: exec &"Get-Item {trg}"
+  else:  trg.string.open(mode = fmAppend).close
+#_____________________________
+proc setExec *(trg :Fil) :void=  os.setFilePermissions(trg.string, {FilePermission.fpUserExec}, followSymlinks = false)
+  ## @descr Sets the given `trg` binary flags to be executable for the current user.
+
 
 #_______________________________________
 # Compiler
 #_____________________________
 proc defaultExt *(lang :Lang) :string=
-  ## Returns the default extension for the given lang as a string  (contains the dot).
-  ## Result will be an empty string if the lang is Unknown
+  ## @descr Returns the default extension for the given lang as a string  (contains the dot).
+  ## @note Result will be an empty string if the lang is Unknown
   case lang
   of Nim,C,Cpp : "." & ($lang).normalize
   of Unknown   : ""
@@ -46,12 +63,12 @@ proc defaultExt *(lang :Lang) :string=
 # Build Target
 #_____________________________
 proc with *(os :OS; cpu :CPU) :System=
-  ## Returns a System object for the given os and cpu.
+  ## @descr Returns a System object for the given os and cpu.
   result.os  = os
   result.cpu = cpu
 #_____________________________
 proc getHost *() :System=
-  ## Returns the properties of the host, as a System object
+  ## @descr Returns the properties of the host, as a System object
   case hostOS
   of   "windows":     result.os = OS.Windows
   of   "macosx":      result.os = OS.Mac

@@ -126,11 +126,11 @@ proc adjustRemotes *(obj :var BuildTrg) :void=
   for file in obj.src.mitems:
     # Dont adjust if the file exists
     if file.path.fileExists:
-      if cfg.verbose: log &"Local file exists. Not adjusting :  {file.path}"
+      if cfg.verbose: log1 &"Local file exists. Not adjusting :  {file.path}"
       continue
     # Adjust for a missing extension with Nim
     elif obj.lang == Lang.Nim and (not file.path.string.endsWith(".nim")):
-      log &"Nim file was sent without extension. Searching for it at  {file.path}"
+      log1 &"Nim file was sent without extension. Searching for it at  {file.path}"
       file = file.findNoExt(Lang.Nim)
       continue
     # Search for the file in the remotes

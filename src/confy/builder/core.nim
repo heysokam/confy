@@ -17,8 +17,8 @@ import ../tool/strings
 import ../task/state
 # @deps confy.builder
 import ./helper
-import ./C   as c
-import ./cpp as cpp
+import ./zigcc as c
+import ./zigcc as cpp
 import ./nim as nim
 
 #_____________________________
