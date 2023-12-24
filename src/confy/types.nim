@@ -94,14 +94,15 @@ type Extension * = object
   bin   *:string
   lib   *:string
   obj   *:string
+  ar    *:string
 type Extensions * = object
   unix  *:Extension
   win   *:Extension
   mac   *:Extension
 const ext * = Extensions(
-  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o"),
-  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj"),
-  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o"),  )
+  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o",   ar: ".a"),
+  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj", ar: ".lib"),
+  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o",   ar: ".a"),  )
 
 
 #_______________________________________

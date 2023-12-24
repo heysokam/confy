@@ -102,6 +102,14 @@ proc isBin *(file :Fil) :bool=
   else: return true  # Custom extensions (perfectly valid for linux) will be considered binaries.
   # wrn: File extensions for unknown os'es will always return true. Add the os to the `ext` list if this is an issue.
 #_____________________________
+proc extAR *(os :OS) :string=
+  case os
+  of OS.Windows: ext.win.ar
+  of OS.Linux  : ext.unix.ar
+  of OS.Mac    : ext.mac.ar
+  else: cerr &"Getting Archive extension of OS.{$os} is not implemented."
+func toAR *(file :Fil; os :OS) :Fil= file.changeFileExt(os.extAR())
+#_____________________________
 proc getCC *(lang :Lang; compiler :Compiler) :string=
   ## @descr Returns the correct command string to build with the given compiler for the given lang.
   case lang

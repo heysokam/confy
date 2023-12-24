@@ -40,8 +40,9 @@ proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   dirs.adjustRemotes( obj )           # Search for files in the remote folders, when they are missing in current.
   obj.root.setup()                    # Setup the root folder of the project.
   compile(obj.src, obj, force)
+  log &"Finished building {obj.trg}."
   if run and obj.kind == Program:
-    log &"Finished building {obj.trg}. Running..."
+    log &"Running {obj.trg} ..."
     sh string(obj.root/obj.sub/obj.trg)
 
 #_____________________________

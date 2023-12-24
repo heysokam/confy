@@ -2,9 +2,13 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
+import std/strformat
 # @deps confy
 import ../types
 import ../cfg
+import ../dirs
+import ../tool/helper
+import ../tool/paths
 # @deps confy.builder
 import ./base
 import ./helper
@@ -33,14 +37,29 @@ proc getCC *(src :seq[DirFile]) :string=
 #_____________________________
 # ZigCC: Compiler
 #___________________
+proc compileStatic *(
+    src      : seq[DirFile];
+    trg      : Fil;
+    root     : Dir;
+    CC       : Compiler;
+    flags    : Flags;
+    syst     : System;
+    quietStr : string;
+  ) :void=
+  ## Compiles the given `src` list of files as a SharedLibrary, using the given `CC` command.
+  ## Assumes the paths given are already relative/absolute in the correct way.
+  let objs = src.compileToObj(root, syst, CC, flags, quietStr).join()
+  let verb = if cfg.verbose: "v" else: ""
+  let ar = (root/trg).toAR(syst.os)
+  sh &"{zcfg.getRealAR()} -rc{verb} {ar} {objs}", cfg.verbose
+#___________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
-  ## Compiles the given `src` list of files with ZigCC.
+  ## @descr Compiles the given `src` list of files with ZigCC.
   case obj.kind
   of Program:        base.direct(src,obj.trg, src.getCC, obj.flags.cc & obj.flags.ld, cfg.Cstr)
-  # of Object:         base.compileToObj(src, obj.root, obj.flags)
+  of Object:         base.compileToObj(src, obj.root, obj.syst, Zig, obj.flags, cfg.Cstr)
+  of SharedLibrary:  base.direct(src, obj.trg.toLib(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @["-shared"], cfg.Cstr)  # base.compileShared(src, obj.trg, Zig, obj.root, obj.flags, obj.syst, cfg.Cstr)
+  of StaticLibrary:  zigcc.compileStatic(src, obj.trg, obj.root, Zig, obj.flags, obj.syst, cfg.Cstr)
   # of Module:         base.compileToMod(src, obj.root, obj.flags)
-  # of SharedLibrary:  base.compileShared(src, obj.trg, obj.root, obj.flags, obj.syst, cfg.Cstr)
-  of StaticLibrary:  raise newException(CompileError, "Compiling as StaticLibrary is not implemented.")
   else: return
-
 
