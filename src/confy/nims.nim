@@ -14,10 +14,11 @@
 ## @guard Will error when loading from non-nimscript.
 ##  The nims section is completely isolated from confy.
 from ./types import nims
+const debug {.booldefine.}= off
 when not nims:
   const nimsMsg :string= "Tried to add a nimscript-only module into a binary app."
-  when defined(debug) : {.warning: nimsMsg.}
-  else                : {.error: nimsMsg.}
+  when debug : {.warning: nimsMsg.}
+  else       : {.error: nimsMsg.}
 #_________________________________________________
 # @deps std
 import std/[ os,strformat,strutils,sequtils,sets ]
@@ -32,11 +33,15 @@ import ./cfg
 template info  *(msg :string)= echo cfg.prefix & msg  ## @descr Logs a message to console
 template info2 *(msg :string)= echo cfg.tab    & msg  ## @descr Logs a tabbed message to console
 template fail  *(msg :string)= quit cfg.prefix & msg  ## @descr Logs a message to console and quits
+proc dbg *(msg :string) :void=
+   when debug: info msg
+proc dbg2 *(msg :string) :void=
+   when debug: info2 msg
 #___________________
 proc asignOrFail (v1,v2,name :string) :string=
   ## @descr Returns either the value of `v1` or `v2`, and fails if both of them are empty.
   result = if v1 != "": v1 elif v2 != "": v2 else: fail "Tried to assign values for required variable "&name&" but none of the options are defined."
-  when debug: info2 &"found {name}:  {result}"
+  dbg2 &"found {name}:  {result}"
 #___________________
 proc sh *(cmd :string; dir :string= ".") :void=
   ## @descr Runs the given command with a shell.
@@ -70,17 +75,17 @@ proc cliOpts *() :seq[string]=  cliParams().filterIt( it.startsWith('-') )
 # Internal Config
 proc getPackageInfo () :Package=
   func getContent (line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
-  when debug: info &"Getting package information"
+  dbg &"Getting package information"
   if packageName != "" : result.name        = packageName
   if version     != "" : result.version     = version
   if author      != "" : result.author      = author
   if description != "" : result.description = description
   if license     != "" : result.license     = license
   if packageName != "" and version != "" and author != "" and description != "" and license != "":
-     when debug: info2 &"{result}"
-     return
+    dbg2 &"{result}"
+    return
   # Nimble
-  when debug: info &"One of the variables is not defined. Searching for .nimble file in {projectDir()}  Running\n  nimble dump"
+  dbg &"One of the variables is not defined. Searching for .nimble file in {projectDir()}  Running\n  nimble dump"
   let data :seq[string]= gorgeEx( &"cd {projectDir()}; nimble dump" ).output.splitLines()
   for line in data:
     if   line.startsWith("name:")    : result.name        = line.getContent("name")
@@ -89,7 +94,7 @@ proc getPackageInfo () :Package=
     elif line.startsWith("desc:")    : result.description = line.getContent("desc")
     elif line.startsWith("license:") : result.license     = line.getContent("license")
     #ignored: skipDirs, skipFiles, skipExt, installDirs, installFiles, installExt, requires, bin, binDir, srcDir, backend
-  when debug: info2 &"{result}"
+  dbg2 &"{result}"
 
 #_________________________________________________
 # Requirements list
@@ -101,7 +106,7 @@ when not defined(nimble):
 #___________________
 proc installRequires *() :void {.inline.}=
   # remember "nimble list -i"
-  when debug: info "Installing dependencies declared with `requires`"
+  dbg "Installing dependencies declared with `requires`"
   var confyID    :Natural
   var confyFound :bool
   for id,req in system.requiresData.pairs:
@@ -109,7 +114,7 @@ proc installRequires *() :void {.inline.}=
     if   req == "confy"         : dep = "https://github.com/heysokam/confy@#head"; confyID = id; confyFound = true
     elif req.endsWith("@#head") : dep = req
     elif req.endsWith("#head")  : dep = req.replace("#head", "@#head")
-    when debug: info2 "Installing "&dep
+    dbg2 "Installing "&dep
     sh "nimble install "&dep
   if confyFound: system.requiresData.delete(confyID) # Remove confy requires so we dont install it multiple times
 #___________________
@@ -125,8 +130,9 @@ when not compiles(afterConfy()):
 proc confy *(file :string= cfg.file.string) :void=
   ## This is the default confy task
   beforeConfy()
+  let dbgOpt  = when debug: "-d:debug" else:"--hints:off -d:release"
   let builder = (&"{cfg.srcDir.string}/{file}").addFileExt(".nim")
-  sh &"{cfg.nim.cc} c -d:ssl --skipParentCfg -d:release --outDir:{cfg.binDir.string} {builder}"   # nim c --outDir:binDir srcDir/build.nim
+  sh &"{cfg.nim.cc} c {dbgOpt} -d:ssl --skipParentCfg --outDir:{cfg.binDir.string} {builder}"   # nim c --outDir:binDir srcDir/build.nim
   sh &"./{cfg.file.string.splitFile.name} {cliParams().join(\" \")}", cfg.binDir
   afterConfy()
 
@@ -135,12 +141,12 @@ proc confy *(file :string= cfg.file.string) :void=
 #_____________________________
 when isMainModule and (nims or defined(nimble)):
   # Initialize
-  when debug: info "Starting in debug mode"
+  dbg "Starting in debug mode"
   # Build Requirements
   when not defined(nimble): installRequires()
   # Package information
   var pkgInfo :Package= getPackageInfo()
-  when debug: info "Asigning package information"
+  dbg "Asigning package information"
   system.packageName = asignOrFail(system.packageName, pkgInfo.name,        "packageName")
   system.version     = asignOrFail(system.version,     pkgInfo.version,     "version")
   system.author      = asignOrFail(system.author,      pkgInfo.author,      "author")
@@ -148,7 +154,7 @@ when isMainModule and (nims or defined(nimble)):
   system.license     = asignOrFail(system.license,     pkgInfo.license,     "license")
   #___________________
   # Folders Config
-  when debug: info "Defining and asigning folder paths"
+  dbg "Defining and asigning folder paths"
   system.binDir      = cfg.binDir
   system.srcDir      = cfg.srcDir
   var docDir       * = cfg.docDir
@@ -156,5 +162,5 @@ when isMainModule and (nims or defined(nimble)):
   var testsDir     * = cfg.testsDir
   var cacheDir     * = cfg.cacheDir
   # Terminate and send control to the user script
-  when debug: info "Done setting up $1 configuration" % [when defined(nimble): "nimble" else: "nims"]
+  dbg "Done setting up $1 configuration" % [when defined(nimble): "nimble" else: "nims"]
 

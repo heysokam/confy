@@ -17,7 +17,7 @@ var cores *:int=
   ## @descr Total cores to use for compiling.  @default 80% of max)
 #___________________
 # Formatting
-var verbose *:bool=  off
+var verbose *:bool=  when debug: on else: off
   ## Output will be fully verbose when active.
 var quiet   *:bool=  on
   ## Output will be formatted in a minimal clean style when active.

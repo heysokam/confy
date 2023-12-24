@@ -13,13 +13,17 @@ import ./dir
 #_______________________________________
 # General
 #___________________
-const Prefix {.strdefine.}= "confy.examples: "
+const Prefix {.strdefine.}=  "confy.examples: "
+const debug  {.booldefine.}=  off
+#___________________
+proc info *(msg :string) :void=  echo Prefix&msg
 #___________________
 proc sh *(cmd :string; dir :string= ".") :void= 
-  echo Prefix&"Running command from $1:\n  $2" % [dir, cmd];
+  if debug: info "Running command from $1:\n  $2" % [dir, cmd]
   withDir dir: exec cmd
 #___________________
 proc push *():void=
+  info "Pushing repository."
   sh "git push"  # Requires local auth
   sh &"graffiti ./{packageName}.nimble"
 
@@ -53,7 +57,7 @@ func getConfig (lang :LangID) :Lang=
     of Nim : dir.nim
   var cmd :string= case lang
     of Nim : "nimble run"
-    else   : "nim --verbosity:3 --noNimblePath --path:$1 confy.nims" % [dir.confy]
+    else   : "nim $1 --hints:off --noNimblePath --path:$2 confy.nims" % [if debug:"-d:debug" else:"", dir.confy]
   Lang(id: lang,
     hello: Example(dir: root/dir.hello, cmd: cmd),
     cross: Example(dir: root/dir.cross, cmd: cmd),
@@ -64,6 +68,7 @@ func getConfig (lang :LangID) :Lang=
 # Examples: Build
 #___________________
 template build *(lang :Lang; example :untyped) :void=
+  info "Building  $1" % [astToStr(example)]
   sh lang.`example`.cmd, lang.`example`.dir
 
 proc buildAll *(lang :LangID) :void=
