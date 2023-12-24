@@ -68,7 +68,7 @@ func getConfig (lang :LangID) :Lang=
 # Examples: Build
 #___________________
 template build *(lang :Lang; example :untyped) :void=
-  info "Building  $1" % [astToStr(example)]
+  info "Building  $1.$2  " % [$lang.id, astToStr(example)]
   sh lang.`example`.cmd, lang.`example`.dir
 
 proc buildAll *(lang :LangID) :void=
@@ -78,5 +78,6 @@ proc buildAll *(lang :LangID) :void=
   # cfg.build( full  )
 
 proc buildAll *() :void=
+  info "Building everything."
   for lang in LangID: lang.buildAll()
 
