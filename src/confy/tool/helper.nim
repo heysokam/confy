@@ -9,11 +9,6 @@ import ../types
 import ../cfg
 # @deps confy.tools
 import ./strings
-import ./logger
-
-#_______________________________________
-# std Extension
-#___________________
 
 
 #_______________________________________
@@ -22,7 +17,7 @@ import ./logger
 # Bash
 proc sh *(cmd :string; dbg :bool= false) :void=
   ## @descr Runs the given command in a shell (binary).
-  if dbg: log cmd
+  if dbg: echo cmd
   if cfg.fakeRun: return
   discard os.execShellCmd cmd
 #___________________

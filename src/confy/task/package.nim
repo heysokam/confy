@@ -3,19 +3,20 @@
 #:_____________________________________________________
 # @deps std
 import std/osproc
-import std/strformat
 # @deps confy
 import ../types
 import ../cfg
-import ../tool/logger
+when debug:
+  import std/strformat
+  import ../tool/logger
 import ../tool/strings
 # @deps confy.task
-import ./base
+# import ./base
 
 #___________________
 func getContent(line,pattern :string) :string {.inline.}=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getInfo *() :Package=
-  when debug: info &"Getting package information from {cfg.rootDir}"
+  when debug: logger.info &"Getting package information from {cfg.rootDir}"
   let data :seq[string]= osproc.execProcess("nimble dump", workingDir=cfg.rootDir.string).splitLines()
   for line in data:
     if   line.startsWith("name:")    : result.name        = line.getContent("name")

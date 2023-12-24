@@ -29,7 +29,6 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
   of Cpp     : cpp.compile(src, obj, force)
   of Nim     : nim.compile(src, obj, force)
   of Unknown : cerr "Tried to compile and Unknown language."
-  else       : cerr "Compiling language {$lang} is not implemented."
 
 #_____________________________
 proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=

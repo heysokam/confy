@@ -34,7 +34,7 @@ proc direct *(
   let cmd = &"{CC} {flg} {src.path} -o {trg}"
   if cfg.quiet : echo &"{quietStr} {trg}"
   else         : echo cmd
-  sh cmd
+  sh cmd, cfg.verbose
   if helper.isBin(trg): trg.setExec()  # Set executable flags on the resulting binary.
 #___________________
 proc direct *(
@@ -48,11 +48,11 @@ proc direct *(
   ## Doesn't compile an intermediate `.o` step.
   let files = src.mapIt(it.path.string).join(" ")
   let flg   = flags.join(" ")
-  let cmd   = &"{CC} {files} {flg} -o {trg}"
+  let cmd   = &"{CC} {flg} {files} -o {trg}"
   if not quiet: echo &"{quietStr} {trg}"
   elif verbose: echo cmd
-  else:         log &"Linking {trg} ..."
-  sh cmd
+  else:         log &"Compiling {trg} ..."
+  sh cmd, cfg.verbose
   if helper.isBin(trg): trg.setExec()  # Set executable flags on the resulting binary.
 
 #_____________________________
@@ -116,7 +116,7 @@ proc compile *(
     flags    : Flags;
     quietStr : string;
   ) :void=
-  ## Compiles the given `src` list of files using the given `CC` command.
+  ## Compiles the given `src` list of files using the given `CC` compiler.
   ## Assumes the paths given are already relative/absolute in the correct way.
   var objs :seq[DirFile]
   # var cmds :seq[string]
