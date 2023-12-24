@@ -35,10 +35,11 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
 proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
   if not quiet: info.report(obj)  # Report build information to console when not quiet
-  dirs.setup( cfg.cacheDir )      # Setup the cache folder for confy.
-  dirs.adjustRemotes( obj )       # Search for files in the remote folders, when they are missing in current.
-  obj.root.setup()                # Setup the root folder of the project.
-  if force: os.removeDir cfg.cacheDir.string  # Force building all files by removing the cacheDir
+  if force and dirExists(cfg.cacheDir.string):
+    os.removeDir cfg.cacheDir.string  # Force building all files by removing the cacheDir
+  dirs.setup( cfg.cacheDir )          # Setup the cache folder for confy.
+  dirs.adjustRemotes( obj )           # Search for files in the remote folders, when they are missing in current.
+  obj.root.setup()                    # Setup the root folder of the project.
   compile(obj.src, obj, force)
   if run and obj.kind == Program:
     log &"Finished building {obj.trg}. Running..."
