@@ -6,12 +6,12 @@ import std/osproc
 # @deps confy
 import ../types
 import ../cfg
-when debug:
-  import std/strformat
-  import ../tool/logger
 import ../tool/strings
 # @deps confy.task
 # import ./base
+when debug:
+  import std/strformat
+  import ../tool/logger
 
 #___________________
 func getContent(line,pattern :string) :string {.inline.}=  line.replace( pattern & ": \"", "").replace("\"", "")
