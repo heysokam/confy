@@ -102,7 +102,7 @@ proc getPackageInfo () :Package=
 when not defined(nimble):
   proc requires *(deps :varargs[string]) :void=
     ## @descr Nims support: Call this to set the list of requirements of your application.
-    for d in deps: requiresData.add(d)
+    for d in deps: system.requiresData.add(d)
 #___________________
 proc installRequires *() :void {.inline.}=
   # remember "nimble list -i"
