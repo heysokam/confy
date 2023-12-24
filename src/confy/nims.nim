@@ -52,6 +52,18 @@ proc sh *(cmd :string; dir :string= ".") :void=
     withDir dir: exec cmd
   except: fail &"Failed running {cmd}"
   if not cfg.quiet: info &"Done running {cmd}."
+#___________________
+proc getModTime *(file :string) :string=
+  when hostOS == "windows": return
+  let lines = gorge( &"stat {file.absolutePath}" ).splitLines
+  for line in lines:
+    if line.startsWith("Modify:"): return line.replace("Modify: ", "")
+#___________________
+proc writeModTime *(src,trg :string) :void=
+  when hostOS == "windows": return
+  let dir = trg.splitFile.dir
+  if not dir.dirExists: mkDir dir
+  trg.writeFile( src.getModTime() )
 
 #___________________
 proc cliParams *() :seq[string]=
@@ -121,10 +133,26 @@ proc installRequires *() :void {.inline.}=
 template clearRequires *()=  system.requiresData = @[]
 
 #_________________________________________________
+# Rebuild build.nim management
+#___________________
+proc rebuild (file :string) :bool=
+  let base = file.lastPathPart & ".mod"
+  let trg  = cfg.cacheDir/base
+  if not fileExists(trg):
+    file.writeModTime(trg)
+    return true
+  let curr = file.getModTime
+  let last = readFile trg
+  if curr != last:
+    file.writeModTime(trg)
+    return true
+  return false
+
+#_________________________________________________
 # Default confy.task
 #___________________
 when not compiles(beforeConfy()):
-  proc beforeConfy= info "Building the current project with confy ..."
+  proc beforeConfy= info &"Building {system.packageName} with confy ..."
 when not compiles(afterConfy()):
   proc afterConfy=  info "Done building."
 proc confy *(file :string= cfg.file.string) :void=
@@ -132,7 +160,9 @@ proc confy *(file :string= cfg.file.string) :void=
   beforeConfy()
   let dbgOpt  = when debug: "-d:debug" else:"--hints:off -d:release"
   let builder = (&"{cfg.srcDir.string}/{file}").addFileExt(".nim")
-  sh &"{cfg.nim.cc} c {dbgOpt} -d:ssl --skipParentCfg --outDir:{cfg.binDir.string} {builder}"   # nim c --outDir:binDir srcDir/build.nim
+  if builder.rebuild:
+    info "Building the builder app ..."
+    sh &"{cfg.nim.cc} c {dbgOpt} -d:ssl --skipParentCfg --outDir:{cfg.binDir.string} {builder}"   # nim c --outDir:binDir srcDir/build.nim
   sh &"./{cfg.file.string.splitFile.name} {cliParams().join(\" \")}", cfg.binDir
   afterConfy()
 

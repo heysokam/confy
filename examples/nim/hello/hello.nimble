@@ -1,21 +1,19 @@
-# confy dependencies
-include confy/nims
-
 # Package
 packageName   = "hello"
 version       = "0.0.0"
 author        = "sOkam"
-description   = "Confy: Hello Nim Build"
+description   = "Confy: hello.Nim"
 license       = "CC0-1.0"
 
 # Dependencies
-requires "nim >= 1.9.3"
+requires "nim >= 2.0.0"
 # Should be active in a real project
 # requires "https://github.com/heysokam/confy"
 
 # Folders
-system.srcDir = "src"
+srcDir = "src"
+binDir = "bin"
 
 # Build task
-task confy, "Builds the current nim project using confy.": confy()
+task confy, "Builds the current nim project using confy.": exec "nim ./confy.nims"
 

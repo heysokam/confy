@@ -55,9 +55,7 @@ func getConfig (lang :LangID) :Lang=
     of C   : dir.C
     of Cpp : dir.cpp
     of Nim : dir.nim
-  var cmd :string= case lang
-    of Nim : "nimble run"
-    else   : "nim $1 --hints:off --noNimblePath --path:$2 confy.nims" % [if debug:"-d:debug" else:"", dir.confy]
+  var cmd :string= "nim $1 --hints:off --noNimblePath --path:$2 confy.nims" % [if debug:"-d:debug" else:"", dir.confy]
   Lang(id: lang,
     hello: Example(dir: root/dir.hello, cmd: cmd),
     cross: Example(dir: root/dir.cross, cmd: cmd),
