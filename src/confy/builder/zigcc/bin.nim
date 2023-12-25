@@ -31,9 +31,9 @@ proc download *(
     force  : bool   = false
   ) :void=
   ## @descr Downloads the correct zig binaries for the current hostCPU/hostOS.
+  if not dir.dirExists: dir.createDir
   let link = trg.latest.url()
   let file = dir/link.lastPathPart
-  if not dir.dirExists: dir.createDir
   if force or not file.fileExists:  dl.file(link, file)
   if not fileExists( dir/zcfg.name ):  file.unzip(dir)
 

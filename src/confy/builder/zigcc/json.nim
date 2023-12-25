@@ -19,8 +19,11 @@ import ./types
 const master = "master"
 const index  = "https://ziglang.org/download/index.json"
 #_____________________________
-proc download (trg :string= cfg.zigJson.string) :void=  dl.file(index, trg)
+proc download (trg :string= cfg.zigJson.string) :void=
   ## Downloads the latest zig json from the website.
+  let dir = trg.splitFile.dir
+  if not dir.dirExists: createDir dir
+  dl.file(index, trg)
 proc yesterday (trg :string= cfg.zigJson.string) :bool=  Fil(trg).noModSince(hours = 24)
   ## Returns true if the json file hasn't been updated in the last 24h.
 

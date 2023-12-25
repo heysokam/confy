@@ -84,16 +84,14 @@ var testsDir     *:Dir=  rootDir/"tests"
 #___________________
 # Subfolders
 var cacheDir     *:Dir=  binDir/".cache"
-var zigDir       *:Dir=  binDir/"zig"
+var zigDir       *:Dir=  binDir/".zig"
 
 #_________________________________________________
 # Project: Files
 #___________________
 var file    *:Fil=  "build.nim".Fil
   ## File used for storing the builder config/app.
-var db      *:Fil=  binDir/".confy.db"
-  ## File used for storing the builder database.
-var zigJson *:Fil=  binDir/".zig.json"
+var zigJson *:Fil=  zigDir/"versions.json"
   ## Zig download index json file.
 
 

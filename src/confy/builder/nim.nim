@@ -90,6 +90,7 @@ proc buildNimZ  *(force=false) :void=
 const ZigTemplate = "{cc} --nimcache:{cfg.cacheDir} -d:zig --cc:clang --clang.exe=\"{zigcc}\" --clang.linkerexe=\"{zigcc}\" --clang.cppCompiler=\"{zigcpp}\" --clang.cppXsupport=\"-std=c++20\" {zigTarget}"
 #_____________________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
+  if obj.kind == Object: cerr "Compiling Nim into Object files is not supported. Run nim manually with `--noLinking:on|off`"
   buildNimZ(force=force) # Build the NimZ aliases when they do not exist
   var zigTarget :string
   if obj.syst != getHost():
@@ -98,8 +99,12 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
     zigTarget.add &"--os:{nimSyst.os} --cpu:{nimSyst.cpu} "
     zigTarget.add &"--passC:\"-target {zigSyst.cpu}-{zigSyst.os}\" "
     zigTarget.add &"--passL:\"-target {zigSyst.cpu}-{zigSyst.os}\" "
+  let typFlag = case obj.kind
+    of SharedLibrary : "--app:lib"
+    of StaticLibrary : "--app:staticlib"
+    else             : ""
   let verb = if cfg.verbose: "--verbosity:3" else:""
-  var cc = &"{cfg.nim.cc} {cfg.nim.backend} {verb}"
+  var cc = &"{cfg.nim.cc} {cfg.nim.backend} {verb} {typFlag}"
   if force: cc &= " -f"
   case  obj.cc  # Add extra parameters for the compilers when required
   of    Zig:    cc = fmt(ZigTemplate)
