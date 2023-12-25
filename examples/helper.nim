@@ -72,8 +72,8 @@ template build *(lang :Lang; example :untyped) :void=
 proc buildAll *(lang :LangID) :void=
   let cfg :Lang= lang.getConfig()
   cfg.build( hello )
-  # cfg.build( cross )
-  # cfg.build( full  )
+  cfg.build( cross )
+  cfg.build( full  )
 
 proc buildAll *() :void=
   info "Building everything."
