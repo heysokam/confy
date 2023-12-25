@@ -1,0 +1,2 @@
+include confy/nims
+confy()
