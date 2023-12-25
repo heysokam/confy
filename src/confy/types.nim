@@ -5,8 +5,7 @@
 ##  Types and global defines for the `confy` library.
 #_____________________________________________________|
 const debug *:bool= not (defined(release) or defined(danger)) or defined(debug)
-from ./tool/nims as n import nil
-const nims *:bool= n.isActive()
+const nims  *:bool= defined(nimscript)
 #_______________________________________
 # @deps std
 when nims:

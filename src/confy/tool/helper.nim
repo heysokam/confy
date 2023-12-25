@@ -37,7 +37,7 @@ proc touch *(trg :Fil) :void=
   ## @descr Creates the target file if it doesn't exist.
   when nims:
     when defined linux:   exec &"touch {trg}"
-    elif defined windows: exec &"Get-Item {trg}"
+    elif defined windows: exec &"powershell \"Get-Item {trg}\""
   else:  trg.string.open(mode = fmAppend).close
 #_____________________________
 proc setExec *(trg :Fil) :void=  os.setFilePermissions(trg.string, {FilePermission.fpUserExec}, followSymlinks = false)

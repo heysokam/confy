@@ -111,7 +111,7 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
   of    GCC:    cc &= " --cc:gcc"
   of    Clang:  cc &= " --cc:clang"
   if cfg.nim.unsafe.functionPointers: cc.add " --passC:-Wno-incompatible-function-pointer-types"
-  let cmd = &"{cc} --out:{obj.trg} --outdir:\"{obj.root/obj.sub}\" {obj.args} {obj.src.join()}"
+  let cmd = &"{cc} --out:{obj.trg.toBin(obj.syst.os)} --outdir:\"{obj.root/obj.sub}\" {obj.args} {obj.src.join()}"
   if cfg.verbose     : echo cmd
   elif not cfg.quiet : echo &"{cfg.Cstr} {obj.trg}"
   echo cmd

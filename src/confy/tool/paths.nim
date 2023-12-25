@@ -2,9 +2,8 @@
 #  nstd  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:____________________________________________________
 ## @fileoverview Duplicate of `@heysokam/nstd.paths` to not depend on it
-import ./nims
 
-when nims.isActive():
+when defined(nimscript):
   type Path * = string
 else:
   # @deps std
