@@ -106,4 +106,7 @@ proc flags *(lang :Lang) :Flags=
   of C   : return fl.all(C)
   of Cpp : return fl.all(Cpp)
   else: quit( "Tried to get the flags of a lang that doesn't have any." )
+#___________________
+var flagsC   *:Flags= cfg.flags(C)
+var flagsCpp *:Flags= cfg.flags(Cpp)
 
