@@ -8,8 +8,9 @@
 **Less important, but todo**:
 - [ ] More examples:
   - [ ] Advanced usage
-- [ ] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
-      You can specify your flags, and add the defaults explicitly, or just don't specify and use the fallback when omitted.  
+- [ ] [c,cpp] Port the make-to-confy translator refactor into confy _(was never included)_
+- [ ] [c,cpp] Fallback set of cc/ld flags, for both debug/release modes. (currently only supports one set without optimizations)
+      You can specify your flags, add the defaults explicitly, or just don't specify and use the fallback when omitted.  
 - [ ] command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] fix: make-to-confy missing ld flags
 ```

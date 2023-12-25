@@ -1,12 +1,12 @@
 ![Confy](./res/banner.png)
-# confy: Comfortable and Configurable buildsystem for C and Nim
-Confy is a Buildsystem for compiling code with ZigCC.  
+# confy: Comfortable and Configurable buildsystem
+Confy is a buildsystem for compiling code with ZigCC.  
 Inspired by SCons, without the issues of a typeless language.  
 You can expect: 
 - Ergonomic, readable and minimal/simple syntax.  
 - Behaves as a library. Builds your own binary that runs the compilation commands.  
 - Imperative, not declarative. You own the flow control of your builder.  
-- Sane project configuration defaults, unless explicitely changed.   
+- Sane project configuration defaults.  
 - Builds with `zig cc`. Auto-downloads the latest version for the host.  
 
 _Note: ZigCC is the binary compiler used, but this doesn't mean we build Zig code._  
