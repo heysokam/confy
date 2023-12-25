@@ -111,7 +111,7 @@ Program.new( @["src/mycode.c"], "hello" ).build()
 
 You can build this file in whatever way you want, and running it will build your code as expected.  
 The easiest way to do this is with the [Caller Script setup](#the-caller-script) described in the prev secion.  
-> _Alternative: Build+Run with `nim c -r src/build.nim`_
+> _Alternative: Build+Run with `nim c -r src/build`_
 
 #### Differences between C, C++ and Nim
 C/C++ are built exactly the same, and Nim compiles into C.  
@@ -149,8 +149,8 @@ let code = @[
 > _I would never recommend this, but... your project, your rules._
 
 
-## Other Examples:
-More ways to configure the buildsystem are shown @[the examples](./examples) folder.  
+## Other Examples
+More ways to configure the buildsystem are shown @[the examples](../examples) folder.  
 You can use those projects as templates for a new project, or just use them as inspiration instead.  
 
 
