@@ -35,9 +35,9 @@ cfg.docDir          = rootDir/"doc"
 cfg.examplesDir     = rootDir/"examples"
 cfg.testsDir        = rootDir/"tests"
 cfg.cacheDir        = binDir/".cache"
-cfg.zigDir          = binDir/"zig"
+cfg.zigDir          = binDir/".zig"
 cfg.file            = Path( "build.nim" )
-cfg.zigJson         = binDir/".zig.json"
+cfg.zigJson         = zigDir/"versions.json"
 cfg.flagsC          = cfg.flags( C   )
 cfg.flagsCpp        = cfg.flags( Cpp )
 
