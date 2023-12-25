@@ -1,42 +1,76 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
-when defined(nimscript):
+## @fileoverview
+##  Types and global defines for the `confy` library.
+#_____________________________________________________|
+const debug *:bool= not (defined(release) or defined(danger)) or defined(debug)
+const nims  *:bool= defined(nimscript)
+#_______________________________________
+# @deps std
+when nims:
   type Path * = string
 else:
-  import std/paths
+  from std/paths import Path
 
+#_________________________________________________
+# Error Management
+#___________________
+type CompileError * = object of IOError
+  ## @descr For exceptions during the compile process
+type GeneratorError * = object of IOError
+  ## @descr For exceptions during code generation.
+
+
+#_________________________________________________
+# Package information
+#___________________
+type Package * = object
+  name        *:string
+  version     *:string
+  author      *:string
+  description *:string
+  license     *:string
+
+#_______________________________________
+# Paths
+#___________________
 type Dir  * = Path
-  ## Path to a Directory
+  ## @descr Path to a Directory
 type Fil  * = Path
-  ## Path to a File
-  ## Note: Name chosen based on the etymology of the word File, which comes from latin Fillum.
-  ##       It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
-  ##       Very :NotLikeThis:
+  ## @descr Path to a File
+  ## @note
+  ##  Name chosen based on the etymology of the word File, which comes from latin Fillum.
+  ##  It's a bad name. Period. But it cannot be just `File` because of std/File conflict.
+  ##  Very :NotLikeThis:
 type DirFile * = object
-  ## Internal Data Type for a single file, so that dir can be adjusted separately without issues. file is always relative to dir
+  ## @descr Internal Data Type for a single file, so that dir can be adjusted separately without issues.
+  ## @field dir Absolute folder where the file is stored
+  ## @field file Always relative to {@link:field dir}
   dir   *:Dir
   file  *:Fil
 
-type CompileError * = object of IOError
-  ## For exceptions during the compile process
-type GeneratorError * = object of IOError
-  ## For exceptions during code generation.
 
-type Opt  * = bool
-  ## Command line ShortOptions / Switches
-
+#_______________________________________
+# Compiler
+#___________________
 type Lang *{.pure.}= enum Unknown, C, Cpp, Nim
-  ## Language of a code file, based on its extension
+  ## @descr Language of a code file, based on its extension
 type BinKind * = enum Program, SharedLibrary, StaticLibrary, Object, Module
-  ## Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc
-
+  ## @descr Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc
+#___________________
 type Flags * = object
-  ## Set of flags to send to the compiler stages.
+  ## @descr Set of flags to send to the compiler stages.
   cc *:seq[string]
   ld *:seq[string]
+#___________________
+type Compiler * = enum Zig, GCC, Clang
+  ## @descr Known compiler names.
 
+
+#_______________________________________
+# Target-specific
+#___________________
 type OS * = enum
   Windows = "windows", Mac     = "macosx",  Linux   = "linux"
   NetBSD  = "netbsd",  FreeBSD = "freebsd", OpenBSD = "openbsd"
@@ -52,25 +86,27 @@ type System * = object
   cpu  *:CPU
 type SystemStr * = tuple[os:string,cpu:string]
   ## Pair of (os,cpu) strings, converted to be valid for use as arguments for specific commands.
-
+#___________________
 type Extension * = object
   ## File extensions for a system.
   os    *:OS
   bin   *:string
   lib   *:string
   obj   *:string
+  ar    *:string
 type Extensions * = object
   unix  *:Extension
   win   *:Extension
   mac   *:Extension
 const ext * = Extensions(
-  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o"),
-  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj"),
-  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o"),  )
+  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o",   ar: ".a"),
+  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj", ar: ".lib"),
+  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o",   ar: ".a"),  )
 
-type Compiler * = enum Zig, GCC, Clang
-  ## Known compiler names.
 
+#_______________________________________
+# Build Target
+#___________________
 type BuildTrg * = object
   kind     *:BinKind       ## Type of build target
   src      *:seq[DirFile]  ## Sequence of source files to build with. Object files (aka `.o`, etc) will be linked at the end and their path won't be adjusted.

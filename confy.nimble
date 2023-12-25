@@ -6,7 +6,7 @@ import std/[ os,strformat ]
 #_____________________________
 # Package
 packageName   = "confy"
-version       = "0.1.11"
+version       = "0.2.0"
 author        = "sOkam"
 description   = "confy | Buildsystem for Nim & C"
 license       = "MIT"
@@ -14,40 +14,31 @@ license       = "MIT"
 #_____________________________
 # Dependencies
 requires "nim >= 2.0.0"
-requires "db_connector"
-requires "checksums"
 requires "jsony"
 requires "zippy"
 
 #_____________________________
 # Folders
-srcDir              = "src"
-binDir              = "bin"
-let examplesDir     = "examples"
-let helloDir        = examplesDir/"hello"
-let helloNimDir     = examplesDir/"nim_hello"
-let helloNimFullDir = examplesDir/"nim_full"
-skipFiles           = @["nim.cfg"]
+srcDir = "src"
+binDir = "bin"
+
+#_____________________________
+# Examples
+#___________________
+import ./examples/helper
+task examples,    "Builds all examples for all languages."                           : helper.buildAll()
+task examplesC,   "Builds all examples for the C   programming language."            : helper.buildAll( C   )
+task examplesCpp, "Builds all examples for the C++ programming language."            : helper.buildAll( Cpp )
+task examplesNim, "Builds all examples for the Nim programming language."            : helper.buildAll( Nim )
+task helloC,      "Builds the hello world example for the C   programming language." : helper.buildHello( C   )
+task helloCpp,    "Builds the hello world example for the C++ programming language." : helper.buildHello( Cpp )
+task helloNim,    "Builds the hello world example for the Nim programming language." : helper.buildHello( Nim )
 
 #_________________________________________________
-# Run the example demo projects
-#___________________
-before helloC: echo packageName,": This is happening before helloC.task."
-after  helloC: echo packageName,": This is happening after helloC.task."
-task helloC, "Example C:  Executes confy inside the helloC folder":
-  withDir helloDir: exec "nim hello.nims"
-#___________________
-task helloNim, "Example Nim:  Executes confy inside the nim_hello folder":
-  withDir helloNimDir: exec "nimble confy"
-task helloNimFull, "Example Nim (Full):  Executes confy inside the nim_full folder":
-  withDir helloNimFullDir: exec "nimble confy"
-
-#_________________________________________________
-# Manage git tags for confy
+# Internal
 #___________________
 task push, "Internal:  Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
-  ## Does nothing when local and remote versions are the same.
+  # @note Does nothing when local and remote versions are the same.
   requires "https://github.com/beef331/graffiti.git"
-  exec "git push"  # Requires local auth
-  exec &"graffiti ./{packageName}.nimble"
+  helper.push()
 

@@ -1,67 +1,69 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/os
-import std/osproc
-when defined(nimscript):
-  import std/strformat
-import std/strutils
 import std/times
-# confy dependencies
+# @deps confy
 import ../types
-import ../auto
 import ../cfg
-import ./logger
+# @deps confy.tools
+import ./strings
 
 
 #_______________________________________
 # General Tools
 #_____________________________
+# Bash
 proc sh *(cmd :string; dbg :bool= false) :void=
-  ## Runs the given command in a shell (binary).
-  if dbg: log cmd
+  ## @descr Runs the given command in a shell (binary).
+  if dbg: echo cmd
   if cfg.fakeRun: return
-  discard execShellCmd cmd
+  discard os.execShellCmd cmd
+#___________________
+# Access time
+when not nims:
+  #_____________________________
+  proc lastMod *(trg :Fil) :times.Time=
+    ## @descr Returns the last modification time of the file, or empty if it cannot be found.
+    try:    result = os.getLastModificationTime( trg.string )
+    except: result = times.Time()
+  #_____________________________
+  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
+    ## @descr Returns true if the trg file hasn't been modified in the last N hours.
 #_____________________________
-proc sh *(cmds: openArray[string]; cores :int= cfg.cores) :void=
-  ## Runs the given commands in parallel, using the given number of cores.
-  ## When used with nimscript, it ignores cores and runs the commands one after the other.
-  # todo:  https://github.com/mratsim/constantine/blob/master/helpers/pararun.nim
-  when defined(nimscript):
-    for cmd in cmds: exec cmd
-  else:
-    discard execProcesses(cmds, n=cores, options={poUsePath, poStdErrToStdOut, poParentStreams})
-
-#_____________________________
+# Files
 proc touch *(trg :Fil) :void=
-  ## Creates the target file if it doesn't exist.
-  when defined(nimscript):
+  ## @descr Creates the target file if it doesn't exist.
+  when nims:
     when defined linux:   exec &"touch {trg}"
-    elif defined windows: exec &"Get-Item {trg}"
-  else:  trg.open(mode = fmAppend).close
-
+    elif defined windows: exec &"powershell \"Get-Item {trg}\""
+  else:  trg.string.open(mode = fmAppend).close
 #_____________________________
-proc with *(os :OS; cpu :CPU) :System=
-  ## Returns a System object for the given os and cpu.
-  result.os  = os
-  result.cpu = cpu
-#_____________________________
-proc setExec *(trg :Fil) :void=  trg.setFilePermissions({FilePermission.fpUserExec}, followSymlinks = false)
-  ## Sets the given `trg` binary flags to be executable for the current user.
+proc setExec *(trg :Fil) :void=  os.setFilePermissions(trg.string, {FilePermission.fpUserExec}, followSymlinks = false)
+  ## @descr Sets the given `trg` binary flags to be executable for the current user.
 
+
+#_______________________________________
+# Compiler
 #_____________________________
 proc defaultExt *(lang :Lang) :string=
-  ## Returns the default extension for the given lang as a string  (contains the dot).
-  ## Result will be an empty string if the lang is Unknown
+  ## @descr Returns the default extension for the given lang as a string  (contains the dot).
+  ## @note Result will be an empty string if the lang is Unknown
   case lang
   of Nim,C,Cpp : "." & ($lang).normalize
   of Unknown   : ""
 
-
+#_______________________________________
+# Build Target
+#_____________________________
+proc with *(os :OS; cpu :CPU) :System=
+  ## @descr Returns a System object for the given os and cpu.
+  result.os  = os
+  result.cpu = cpu
 #_____________________________
 proc getHost *() :System=
-  ## Returns the properties of the host, as a System object
+  ## @descr Returns the properties of the host, as a System object
   case hostOS
   of   "windows":     result.os = OS.Windows
   of   "macosx":      result.os = OS.Mac
@@ -90,22 +92,4 @@ proc getHost *() :System=
   of   "riscv32":     result.cpu = CPU.riscv32
   of   "riscv64":     result.cpu = CPU.riscv64
   of   "alpha":       result.cpu = CPU.alpha
-
-
-when not defined(nimscript):
-  #_____________________________
-  proc lastMod *(trg :Fil) :times.Time=
-    ## Returns the last modification time of the file, or empty if it cannot be found.
-    try:    result = trg.getLastModificationTime
-    except: result = Time()
-  #_____________________________
-  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
-    ## Returns true if the trg file hasn't been modified in the last N hours.
-
-#_______________________________________
-# std Extension
-#___________________
-proc startsWith *(entry :string; args :varargs[string, `$`]) :bool=
-  for arg in args:
-    if strutils.startsWith(entry, arg): return true
 

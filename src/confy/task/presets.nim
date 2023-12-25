@@ -1,6 +1,7 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
+{.error:"Tasks and keywords need to be reimplemented for the refactor of 2.0.0".}
 # std dependencies
 import std/os
 import std/strformat

@@ -1,41 +1,103 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# WARNING:                                             |
-# This file is meant to be `include`d, not `import`ed, |
-# into your confy.nims file.                           |
-# Import dependencies are solved globally.             |
-#_______________________________________________________
-include ./nims/guard
-# confy dependencies for nims
-from ./nims/confy as c import nil
-# std dependencies
-import std/[ os,strformat,strutils,sets ]
+## @fileoverview
+##  Implements the nimscript-specific tools for confy.
+##  Provides tools to easily build your builder app.
+##  Use with `include confy/nims`
+##
+## @WARNING
+##  This file is meant to be `include`d, not `import`ed
+##  into your confy.nims file.
+##  @reason Import dependencies are solved globally.
+#_______________________________________________________|
+## @guard Will error when loading from non-nimscript.
+##  The nims section is completely isolated from confy.
+from ./types import nims
+const debug {.booldefine.}= off
+when not nims:
+  const nimsMsg :string= "Tried to add a nimscript-only module into a binary app."
+  when debug : {.warning: nimsMsg.}
+  else       : {.error: nimsMsg.}
+#_________________________________________________
+# @deps std
+import std/[ os,strformat,strutils,sequtils,sets ]
+# @deps confy
+import ./types
+import ./cfg
+
+
+#_________________________________________________
+# General tools
+#___________________
+template info  *(msg :string)= echo cfg.prefix & msg  ## @descr Logs a message to console
+template info2 *(msg :string)= echo cfg.tab    & msg  ## @descr Logs a tabbed message to console
+template fail  *(msg :string)= quit cfg.prefix & msg  ## @descr Logs a message to console and quits
+proc dbg *(msg :string) :void=
+   when debug: info msg
+proc dbg2 *(msg :string) :void=
+   when debug: info2 msg
+#___________________
+proc asignOrFail (v1,v2,name :string) :string=
+  ## @descr Returns either the value of `v1` or `v2`, and fails if both of them are empty.
+  result = if v1 != "": v1 elif v2 != "": v2 else: fail "Tried to assign values for required variable "&name&" but none of the options are defined."
+  dbg2 &"found {name}:  {result}"
+#___________________
+proc sh *(cmd :string; dir :string= ".") :void=
+  ## @descr Runs the given command with a shell.
+  ## @arg cmd The command to run
+  ## @arg dir The folder from which the {@link:arg cmd} command will be run.
+  if not cfg.quiet: info &"Running {cmd} from {dir} ..."
+  try:
+    withDir dir: exec cmd
+  except: fail &"Failed running {cmd}"
+  if not cfg.quiet: info &"Done running {cmd}."
+#___________________
+proc getModTime *(file :string) :string=
+  when hostOS == "windows": return
+  let lines = gorge( &"stat {file.absolutePath}" ).splitLines
+  for line in lines:
+    if line.startsWith("Modify:"): return line.replace("Modify: ", "")
+#___________________
+proc writeModTime *(src,trg :string) :void=
+  when hostOS == "windows": return
+  let dir = trg.splitFile.dir
+  if not dir.dirExists: mkDir dir
+  trg.writeFile( src.getModTime() )
+
+#___________________
+proc cliParams *() :seq[string]=
+  ## @descr Returns the list of all Command Line Parameters passed to the script.
+  const KnownAliases = ["confy"]
+  var valid :bool= false
+  for id in 0..paramCount():
+    let curr = paramStr( id )
+    if   id == 0 and curr in KnownAliases : valid = true     # Special case for aliased script used as arg0
+    elif valid                            : result.add curr  # Everything is valid after arg0 was found
+    elif curr.endsWith(".nims")           : valid = true     # Add everything after we found arg0 (case: the first .nims file)
+proc cliArgs *() :seq[string]=  cliParams().filterIt( not it.startsWith('-') )
+  ## @descr List of command line arguments passed to the nims script.
+proc cliOpts *() :seq[string]=  cliParams().filterIt( it.startsWith('-') )
+  ## @descr List of command line options passed to the nims script.
 
 
 #_________________________________________________
 # Configuration
 #___________________
 # Internal Config
-const confyPrefix * = "confy: "
-const confyTab    * = "     : "
-const debug       * = not (defined(release) or defined(danger)) or defined(debug)
-template info  *(msg :string)= echo confyPrefix & msg
-template info2 *(msg :string)= echo confyTab    & msg
-
-#_________________________________________________
-# Package information
-#___________________
-type Package = object
-  name        :string
-  version     :string
-  author      :string
-  description :string
-  license     :string
-#___________________
-func getContent(line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
-proc getPackageInfo() :Package=
-  when debug: info &"Getting .nimble data information from {projectDir()}"
+proc getPackageInfo () :Package=
+  func getContent (line,pattern :string) :string=  line.replace( pattern & ": \"", "").replace("\"", "")
+  dbg &"Getting package information"
+  if packageName != "" : result.name        = packageName
+  if version     != "" : result.version     = version
+  if author      != "" : result.author      = author
+  if description != "" : result.description = description
+  if license     != "" : result.license     = license
+  if packageName != "" and version != "" and author != "" and description != "" and license != "":
+    dbg2 &"{result}"
+    return
+  # Nimble
+  dbg &"One of the variables is not defined. Searching for .nimble file in {projectDir()}  Running\n  nimble dump"
   let data :seq[string]= gorgeEx( &"cd {projectDir()}; nimble dump" ).output.splitLines()
   for line in data:
     if   line.startsWith("name:")    : result.name        = line.getContent("name")
@@ -44,14 +106,19 @@ proc getPackageInfo() :Package=
     elif line.startsWith("desc:")    : result.description = line.getContent("desc")
     elif line.startsWith("license:") : result.license     = line.getContent("license")
     #ignored: skipDirs, skipFiles, skipExt, installDirs, installFiles, installExt, requires, bin, binDir, srcDir, backend
-  when debug: info2 &"found ->  {result}"
+  dbg2 &"{result}"
 
 #_________________________________________________
 # Requirements list
 #___________________
+when not defined(nimble):
+  proc requires *(deps :varargs[string]) :void=
+    ## @descr Nims support: Call this to set the list of requirements of your application.
+    for d in deps: system.requiresData.add(d)
+#___________________
 proc installRequires *() :void {.inline.}=
   # remember "nimble list -i"
-  info "Installing dependencies declared with `requires`"
+  dbg "Installing dependencies declared with `requires`"
   var confyID    :Natural
   var confyFound :bool
   for id,req in system.requiresData.pairs:
@@ -59,50 +126,71 @@ proc installRequires *() :void {.inline.}=
     if   req == "confy"         : dep = "https://github.com/heysokam/confy@#head"; confyID = id; confyFound = true
     elif req.endsWith("@#head") : dep = req
     elif req.endsWith("#head")  : dep = req.replace("#head", "@#head")
-    info2 "Installing "&dep
-    exec "nimble install "&dep
+    dbg2 "Installing "&dep
+    sh "nimble install "&dep
   if confyFound: system.requiresData.delete(confyID) # Remove confy requires so we dont install it multiple times
 #___________________
 template clearRequires *()=  system.requiresData = @[]
 
+#_________________________________________________
+# Rebuild build.nim management
 #___________________
-# nims confy+any tasks
-include ./nims/task
+proc rebuild (file :string) :bool=
+  let base = file.lastPathPart & ".mod"
+  let trg  = cfg.cacheDir/base
+  if not fileExists(trg):
+    file.writeModTime(trg)
+    return true
+  let curr = file.getModTime
+  let last = readFile trg
+  if curr != last:
+    file.writeModTime(trg)
+    return true
+  return false
 
 #_________________________________________________
-# Initialize
+# Default confy.task
+#___________________
+when not compiles(beforeConfy()):
+  proc beforeConfy= info &"Building {system.packageName} with confy ..."
+when not compiles(afterConfy()):
+  proc afterConfy=  info "Done building."
+proc confy *(file :string= cfg.file.string) :void=
+  ## This is the default confy task
+  beforeConfy()
+  let dbgOpt  = when debug: "-d:debug" else:"--hints:off -d:release"
+  let builder = (&"{cfg.srcDir.string}/{file}").addFileExt(".nim")
+  if builder.rebuild:
+    info "Building the builder app ..."
+    sh &"{cfg.nim.cc} c {dbgOpt} -d:ssl --skipParentCfg --outDir:{cfg.binDir.string} {builder}"   # nim c --outDir:binDir srcDir/build.nim
+  sh &"./{cfg.file.string.splitFile.name} {cliParams().join(\" \")}", cfg.binDir
+  afterConfy()
+
+#_________________________________________________
+# Process: nims
 #_____________________________
-when debug: info "Starting in debug mode"
-#___________________
-# Build Requirements
-installRequires()
-#___________________
-# Package information
-var nimble :Package= getPackageInfo()
-func asignOrFail (v1,v2,name :string) :string= result = if v1 != "": v1 elif v2 != "": v2 else: raise newException(IOError, "Tried to assign values for required variable "&name&" but none of the options are defined.")
-#___________________
-# Package Config
-when debug:
-  info "Asigning Package information variables..."
-  for name,field in nimble.fieldPairs:
-    if field == "": info2 "package."&name&" was not found in .nimble"
-system.packageName = asignOrFail(system.packageName, nimble.name,        "packageName")
-system.version     = asignOrFail(system.version,     nimble.version,     "version")
-system.author      = asignOrFail(system.author,      nimble.author,      "author")
-system.description = asignOrFail(system.description, nimble.description, "description")
-system.license     = asignOrFail(system.license,     nimble.license,     "license")
-#___________________
-# Folders Config
-system.binDir      = c.binDir
-system.srcDir      = c.srcDir
-var docDir       * = c.docDir
-var examplesDir  * = c.examplesDir
-var testsDir     * = c.testsDir
-var cacheDir     * = c.cacheDir
-#___________________
-# Binaries Config
-system.backend     = "c"
-#___________________
-# Terminate and send control to the user script
-info "Done setting up."
+when isMainModule and (nims or defined(nimble)):
+  # Initialize
+  dbg "Starting in debug mode"
+  # Build Requirements
+  when not defined(nimble): installRequires()
+  # Package information
+  var pkgInfo :Package= getPackageInfo()
+  dbg "Asigning package information"
+  system.packageName = asignOrFail(system.packageName, pkgInfo.name,        "packageName")
+  system.version     = asignOrFail(system.version,     pkgInfo.version,     "version")
+  system.author      = asignOrFail(system.author,      pkgInfo.author,      "author")
+  system.description = asignOrFail(system.description, pkgInfo.description, "description")
+  system.license     = asignOrFail(system.license,     pkgInfo.license,     "license")
+  #___________________
+  # Folders Config
+  dbg "Defining and asigning folder paths"
+  system.binDir      = cfg.binDir
+  system.srcDir      = cfg.srcDir
+  var docDir       * = cfg.docDir
+  var examplesDir  * = cfg.examplesDir
+  var testsDir     * = cfg.testsDir
+  var cacheDir     * = cfg.cacheDir
+  # Terminate and send control to the user script
+  dbg "Done setting up $1 configuration" % [when defined(nimble): "nimble" else: "nims"]
 

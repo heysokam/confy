@@ -28,23 +28,24 @@ cfg.zigDir       = binDir/"zig"        ## Subfolder where the zig binaries
 ```nim
 # Files
 cfg.file    = "build.nim"         ## File used for storing the builder config/app. Searched for @`srcDir/cfg.file`
-cfg.db      = binDir/".confy.db"  ## File used for storing the builder database.
 cfg.zigJson = binDir/".zig.json"  ## Zig download index json file. Will be output when the ZigCC binaries are downloaded.
-```
-```nim
-# Commands
-cfg.nimble  = &"nimble {switchVerbose}"              ## Command to run when nimble needs to be run
-cfg.nimc    = &"nim c {switchVerbosity} -d:release"  ## Command to run for nimc tasks
 ```
 ```nim
 # Compilation
 ## Flags  (see confy/flags.nim for details)
-cfg.flagsC  = fl.allC           ## C   : Preset Flags object for all warnings and errors active
-cfg.flags   = fl.allPP          ## C++ : Preset Flags object for all warnings and errors active
+cfg.flagsC   = cfg.flags(C)      ## C   : Preset Flags object for all warnings and errors active
+cfg.flagsCpp = cfg.flags(Cpp)    ## C++ : Preset Flags object for all warnings and errors active
 
 ## Other options
-cfg.Cstr         = "CC"         ## Prefix used for formatting the quiet output calls to the Compiler.
-cfg.Lstr         = "LD"         ## Prefix used for formatting the quiet output calls to the Linker.
-cfg.zigSystemBin = on           ## Uses the System's ZigCC path, without downloading a new version from the web.
+cfg.Cstr            = "CC"         ## Prefix used for formatting the quiet output calls to the Compiler.
+cfg.Lstr            = "LD"         ## Prefix used for formatting the quiet output calls to the Linker.
+cfg.zigcc.systemBin = on           ## Uses the System's ZigCC path, without downloading a new version from the web.
+
+## Nim-specific
+cfg.nim.cc      = "nim"  ## Binary to call when running nim operations.
+cfg.nim.backend = "c"    ## Builds nim applications with this backend. Will be `nim {backend} thefile.nim`
+
+### Nim-unsafe options for ZigCC
+cfg.nim.unsafe.functionPointers = off  ## Builds nim applications with the `-Wno-incompatible-function-pointer-types` flag
 ```
 

@@ -1,9 +1,11 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/sets
-# confy dependencies
+# @deps confy
+import ../types
+# @deps confy.task
 import ./base
 import ./package as pkg
 import ./keywords
