@@ -47,11 +47,11 @@ or when you want to do some low level systems programming/coding before any of t
 You can do whatever you want. The builder application is yours.   
 
 This is why you need two files to setup your project:  
-1. **Builder**: Where you define how to build your project.
-  `REPO/src/build.nim`
+1. **Builder**: Where you define how to build your project.  
+  `REPO/src/build.nim`  
 
-2. **Caller**: Where you define how to build the builder itself.
-  `REPO/projectname.nimble` or `REPO/projectname.nims`
+2. **Caller**: Where you define how to build the builder itself.  
+  `REPO/projectname.nimble` or `REPO/projectname.nims`  
 
 > **Important**:  
 > Like everything else in confy, you don't `need` these defaults.  
@@ -59,7 +59,9 @@ This is why you need two files to setup your project:
 > This setup is here just to make things easy and ergonomic to use.  
 
 
-### The Caller Script  (aka project.nimble or project.nims)
+### The Caller Script
+_(aka `./project.nimble` or `./project.nims`)_  
+
 The Caller Script is a simple `nimscript` file that asks nim to compile your builder.  
 
 The most minimal Caller Script file possible would be:
@@ -80,33 +82,40 @@ To build the project, you have two options:
   # ...
 
   task confy, "This task will build the project with confy":
-  requires "https://github.com/heysokam/confy#head"
-  exec "nim confy.nims"
+    requires "https://github.com/heysokam/confy#head"
+    exec "nim confy.nims"
   ```
 > Note:  
 > Just like with the `example.nims` file, this is just convenience.  
-> The file can be called anything you want. It has no requirements. Just call the `confy()` function from nimscript and you are good to go.  
+> The file can be called anything you want. It has no requirements.  
+> Just call the `confy()` function from nimscript and you are good to go.  
 
-> Important:
-> You can build your `build.nim` Builder App however else you want.
+> Important:  
+> You can build your `build.nim` Builder App however else you want.  
 > All the `confy()` function does is provide some sane preconfigured defaults for you to make it easier to run the Builder.  
 
 
-### The Builder App  (aka src/build.nim)
-Following the overview trend of minimalism, lets make the previous example `src/build.nim` file even simpler:
+### The Builder App
+_(aka `./src/build.nims`)_  
+
+The Builder App is the actual application that will build your project.  
+This is the only required part of confy.  
+Compile the Builder App, run it, and that's it.  
+
+Following the trend of minimalism, lets make the previous example `src/build.nim` file even simpler:
 ```nim
 import confy
-Program.new( @["src/mycode.c"], "hello.exe" ).build()
+Program.new( @["src/mycode.c"], "hello" ).build()
 ```
-That's all, really. The rest is just for changing the defaults.
+> That's all, really. The other options are just for changing the defaults.
 
-You can build and run this file in whatever way you want, and it will bould your code as expected.  
-The usual way to do this will be with the Caller Script described in the prev secion.  
+You can build this file in whatever way you want, and running it will build your code as expected.  
+The easiest way to do this is with the [Caller Script setup](#the-caller-script) described in the prev secion.  
 > _Alternative: Build+Run with `nim c -r src/build.nim`_
 
 #### Differences between C, C++ and Nim
 C/C++ are built exactly the same, and Nim compiles into C.
-The only difference between them is the file you send into the `src` variable.  
+The only difference between them is the files you send into the `src` variable.  
 ```nim
 # If you want to build a Nim app:
 let code = @[ srcDir/"myfile.nim" ]
@@ -119,11 +128,11 @@ let code = @[ srcDir/"myfile.cpp" ]
 ```
 
 ##### Nim
-In C and C++ you will need to send all of the files, because the compiler doesn't understand dependency resolution.  
-But Nim has module dependency resolution.  
-As such, the only uniqueness for building Nim is that you can only send one `.nim` file for each object you build.  
+Nim has module dependency resolution.  
+The only uniqueness for building Nim is that you can only send one `.nim` file for each object you build.  
 
 ##### C and C++
+In C and C++ you will need to send all of your source files, because the compiler doesn't understand dependency resolution.  
 The `SomeFolder.glob(".ext")` function is created so that you don't need to explicitly list all files in your project manually,  
 and -also- maintain the list manually _(which is a giant PITA, time consuming, and extremely error and bug prone)_.  
 
@@ -137,7 +146,8 @@ let code = @[
   # ... list 100 other files one by one in here ...
   ]
 ```
-_I would never recommend this, but... your project, your rules._
+> _I would never recommend this, but... your project, your rules._
+
 
 ## Other Examples:
 More ways to configure the buildsystem are shown @[the examples](./examples) folder.  
