@@ -66,16 +66,20 @@ func getConfig (lang :LangID) :Lang=
 # Examples: Build
 #___________________
 template build *(lang :Lang; example :untyped) :void=
-  info "Building  $1.$2  " % [$lang.id, astToStr(example)]
+  info "Building  $1.$2" % [$lang.id, astToStr(example)]
   sh lang.`example`.cmd, lang.`example`.dir
 
 proc buildAll *(lang :LangID) :void=
+  info "Building all examples for $1" % [$lang]
   let cfg :Lang= lang.getConfig()
   cfg.build( hello )
   cfg.build( cross )
   cfg.build( full  )
 
+proc buildHello *(lang :LangID) :void=
+  let cfg :Lang= lang.getConfig()
+  cfg.build( hello )
+
 proc buildAll *() :void=
   info "Building everything."
   for lang in LangID: lang.buildAll()
-

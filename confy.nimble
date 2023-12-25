@@ -14,9 +14,6 @@ license       = "MIT"
 #_____________________________
 # Dependencies
 requires "nim >= 2.0.0"
-# TODO:
-# requires "db_connector"
-# requires "checksums"
 requires "jsony"
 requires "zippy"
 
@@ -29,14 +26,13 @@ binDir = "bin"
 # Examples
 #___________________
 import ./examples/helper
-task examples,    "Builds all examples for all languages."                : helper.buildAll()
-task examplesC,   "Builds all examples for the C   programming language." : helper.buildAll( C   )
-task examplesCpp, "Builds all examples for the C++ programming language." : helper.buildAll( Cpp )
-task examplesNim, "Builds all examples for the Nim programming language." : helper.buildAll( Nim )
-# TODO:
-# task helloC,      "Builds the hello world example for the C   programming language." : helper.build( C  , Hello )
-# task helloCpp,    "Builds the hello world example for the C++ programming language." : helper.build( Cpp, Hello )
-# task helloNim,    "Builds the hello world example for the Nim programming language." : helper.build( Nim, Hello )
+task examples,    "Builds all examples for all languages."                           : helper.buildAll()
+task examplesC,   "Builds all examples for the C   programming language."            : helper.buildAll( C   )
+task examplesCpp, "Builds all examples for the C++ programming language."            : helper.buildAll( Cpp )
+task examplesNim, "Builds all examples for the Nim programming language."            : helper.buildAll( Nim )
+task helloC,      "Builds the hello world example for the C   programming language." : helper.buildHello( C   )
+task helloCpp,    "Builds the hello world example for the C++ programming language." : helper.buildHello( Cpp )
+task helloNim,    "Builds the hello world example for the Nim programming language." : helper.buildHello( Nim )
 
 #_________________________________________________
 # Internal
