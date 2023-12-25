@@ -13,9 +13,8 @@ var cross = Program.new(           # Configure the target options common to all 
   syst    = confy.getHost(),
   root    = cfg.binDir,
   sub     = Dir(""),
-  remotes = @[],                  # Does nothing for Nim
+  remotes = @[],
   version = "",
-  args    = "",                   # Extra Arguments to send to the compiler
   ) # Doesn't build. Stores the configuration for calling .build() later
 
 
