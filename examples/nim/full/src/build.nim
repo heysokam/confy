@@ -58,10 +58,21 @@ var full = Program.new(           # Configure the target options common to all s
   args    = "",                   # Extra Arguments to send to the Nim compiler
   ) # Doesn't build. Stores the configuration for calling .build() later
 
+
+#_____________________________
+# @note Not required. Only for ergonomics.
+#  Comment this line to disable cross-compilation
+#  You can control this define however you prefer.
+#  `-d:CrossCompile` also works.
+#  And the same if you change the name of this to something else.
+#  You can also not have this at all and use keywords or target names instead.
+{.define: CrossCompile.}
+#_____________________________
+
+
 #_____________________
 # Normal Compilation |
 #____________________|
-{.define: CrossCompile.}
 when not defined(CrossCompile):
   full.syst = confy.getHost()         # This is the default value set when not specified. Explicit just for clarity of the example.
   full.build( run=true, force=true )  # Order to build. Defaults when omitted: (run=false, force=false)
