@@ -1,9 +1,3 @@
-> **Warning**:  
-> This library is in the process of deprecating support for multiple builder backends  
-> _(ie: gcc, clang, mingw, etc)_  
-> ZigCC will be the only builder remaining after the [PR#5](https://github.com/heysokam/confy/pull/5) refactor.  
-> _Nim, C and C++ compilation will continue to be supported._  
-
 ![Confy](./res/banner.png)
 # confy: Comfortable and Configurable buildsystem
 Confy is a buildsystem for compiling code with ZigCC.  
@@ -72,5 +66,4 @@ Confy, instead, provides you with a -library- of functions and types to build yo
 It is created to make this process seamless and ergonomic, as if it was a regular buildscript.  
 But the Builder app is compiled systems binary.  
 It can do literally -anything- a normal compiled systems binary can do.  
-
 
