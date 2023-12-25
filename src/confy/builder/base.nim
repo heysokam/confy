@@ -28,8 +28,8 @@ proc direct *(
     flags    : seq[string];
     quietStr : string;
   ) :void=
-  ## Builds the `src` file directly into the `trg` file.
-  ## Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
+  ## @descr Builds the `src` file directly into the `trg` file.
+  ## @note Doesn't compile an intermediate `.o` step, unless the CC command includes the "-c" option.
   let flg = flags.join(" ")
   let cmd = &"{CC} {flg} {src.path} -o {trg}"
   if cfg.quiet : echo &"{quietStr} {trg}"
@@ -43,8 +43,8 @@ proc direct *(
     flags    : seq[string];
     quietStr : string;
   ) :void=
-  ## Builds the `src` list of files directly into the `trg` file.
-  ## Doesn't compile an intermediate `.o` step.
+  ## @descr Builds the `src` list of files directly into the `trg` file.
+  ## @note Doesn't compile an intermediate `.o` step.
   let files = src.mapIt(it.path.string).join(" ")
   let flg   = flags.join(" ")
   let cmd   = &"{CC} {flg} {files} -o {trg}"
@@ -64,7 +64,7 @@ proc link *(
     CC    : Compiler;
     flags : Flags;
   ) :void=
-  ## Links the given `src` list of files into the `trg` binary.
+  ## @descr Links the given `src` list of files into the `trg` binary.
   direct(src, trg, lang.getCC(CC), flags.ld, Lstr)
 
 #_____________________________
@@ -107,37 +107,3 @@ proc compileToMod *(
   for file in src:
     let trg = file.chgDir(dir).path.string.changeFileExt(".pcm").Fil
     file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
-
-#___________________
-proc compile *(
-    src      : seq[DirFile];
-    trg      : Fil;
-    root     : Dir;
-    syst     : System;
-    CC       : Compiler;
-    flags    : Flags;
-    quietStr : string;
-  ) :void=
-  ## Compiles the given `src` list of files using the given `CC` compiler.
-  ## Assumes the paths given are already relative/absolute in the correct way.
-  var objs :seq[DirFile]
-  # var cmds :seq[string]
-  var cfl  = flags.cc.join(" ")
-  log &"Building {trg} ..."
-  if quiet: stdmsg.write &"{tab}|" # add | to start the line of the silent case
-  for file in src:
-    if file.path.isObj:  # File is already an object. Add to objs and continue
-      objs.add(file); continue
-    let trg = DirFile.new(file.dir, file.file.toObj(syst.os)).chgDir(root)
-    let dir = trg.path.string.splitFile.dir
-    let cmd = &"{file.getCC(CC)} -MMD {cfl} -c {file.path} -o {trg.path}"
-    if   quiet:   stdmsg.write "."
-    elif verbose: echo cmd
-    else:         echo &"{quietStr} {trg.path}"
-    objs.add trg
-    if not dir.dirExists: createDir dir
-    sh cmd
-    # cmds.add cmd
-  if quiet: echo "Done." # add \n to end the line of the silent case
-  # sh cmds, cfg.cores
-  objs.link(trg, src.getLang(), CC, flags)

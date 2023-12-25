@@ -7,7 +7,7 @@ import std/strformat
 import ../types
 import ../cfg
 import ../dirs
-import ../tool/helper
+import ../tool/helper as t
 import ../tool/paths
 # @deps confy.builder
 import ./base
@@ -33,6 +33,12 @@ proc getCC *(src :seq[DirFile]) :string=
   if zcfg.getRealCCP() in cmds : return zcfg.getRealCCP()
   else                         : return zcfg.getRealCC()
 
+#_____________________________
+proc getTarget *(syst :System) :string=
+  ## @descr Returns a `-target cpu-os` flag for sending it to zigcc for cross-compilation.
+  if syst == getHost(): return ""
+  let zigSyst = helper.toZig(syst)
+  result = &"-target {zigSyst.cpu}-{zigSyst.os}"
 
 #_____________________________
 # ZigCC: Compiler
@@ -56,7 +62,7 @@ proc compileStatic *(
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
   ## @descr Compiles the given `src` list of files with ZigCC.
   case obj.kind
-  of Program:        base.direct(src,obj.trg, src.getCC, obj.flags.cc & obj.flags.ld, cfg.Cstr)
+  of Program:        base.direct(src, obj.trg.toBin(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @[obj.syst.getTarget()], cfg.Cstr)
   of Object:         base.compileToObj(src, obj.root, obj.syst, Zig, obj.flags, cfg.Cstr)
   of SharedLibrary:  base.direct(src, obj.trg.toLib(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @["-shared"], cfg.Cstr)  # base.compileShared(src, obj.trg, Zig, obj.root, obj.flags, obj.syst, cfg.Cstr)
   of StaticLibrary:  zigcc.compileStatic(src, obj.trg, obj.root, Zig, obj.flags, obj.syst, cfg.Cstr)

@@ -76,6 +76,7 @@ proc isValid *(src :string) :bool=  src.splitFile.ext in validExt
   ## @descr Returns true if the given src file has a valid known file extension.
 #_____________________________
 proc toLib *(file :Fil; os :OS) :Fil=
+  ## @descr Returns the input {@link:arg file} path with shared library file extension based on the input {@link:arg os}.
   case os
   of   OS.Linux:    file.changeFileExt ext.unix.lib
   of   OS.Windows:  file.changeFileExt ext.win.lib
@@ -83,17 +84,29 @@ proc toLib *(file :Fil; os :OS) :Fil=
   else: raise newException(CompileError, &"Support for {os} is currently not implemented.")
 #_____________________________
 proc toObj *(file :Fil; os :OS) :Fil=
+  ## @descr Returns the input {@link:arg file} path with an object file extension based on the input {@link:arg os}.
   case os
   of   OS.Linux:    file.changeFileExt ext.unix.obj
   of   OS.Windows:  file.changeFileExt ext.win.obj
   of   OS.Mac:      file.changeFileExt ext.mac.obj
   else: raise newException(CompileError, &"Support for {os} is currently not implemented.")
 #_____________________________
+proc toBin *(file :Fil; os :OS) :Fil=
+  ## @descr Returns the input {@link:arg file} path with a binary file extension based on the input {@link:arg os}.
+  case os
+  of   OS.Linux:    file.changeFileExt ext.unix.bin
+  of   OS.Windows:  file.changeFileExt ext.win.bin
+  of   OS.Mac:      file.changeFileExt ext.mac.bin
+  else: raise newException(CompileError, &"Support for {os} is currently not implemented.")
+#_____________________________
+proc isLib *(trg :Fil) :bool=  trg.splitFile.ext in [ext.unix.lib, ext.win.lib, ext.mac.lib]
+  ## @descr Returns true if the target `file` has a known shared library file extension.
+#_____________________________
 proc isObj *(trg :Fil) :bool=  trg.splitFile.ext in [ext.unix.obj, ext.win.obj, ext.mac.obj]
-  ## @descr Returns true if the `trg` file is already a compiled object.
+  ## @descr Returns true if the target `file` has a known object file extension.
 #_____________________________
 proc isBin *(file :Fil) :bool=
-  ## @descr Returns true if the target `file` is considered to have a known binary file extension.
+  ## @descr Returns true if the target `file` has a known binary file extension.
   if file.string.isValid: return false  # Never set binary flags for valid compilation unit extensions .o .a .c .cc .cpp
   case file.splitFile.ext
   of ext.unix.bin, ext.win.bin, ext.mac.bin:  return true   # Known binary extensions

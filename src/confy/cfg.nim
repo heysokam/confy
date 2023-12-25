@@ -19,7 +19,7 @@ var cores *:int=
 # Formatting
 var verbose *:bool=  when debug: on else: off
   ## Output will be fully verbose when active.
-var quiet   *:bool=  on
+var quiet   *:bool=  on and not verbose
   ## Output will be formatted in a minimal clean style when active.
 var prefix  *:string=  "confy: "
   ## Prefix that will be added at the start of every command output.
