@@ -29,7 +29,7 @@ let zigcppSrc  = cfg.cacheDir/"zigcpp.nim"
 #_____________________________________________________
 # NimZ Compiler : Alias Manager
 #_____________________________
-const nimcZ = "nim c -d:release --hint:Conf:off --hint:Link:off" # Base nimc command to build zigcc and zigcpp binaries with
+let nimcZopts = "c -d:release --hint:Conf:off --hint:Link:off --skipProjCfg --skipParentCfg" # Base nimc command to build zigcc and zigcpp binaries with
 const ZigccTemplate = """
 # From: https://github.com/enthus1ast/zigcc
 import std/os
@@ -61,14 +61,14 @@ proc writeZigcpp(rebuild:bool)=
 proc buildZigcc(rebuild:bool)=
   ## Build the zigcc binary if it doesn't exist
   if rebuild or not zigcc.fileExists:
-    let cmd = &"{nimcZ} --skipProjCfg --skipParentCfg --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc.string}"
+    let cmd = cfg.nim.cc & &" {nimcZopts} --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc.string}"
     if verbose: log &"{zigcc} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcc.lastPathPart} is up to date."
 proc buildZigcpp(rebuild:bool)=
   ## Build the zigcpp binary if it doesn't exist
   if rebuild or not zigcpp.fileExists:
-    let cmd = &"{nimcZ} --skipProjCfg --skipParentCfg --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc.string}"
+    let cmd = cfg.nim.cc & &" {nimcZopts} --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc.string}"
     if verbose: log &"{zigcpp} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcpp.lastPathPart} is up to date."
