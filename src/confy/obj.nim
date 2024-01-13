@@ -23,20 +23,28 @@ proc new *(_ :typedesc[BuildTrg];
     root    : Dir           = Dir("");
     sub     : Dir           = Dir("");
     remotes : seq[Path]     = @[];
-    version : string        = "";
+    deps    : Dependencies  = Dependencies();
     args    : string        = "";
+    version : string        = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
   # note: Main constructor logic unified here. Other constructors should call this one.
   #     : Exposed for ergonomics, but not needed by the user.
   if verbose: cfg.quiet = off  # Disable quiet when verbose is active.
-  let rDir = if root.string == "": cfg.binDir elif root.isAbsolute: root else: cfg.binDir/root
-  let lang = src.getLang()
+  let rDir   = if root.string == "": cfg.binDir elif root.isAbsolute: root else: cfg.binDir/root
+  let lang   = src.getLang()
+  let target :Path=
+    when trg is string:
+      if trg == "": src[0].file.lastPathPart().Path
+      else: trg.Path
+    else:
+      if trg == Path"": src[0].file.lastPathPart()
+      else: trg
   BuildTrg(
-    kind    : kind,    src   : src,   trg     : when trg is string: trg.Path else: trg,
-    cc      : cc,      flags : flags, syst    : syst,
-    root    : rDir,    sub   : sub,   remotes : remotes,
-    version : version, args  : args,  lang    : lang,
+    kind  : kind,  src     : src,     trg     : target,
+    cc    : cc,    flags   : flags,   syst    : syst,
+    root  : rDir,  sub     : sub,     remotes : remotes,
+    deps  : deps,  args  : args,  version : version, lang    : lang,
     ) # << BuildTrg( ... )
 #_____________________________
 proc new *(kind :BinKind;
@@ -48,11 +56,12 @@ proc new *(kind :BinKind;
     root    : Dir           = cfg.binDir;
     sub     : Dir           = Dir("");
     remotes : seq[Path]     = @[];
-    version : string        = "";
+    deps    : Dependencies  = Dependencies();
     args    : string        = "";
+    version : string        = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, version, args)
+  BuildTrg.new(src, trg, kind, cc, flags, syst, root, sub, remotes, deps, args, version)
 #_____________________________
 proc new *(kind :BinKind;
     src     : seq[Path];
@@ -63,11 +72,12 @@ proc new *(kind :BinKind;
     root    : Dir           = cfg.binDir;
     sub     : Dir           = Dir("");
     remotes : seq[Path]     = @[];
-    version : string        = "";
+    deps    : Dependencies  = Dependencies();
     args    : string        = "";
+    version : string        = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(src.toDirFile, trg, kind, cc, flags, syst, root, sub, remotes, version, args)
+  BuildTrg.new(src.toDirFile, trg, kind, cc, flags, syst, root, sub, remotes, deps, args, version)
 #_____________________________
 proc new *(kind :BinKind;
     src     : Path;
@@ -78,11 +88,12 @@ proc new *(kind :BinKind;
     root    : Dir           = cfg.binDir;
     sub     : Dir           = Dir("");
     remotes : seq[Path]     = @[];
-    version : string        = "";
+    deps    : Dependencies  = Dependencies();
     args    : string        = "";
+    version : string        = "";
   ) :BuildTrg=
   ## Creates a new BuildTrg with the given data.
-  BuildTrg.new(@[src.Fil.toDirFile], trg, kind, cc, flags, syst, root, sub, remotes, version, args)
+  BuildTrg.new(@[src.Fil.toDirFile], trg, kind, cc, flags, syst, root, sub, remotes, deps, args, version)
 
 #_____________________________
 proc print *(obj :BuildTrg) :void=  info.report(obj)

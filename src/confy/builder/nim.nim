@@ -10,6 +10,7 @@ import ../dirs
 import ../tool/paths
 import ../tool/logger
 import ../tool/helper as t
+import ../task/deps
 # @deps confy.builder
 import ./helper
 # @deps confy.builder.zigcc
@@ -24,7 +25,11 @@ let zigcc      = cfg.zigDir/"zigcc"
 let zigcpp     = cfg.zigDir/"zigcpp"
 let zigccSrc   = cfg.cacheDir/"zigcc.nim"
 let zigcppSrc  = cfg.cacheDir/"zigcpp.nim"
-
+#___________________
+template getRealBin *() :string=
+  if cfg.nim.systemBin: cfg.nim.cc else: string cfg.nimDir/"bin"/cfg.nim.cc
+template getRealNimble *() :string=
+  if cfg.nim.systemBin: "nimble" else: string(cfg.nimDir/"bin"/"nimble") & &" --nim:{nim.getRealBin()}"
 
 #_____________________________________________________
 # NimZ Compiler : Alias Manager
@@ -61,14 +66,14 @@ proc writeZigcpp(rebuild:bool)=
 proc buildZigcc(rebuild:bool)=
   ## Build the zigcc binary if it doesn't exist
   if rebuild or not zigcc.fileExists:
-    let cmd = cfg.nim.cc & &" {nimcZopts} --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc.string}"
+    let cmd = nim.getRealBin() & &" {nimcZopts} --out:{zigcc.lastPathPart} --outDir:{cfg.zigDir} {zigccSrc.string}"
     if verbose: log &"{zigcc} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcc.lastPathPart} is up to date."
 proc buildZigcpp(rebuild:bool)=
   ## Build the zigcpp binary if it doesn't exist
   if rebuild or not zigcpp.fileExists:
-    let cmd = cfg.nim.cc & &" {nimcZopts} --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc.string}"
+    let cmd = nim.getRealBin() & &" {nimcZopts} --out:{zigcpp.lastPathPart} --outDir:{cfg.zigDir} {zigcppSrc.string}"
     if verbose: log &"{zigcpp} does not exist. Creating it with:\n  {cmd}"
     sh cmd
   elif verbose: log &"{zigcpp.lastPathPart} is up to date."
@@ -103,17 +108,17 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
     of SharedLibrary : "--app:lib"
     of StaticLibrary : "--app:staticlib"
     else             : ""
-  let verb = if cfg.verbose: "--verbosity:3" else:""
-  var cc = &"{cfg.nim.cc} {cfg.nim.backend} {verb} {typFlag}"
+  let verb = if cfg.verbose: "--verbosity:3" elif cfg.quiet: "--hints:off" else:""
+  var cc = &"{nim.getRealBin()} {cfg.nim.backend} {verb} {typFlag}"
   if force: cc &= " -f"
   case  obj.cc  # Add extra parameters for the compilers when required
   of    Zig:    cc = fmt(ZigTemplate)
   of    GCC:    cc &= " --cc:gcc"
   of    Clang:  cc &= " --cc:clang"
   if cfg.nim.unsafe.functionPointers: cc.add " --passC:-Wno-incompatible-function-pointer-types"
-  let cmd = &"{cc} --out:{obj.trg.toBin(obj.syst.os)} --outdir:\"{obj.root/obj.sub}\" {obj.args} {obj.src.join()}"
+  let paths = obj.deps.to(Nim)
+  let cmd = &"{cc} --out:{obj.trg.toBin(obj.syst.os)} --outdir:\"{obj.root/obj.sub}\" {paths} {obj.args} {obj.src.join()}"
   if cfg.verbose     : echo cmd
   elif not cfg.quiet : echo &"{cfg.Cstr} {obj.trg}"
-  echo cmd
   sh cmd
 

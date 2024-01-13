@@ -8,13 +8,14 @@ const debug *:bool= not (defined(release) or defined(danger)) or defined(debug)
 const nims  *:bool= defined(nimscript)
 #_______________________________________
 # @deps std
+from std/sets import HashSet
 when nims:
   type Path * = string
 else:
   from std/paths import Path
 
 #_________________________________________________
-# Error Management
+# @section Error Management
 #___________________
 type CompileError * = object of IOError
   ## @descr For exceptions during the compile process
@@ -22,18 +23,8 @@ type GeneratorError * = object of IOError
   ## @descr For exceptions during code generation.
 
 
-#_________________________________________________
-# Package information
-#___________________
-type Package * = object
-  name        *:string
-  version     *:string
-  author      *:string
-  description *:string
-  license     *:string
-
 #_______________________________________
-# Paths
+# @section Paths
 #___________________
 type Dir  * = Path
   ## @descr Path to a Directory
@@ -51,8 +42,30 @@ type DirFile * = object
   file  *:Fil
 
 
+#_________________________________________________
+# @section Package information
+#___________________
+type Package * = object
+  name        *:string
+  version     *:string
+  author      *:string
+  description *:string
+  license     *:string
+
+
+#_________________________________________________
+# @section Dependencies/Submodules Management
+#___________________
+type Dependency * = object
+  name  *:string
+  url   *:string
+  src   *:Dir
+  dir   *:Dir
+type Dependencies * = HashSet[Dependency]
+
+
 #_______________________________________
-# Compiler
+# @section Compiler
 #___________________
 type Lang *{.pure.}= enum Unknown, C, Cpp, Nim
   ## @descr Language of a code file, based on its extension
@@ -69,7 +82,7 @@ type Compiler * = enum Zig, GCC, Clang
 
 
 #_______________________________________
-# Target-specific
+# @section Target-specific
 #___________________
 type OS * = enum
   Windows = "windows", Mac     = "macosx",  Linux   = "linux"
@@ -105,21 +118,22 @@ const ext * = Extensions(
 
 
 #_______________________________________
-# Build Target
+# @section Build Target
 #___________________
 type BuildTrg * = object
-  kind     *:BinKind       ## Type of build target
-  src      *:seq[DirFile]  ## Sequence of source files to build with. Object files (aka `.o`, etc) will be linked at the end and their path won't be adjusted.
-  trg      *:Fil           ## Output binary to build
-  cc       *:Compiler      ## Compiler that will be used to build the app.
+  kind     *:BinKind       ## @field kind Type of build target
+  src      *:seq[DirFile]  ## @field src Sequence of source files to build with. Object files (aka `.o`, etc) will be linked at the end and their path won't be adjusted.
+  trg      *:Fil           ## @field trg Output binary to build
+  cc       *:Compiler      ## @field cc Compiler that will be used to build the app.
   # Optional fields
-  flags    *:Flags         ## Set of flags to send to each compiler stage
-  syst     *:System        ## Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
-  root     *:Dir           ## Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
-  sub      *:Dir           ## Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
-  remotes  *:seq[Dir]      ## Remote folders to search for files (in order), when they are not found in the main folder.
-  version  *:string        ## Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
-  args     *:string        ## Extra arguments to send to the compiler command. Will be added right at the end.
+  flags    *:Flags         ## @field flags Set of flags to send to each compiler stage
+  syst     *:System        ## @field syst Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
+  root     *:Dir           ## @field root Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
+  sub      *:Dir           ## @field sub Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
+  remotes  *:seq[Dir]      ## @field remotes Remote folders to search for files (in order), when they are not found in the main folder.
+  deps     *:Dependencies  ## @field deps Submodules/Dependencies required to build this target
+  args     *:string        ## @field args Extra arguments to send to the compiler command. Will be added right at the end.
+  version  *:string        ## @field version Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
   # Internals
-  lang     *:Lang          ## Main language of the app. Having any cpp files will make the app be Cpp
+  lang     *:Lang          ## @internal @field lang Main language of the app. Having any cpp files will make the app be Cpp
 
