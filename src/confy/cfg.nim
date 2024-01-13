@@ -41,9 +41,12 @@ var zigcc * = (
 #___________________
 # Nim
 var nim * = (
-  cc      : "nim",
-  backend : "c",
-  unsafe  : (
+  cc        : "nim",
+  systemBin : off,  # default:off
+  backend   : "c",
+  url       : "https://github.com/nim-lang/Nim",
+  vers      : "version-2-0",
+  unsafe    : (
     functionPointers : off,
     ) # << cfg.nim.unsafe ( ... )
   ) # << cfg.nim ( ... )
@@ -60,6 +63,11 @@ var nim * = (
   ##  This config option exists just for ergonomics, and the same behavior can be achieved by:
   ##  `someBuildTarget.args = "-Wno-incompatible-function-pointer-types"`
 
+#___________________
+# Shell Tools
+var gitBin * = "git"
+  ## @descr Binary to call for running `git` tasks.
+
 #_________________________________________________
 # confy: Debugging
 #___________________
@@ -75,7 +83,8 @@ var rootDir *:Dir=
   else      : Dir(getAppDir()/"..")  # Assume the builder is inside root/bin/
 #___________________
 # Root Folders
-var srcDir       *:Dir=  rootDir/"src"
+var srcSub       *:Dir=  Dir "src"
+var srcDir       *:Dir=  rootDir/srcSub
 var binDir       *:Dir=  rootDir/"bin"
 var libDir       *:Dir=  rootDir/"lib"
 var docDir       *:Dir=  rootDir/"doc"
@@ -85,6 +94,7 @@ var testsDir     *:Dir=  rootDir/"tests"
 # Subfolders
 var cacheDir     *:Dir=  binDir/".cache"
 var zigDir       *:Dir=  binDir/".zig"
+var nimDir       *:Dir=  binDir/".nim"
 
 #_________________________________________________
 # Project: Files
