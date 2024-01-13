@@ -77,4 +77,7 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= fals
     return
   # Key was found. Continue building
   obj.build(run,force)
-
+#_____________________________
+proc build *(obj :BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
+  var tmp :BuildTrg= obj
+  tmp.build(keywords, run, force)
