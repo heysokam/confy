@@ -4,6 +4,7 @@
 # @deps std
 import std/os
 import std/times
+from std/strformat import `&`
 # @deps confy
 import ../types
 import ../cfg
@@ -19,7 +20,8 @@ proc sh *(cmd :string; dbg :bool= false) :void=
   ## @descr Runs the given command in a shell (binary).
   if dbg: echo cmd
   if cfg.fakeRun: return
-  discard os.execShellCmd cmd
+  if os.execShellCmd(cmd) != 0: raise newException(OSError, &"Failed to run shell command:  {cmd}")
+proc git *(args :varargs[string,`$`]) :void= sh cfg.gitBin&" "&args.join(" ")
 #___________________
 # Access time
 when not nims:

@@ -1,7 +1,9 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# confy dependencies
+# @deps std
+from std/strutils import join
+# @deps confy
 import ../types
 import ../cfg
 #___________________
@@ -34,9 +36,13 @@ proc info2 *(msg :string) :void= log1 msg
 proc wrn *(args :varargs[string, `$`]) :void=  echo cfg.prefix & "! WRN ! " & args.toString
   ## Reports a warning message to console.
 
+proc dbg *(args :varargs[string, `$`]) :void=
+  ## Reports a message to console. Does nothing if {@link cfg.verbose} is disabled.
+  if not cfg.verbose: return
+  log0 args.join(" ")
+
 template cerr*(args :varargs[string, `$`]) :void=  raise newException(CompileError, args.toString)
   ## Raises a compile exception error with the given message.
 template gerr*(args :varargs[string, `$`]) :void=  raise newException(GeneratorError, args.toString)
   ## Raises a compile exception error with the given message.
-  
 
