@@ -42,7 +42,7 @@ var zigcc * = (
 # Nim
 var nim * = (
   cc        : "nim",
-  systemBin : off,  # default:off
+  systemBin : on,
   backend   : "c",
   url       : "https://github.com/nim-lang/Nim",
   vers      : "version-2-0",
@@ -54,9 +54,16 @@ var nim * = (
   ##  Selects the binary that confy will call when it needs to run `nim [options]`
   ##  Can be a binary in PATH, or an absolute or relative path
   ##  @default "nim" Relies on nim being installed on PATH
+  ## @field systemBin
+  ##  @default:on Avoids confusion for nim users.
+  ##   They will expect it `on` because both the nim compiler and nimble work that way.
   ## @field backend
   ##   Selects the backend that the nim compiler will use to build the project.
   ##   @note Only applies to the project files. The builder app always compiles with the `nim c` backend.
+  ## @field url
+  ##  Link to the Nim repository that will be used for initializing a local-installation of the compiler.
+  ## @field vers
+  ##  Name of the branch (aka version) that will be used when cloning the Nim repository for local-installation of the compiler.
   ## @field unsafe.functionPointers
   ##  When active, the flag `-Wno-incompatible-function-pointer-types` will be passed to ZigCC for compiling nim code.
   ##  The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.
@@ -95,6 +102,7 @@ var testsDir     *:Dir=  rootDir/"tests"
 var cacheDir     *:Dir=  binDir/".cache"
 var zigDir       *:Dir=  binDir/".zig"
 var nimDir       *:Dir=  binDir/".nim"
+var mincDir      *:Dir=  binDir/".minc"
 
 #_________________________________________________
 # Project: Files

@@ -5,6 +5,8 @@
 import std/os
 import std/times
 from std/strformat import `&`
+# @deps ndk
+import nstd/shell ; export shell except git, sh
 # @deps confy
 import ../types
 import ../cfg
