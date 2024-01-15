@@ -15,6 +15,7 @@ var cores *:int=
   when nims : 1
   else      : (0.8 * cpu.countProcessors().float).int
   ## @descr Total cores to use for compiling.  @default 80% of max)
+
 #___________________
 # Formatting
 var verbose *:bool=  when debug: on else: off
@@ -29,6 +30,7 @@ var Cstr    *:string=  "CC"
   ## Prefix used for formatting the quiet output calls to the Compiler.
 var Lstr    *:string=  "LD"
   ## Prefix used for formatting the quiet output calls to the Linker.
+
 #___________________
 # ZigCC
 var zigcc * = (
@@ -38,6 +40,7 @@ var zigcc * = (
   ##  Uses the System's ZigCC path, without downloading a new version from the web.
   ##  @when on : Uses the system's zig like `zig cc file.c
   ##  @when off: Runs the zig compiler setup logic and executes the zig compiler like `cfg.zigDir/zig cc file.c`
+
 #___________________
 # Nim
 var nim * = (
@@ -55,7 +58,11 @@ var nim * = (
   ##  Can be a binary in PATH, or an absolute or relative path
   ##  @default "nim" Relies on nim being installed on PATH
   ## @field systemBin
-  ##  @default:on Avoids confusion for nim users.
+  ##  Uses the System's Nim path, without downloading a new version from the web.
+  ##  @when on : Uses the system's nim like `nim c file.nim`
+  ##  @when off: Runs the nim compiler setup logic and executes the nim compiler like `cfg.nimDir/bin/nim c file.nim`
+  ##  @default:on
+  ##   Avoids confusion for nim users.
   ##   They will expect it `on` because both the nim compiler and nimble work that way.
   ## @field backend
   ##   Selects the backend that the nim compiler will use to build the project.
@@ -69,6 +76,24 @@ var nim * = (
   ##  The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.
   ##  This config option exists just for ergonomics, and the same behavior can be achieved by:
   ##  `someBuildTarget.args = "-Wno-incompatible-function-pointer-types"`
+
+#___________________
+# MinC
+var minc * = (
+  cc        : "minc",
+  systemBin : off,
+  url       : "https://github.com/heysokam/minc",
+  ) # << cfg.minc ( ... )
+  ## @field cc
+  ##  Selects the binary that confy will call when it needs to run `minc [options]`
+  ##  Can be a binary in PATH, or an absolute or relative path
+  ## @field systemBin
+  ##  Uses the System's MinC path, without downloading a new version from the web.
+  ##  @default:off
+  ##  @when on : Uses the system's minc like `minc c file.cm`
+  ##  @when off: Runs the minc compiler setup logic and executes the minc compiler like `cfg.mincDir/bin/minc c file.cm`
+  ## @field url
+  ##  Link to the MinC repository that will be used for initializing a local-installation of the compiler.
 
 #___________________
 # Shell Tools

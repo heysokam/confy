@@ -48,6 +48,7 @@ func getLangFromExt (ext :string) :Lang=
   of ".c"          : result = Lang.C
   of ".cpp", ".cc" : result = Lang.Cpp
   of ".nim"        : result = Lang.Nim
+  of ".cm"         : result = Lang.MinC
   else             : result = Lang.Unknown
 #_____________________________
 proc getLang *(file :DirFile) :Lang=
@@ -61,9 +62,10 @@ proc getLang *(list :seq[DirFile]) :Lang=
   ## @descr Returns the language of the given input list of files, based on their extension.
   var langs = initHashSet[Lang]()
   for src in list: langs.incl src.getLang()
-  if    Lang.Cpp in langs: result = Lang.Cpp
-  elif  Lang.C   in langs: result = Lang.C
-  elif  Lang.Nim in langs: result = Lang.Nim
+  if    Lang.Nim  in langs: result = Lang.Nim
+  elif  Lang.MinC in langs: result = Lang.MinC
+  elif  Lang.Cpp  in langs: result = Lang.Cpp
+  elif  Lang.C    in langs: result = Lang.C
   else: raise newException(CompileError, &"Unimplemented language found in {langs} for files:\n{list}")
 
 #_________________________________________________

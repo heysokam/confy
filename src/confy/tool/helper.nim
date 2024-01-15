@@ -56,6 +56,7 @@ proc defaultExt *(lang :Lang) :string=
   ## @note Result will be an empty string if the lang is Unknown
   case lang
   of Nim,C,Cpp : "." & ($lang).normalize
+  of MinC      : ".cm"
   of Unknown   : ""
 
 #_______________________________________

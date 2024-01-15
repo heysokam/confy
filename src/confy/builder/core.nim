@@ -20,6 +20,7 @@ import ./helper
 import ./zigcc as c
 import ./zigcc as cpp
 import ./nim as nim
+import ./minc as minc
 
 #_____________________________
 proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
@@ -28,6 +29,7 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
   of C       : c.compile(src, obj, force)
   of Cpp     : cpp.compile(src, obj, force)
   of Nim     : nim.compile(src, obj, force)
+  of MinC    : minc.compile(src, obj, force)
   of Unknown : cerr "Tried to compile and Unknown language."
 
 #_____________________________
