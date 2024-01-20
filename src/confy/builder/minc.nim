@@ -2,18 +2,26 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
+from std/strformat import `&`
 # @deps confy
+import ../cfg
 import ../types
+import ../dirs
 import ../tool/logger
+import ../tool/paths
+import ../tool/helper
+import ../task/deps
 # @deps confy.builder
 import ./helper
 # @deps confy.builder.zigcc
 import ./zigcc/bin as z
+import ./zigcc/zcfg
 
 
 #_____________________________________________________
 # MinC: General Config
 #_____________________________
+const KnownExts = ["cm","nim"]
 template getRealBin *() :string=
   if cfg.minc.systemBin: cfg.minc.cc else: string cfg.mincDir/"bin"/cfg.minc.cc
 
@@ -21,7 +29,18 @@ template getRealBin *() :string=
 # MinC Compiler : Builder
 #_____________________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
-  cerr "Tried to compile MinC, but its not implemented."
+  var srcFile :string
+  var cfiles  :string
+  for file in src:
+    case file.file.splitFile.ext
+    of ".cm" : srcFile = file.path.string
+    of ".c"  : cfiles.add &"--cFile:{file.path.string} "
+    else     : continue
+  let cmd = &"{minc.getRealBin()} c --zigBin:{zcfg.getRealBin()} --cacheDir:{cfg.cacheDir} --outDir:{obj.root/obj.sub} {obj.deps.to(Nim)} {obj.args} {cfiles} {srcFile} {obj.trg.toBin(obj.syst.os)}"
+  dbg "Running command:\n  ",cmd
+  sh cmd
+  #TODO os,cpu
+
   # if obj.kind == Object: cerr "Compiling Nim into Object files is not supported. Run nim manually with `--noLinking:on|off`"
   # buildNimZ(force=force) # Build the NimZ aliases when they do not exist
   # var zigTarget :string
