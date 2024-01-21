@@ -44,8 +44,9 @@ proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
   compile(obj.src, obj, force)
   log &"Finished building {obj.trg}."
   if run and obj.kind == Program:
-    log &"Running {obj.trg} ..."
-    sh string(obj.root/obj.sub/obj.trg)
+    let bin = string obj.root/obj.sub/obj.trg.toBin(obj.syst.os)
+    log &"Running {bin} ..."
+    sh bin
 
 #_____________________________
 const ReservedKeywords = ["all", "examples", "tests", "tasks"]
