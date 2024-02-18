@@ -28,8 +28,9 @@ let zigcppSrc  = cfg.cacheDir/"zigcpp.nim"
 #___________________
 template getRealBin *() :string=
   if cfg.nim.systemBin: cfg.nim.cc else: string cfg.nimDir/"bin"/cfg.nim.cc
-template getRealNimble *() :string=
-  if cfg.nim.systemBin: "nimble" else: string(cfg.nimDir/"bin"/"nimble") & &" --nim:{nim.getRealBin()}"
+proc getRealNimble *() :string=
+  let cc = &" --nim:{nim.getRealBin()}"
+  if cfg.nim.systemBin: "nimble" else: string(cfg.nimDir/"bin"/"nimble") & cc
 
 #_____________________________________________________
 # NimZ Compiler : Alias Manager
