@@ -62,9 +62,9 @@ proc compileStatic *(
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
   ## @descr Compiles the given `src` list of files with ZigCC.
   case obj.kind
-  of Program:        base.direct(src, obj.trg.toBin(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @[obj.syst.getTarget()], cfg.Cstr)
+  of Program:        base.direct(src, obj.root/obj.sub/obj.trg.toBin(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @[obj.syst.getTarget()], cfg.Cstr)
   of Object:         base.compileToObj(src, obj.root, obj.syst, Zig, obj.flags, cfg.Cstr)
-  of SharedLibrary:  base.direct(src, obj.trg.toLib(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @["-shared"], cfg.Cstr)  # base.compileShared(src, obj.trg, Zig, obj.root, obj.flags, obj.syst, cfg.Cstr)
+  of SharedLibrary:  base.direct(src, obj.root/obj.sub/obj.trg.toLib(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @["-shared"], cfg.Cstr)  # base.compileShared(src, obj.trg, Zig, obj.root, obj.flags, obj.syst, cfg.Cstr)
   of StaticLibrary:  zigcc.compileStatic(src, obj.trg, obj.root, Zig, obj.flags, obj.syst, cfg.Cstr)
   # of Module:         base.compileToMod(src, obj.root, obj.flags)
   else: return
