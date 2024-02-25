@@ -12,9 +12,8 @@ import ../tool/paths
 import ../builder/nim
 # @deps confy.task
 # import ./base
-when debug:
-  import std/strformat
-  import ../tool/logger
+import std/strformat
+import ../tool/logger
 
 #___________________
 func getContent(line,pattern :string) :string {.inline.}=  line.replace( pattern & ": \"", "").replace("\"", "")
@@ -28,7 +27,7 @@ proc getInfo *() :Package=
     elif line.startsWith("desc:")    : result.description = line.getContent("desc")
     elif line.startsWith("license:") : result.license     = line.getContent("license")
     #ignored: skipDirs, skipFiles, skipExt, installDirs, installFiles, installExt, requires, bin, binDir, srcDir, backend
-  when debug:
+  if cfg.verbose:
     if result.name == ""        : info2 "Package name wasn't found in .nimble"
     if result.version == ""     : info2 "Package version wasn't found in .nimble"
     if result.author == ""      : info2 "Package author wasn't found in .nimble"

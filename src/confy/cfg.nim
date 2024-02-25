@@ -18,18 +18,18 @@ var cores *:int=
 
 #___________________
 # Formatting
-var verbose *:bool=  when debug: on else: off
-  ## Output will be fully verbose when active.
+var verbose *:bool=  off
+  ## @descr Output will be fully verbose when active.
 var quiet   *:bool=  on and not verbose
-  ## Output will be formatted in a minimal clean style when active.
+  ## @descr Output will be formatted in a minimal clean style when active.
 var prefix  *:string=  "confy: "
-  ## Prefix that will be added at the start of every command output.
+  ## @descr Prefix that will be added at the start of every command output.
 var tab     *:string=  "     : "
-  ## Tab that will be added at the start of every new line in of the same message.
+  ## @descr Tab that will be added at the start of every new line in of the same message.
 var Cstr    *:string=  "CC"
-  ## Prefix used for formatting the quiet output calls to the Compiler.
+  ## @descr Prefix used for formatting the quiet output calls to the Compiler.
 var Lstr    *:string=  "LD"
-  ## Prefix used for formatting the quiet output calls to the Linker.
+  ## @descr Prefix used for formatting the quiet output calls to the Linker.
 
 #___________________
 # ZigCC
