@@ -38,6 +38,7 @@ proc findExt *(file :DirFile) :string=
   if file.file.string.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
   let filepath = file.dir/file.file
   for found in file.dir.string.walkDir:
+    if found.kind == pcDir: continue
     if filepath.string in found.path: return found.path.splitFile.ext
   raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
 #_____________________________

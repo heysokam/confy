@@ -61,6 +61,7 @@ proc submodule *(name :string; url :string= ""; code :Dir|string= cfg.srcSub; sh
     src  : when code is string: code.Path else: code,
     dir  : absolutePath( cfg.libDir/name/code )
     ) # << Dependency( ... )
+  if not dirExists(cfg.libDir)               : md cfg.libDir
   if not fileExists(cfg.libDir/".gitignore") : writeFile(cfg.libDir/".gitignore", "*\n!.gitignore")
   if not dirExists(cfg.libDir/name)          : git "clone", &"{url} {cfg.libDir/name}", if shallow: " --depth 1" else: ""
 
