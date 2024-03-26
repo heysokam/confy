@@ -36,7 +36,16 @@ proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
     of ".cm" : srcFile = file.path.string
     of ".c"  : cfiles.add &"--cFile:{file.path.string} "
     else     : continue
-  let cmd = &"{minc.getRealBin()} c --zigBin:{zcfg.getRealBin()} --cacheDir:{cfg.cacheDir} --outDir:{obj.root/obj.sub} {obj.deps.to(Nim)} {obj.args} {cfiles} {srcFile} {obj.trg.toBin(obj.syst.os)}"
+  let typFlag = case obj.kind
+    of SharedLibrary : "--passL=\"-shared\""
+    of StaticLibrary : "--passL=\"\""
+    else             : ""
+  let trgFile = case obj.kind
+    of Program       : obj.trg.toBin(obj.syst.os)
+    of SharedLibrary : obj.trg.toLib(obj.syst.os)
+    of StaticLibrary : obj.trg # TODO
+    else             : obj.trg
+  let cmd = &"{minc.getRealBin()} c --zigBin:{zcfg.getRealBin()} --cacheDir:{cfg.cacheDir} --outDir:{obj.root/obj.sub} {obj.deps.to(Nim)} {typFlag} {obj.args} {cfiles} {srcFile} {trgFile}"
   dbg "Running command:\n  ",cmd
   sh cmd
   #TODO os,cpu
