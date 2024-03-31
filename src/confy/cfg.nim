@@ -117,7 +117,8 @@ var rootDir *:Dir=
 # Root Folders
 var srcSub       *:Dir=  Dir "src"
 var srcDir       *:Dir=  rootDir/srcSub
-var binDir       *:Dir=  rootDir/"bin"
+var binSub       *:Dir=  Dir "bin"
+var binDir       *:Dir=  rootDir/binSub
 var libDir       *:Dir=  rootDir/"lib"
 var docDir       *:Dir=  rootDir/"doc"
 var examplesDir  *:Dir=  rootDir/"examples"
