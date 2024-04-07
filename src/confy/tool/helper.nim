@@ -27,23 +27,10 @@ proc git *(args :varargs[string,`$`]) :void= sh cfg.gitBin&" "&args.join(" ")
 #___________________
 # Access time
 when not nims:
-  #_____________________________
-  proc lastMod *(trg :Fil) :times.Time=
-    ## @descr Returns the last modification time of the file, or empty if it cannot be found.
-    try:    result = os.getLastModificationTime( trg.string )
-    except: result = times.Time()
-  #_____________________________
-  proc noModSince *(trg :Fil; hours :SomeInteger) :bool=  ( times.getTime() - trg.lastMod ).inHours > hours
-    ## @descr Returns true if the trg file hasn't been modified in the last N hours.
+  from nstd/paths import lastMod, noModSince
+  export lastMod, noModSince
 #_____________________________
 # Files
-proc touch *(trg :Fil) :void=
-  ## @descr Creates the target file if it doesn't exist.
-  when nims:
-    when defined linux:   exec &"touch {trg}"
-    elif defined windows: exec &"powershell \"Get-Item {trg}\""
-  else:  trg.string.open(mode = fmAppend).close
-#_____________________________
 proc setExec *(trg :Fil) :void=  os.setFilePermissions(trg.string, {FilePermission.fpUserExec}, followSymlinks = false)
   ## @descr Sets the given `trg` binary flags to be executable for the current user.
 
