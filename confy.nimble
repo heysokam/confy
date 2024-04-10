@@ -13,10 +13,11 @@ license       = "MIT"
 
 #_____________________________
 # Dependencies
-requires "nim >= 2.0.0"
+requires "nim >= 1.9.1"
 requires "jsony"
 requires "zippy"
 requires "https://github.com/heysokam/nstd#head"
+requires "https://github.com/heysokam/get.Lang#head"
 
 #_____________________________
 # Folders
@@ -34,12 +35,4 @@ task examplesNim, "Builds all examples for the Nim programming language."       
 task helloC,      "Builds the hello world example for the C   programming language." : helper.buildHello( C   )
 task helloCpp,    "Builds the hello world example for the C++ programming language." : helper.buildHello( Cpp )
 task helloNim,    "Builds the hello world example for the Nim programming language." : helper.buildHello( Nim )
-
-#_________________________________________________
-# Internal
-#___________________
-task push, "Internal:  Pushes the git repository, and orders to create a new git tag for the package, using the latest version.":
-  # @note Does nothing when local and remote versions are the same.
-  requires "https://github.com/beef331/graffiti.git"
-  helper.push()
 
