@@ -3,8 +3,10 @@
 #:_____________________________________________________
 # @deps std
 import std/os
-import std/strformat
 import std/sets
+# @deps ndk
+import nstd/strings
+import nstd/paths
 # @deps confy
 import ../types
 import ../cfg
@@ -12,8 +14,6 @@ import ../info
 import ../dirs
 import ../tool/logger
 import ../tool/helper as t
-import ../tool/paths
-import ../tool/strings
 import ../task/state
 # @deps confy.builder
 import ./helper

@@ -2,18 +2,17 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
-from std/strformat import `&`
 from std/sets import HashSet, incl, items, len, toHashSet
 from std/sequtils import toSeq
 # @deps nstd
 from nstd/shell import withDir
+import nstd/strings
+import nstd/paths
 # @deps confy
 from ../cfg import nil
 import ../types
-import ../tool/strings
 import ../tool/helper
 import ../tool/logger
-import ../tool/paths
 
 
 #_________________________________________________

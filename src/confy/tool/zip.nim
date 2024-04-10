@@ -3,13 +3,12 @@
 #:_____________________________________________________
 # @deps std
 import std/os
-import std/strformat
 # @deps External
 import pkg/zippy/ziparchives
+# @deps ndk
+import nstd/strings
 # @deps confy
 import ../cfg
-# @deps confy.helper
-import ./strings
 
 
 # TODO: liblzma wrapper

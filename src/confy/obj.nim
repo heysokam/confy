@@ -1,10 +1,11 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ./cfg
 import ./types
-import ./tool/paths
 import ./tool/helper as t
 import ./builder/helper
 import ./dirs

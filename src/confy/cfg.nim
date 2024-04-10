@@ -4,9 +4,10 @@
 # @deps std
 import std/os
 import std/cpuinfo as cpu
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ./types
-import ./tool/paths
 import ./flags as fl
 
 #___________________

@@ -1,9 +1,10 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# confy dependencies
+# @deps ndk
+import nstd/paths
+# @deps confy
 import ../../cfg
-import ../../tool/paths
 
 
 #___________________
@@ -25,3 +26,4 @@ template getRealAR  *() :string=
   if cfg.zigcc.systemBin: zar  else: string cfg.zigDir/( name & ext & ar)
 template getRealBin *() :string=
   if cfg.zigcc.systemBin: name else: string cfg.zigDir/( name & ext )
+

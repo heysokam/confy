@@ -4,14 +4,12 @@
 # @deps std
 import std/os
 import std/times
-from std/strformat import `&`
 # @deps ndk
+import nstd/strings
 import nstd/shell ; export shell except git, sh
 # @deps confy
 import ../types
 import ../cfg
-# @deps confy.tools
-import ./strings
 
 
 #_______________________________________

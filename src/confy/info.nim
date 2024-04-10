@@ -1,13 +1,14 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-# std dependencies
+# @deps std
 import std/os
-import std/strformat
-# confy dependencies
+# @deps ndk
+import nstd/paths
+import nstd/strings
+# @deps confy
 import ./types
 import ./tool/helper
-import ./tool/paths
 import ./cfg
 
 

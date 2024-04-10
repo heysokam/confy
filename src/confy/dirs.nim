@@ -3,12 +3,12 @@
 #:_____________________________________________________
 # @deps std
 import std/os except `/`
-import std/strformat
+# @deps ndk
+import nstd/strings
+import nstd/paths
 # @deps confy
 import ./types
 import ./cfg
-import ./tool/strings
-import ./tool/paths
 import ./tool/logger
 import ./tool/helper
 import ./tool/git

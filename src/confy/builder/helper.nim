@@ -5,14 +5,14 @@
 #____________________________________________________|
 # @deps std
 import std/os
-import std/strformat
 import std/sets
 import std/enumutils
+# @deps ndk
+import nstd/strings
+import nstd/paths
 # @deps confy
 import ../types
 import ../cfg
-import ../tool/paths
-import ../tool/strings
 import ../tool/logger
 # @deps confy.builder.zigcc
 import ./zigcc/bin as z

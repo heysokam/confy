@@ -5,12 +5,12 @@
 #___________________________________________________________________|
 # @deps std
 import std/os
-import std/strformat
 import std/sequtils
+# @deps ndk
+import nstd/strings
 # @deps confy
 import ../types
 import ../cfg
-import ../tool/strings
 import ../tool/helper as t
 import ../tool/logger
 import ../dirs

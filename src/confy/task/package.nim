@@ -3,12 +3,12 @@
 #:_____________________________________________________
 # @deps std
 import std/osproc
-from std/strformat import `&`
+# @deps ndk
+import nstd/strings
+import nstd/paths
 # @deps confy
 import ../types
 import ../cfg
-import ../tool/strings
-import ../tool/paths
 import ../builder/nim
 # @deps confy.task
 # import ./base
