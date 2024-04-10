@@ -9,7 +9,11 @@ import std/os
 
 # General
 const thisDir :string= currentSourcePath().parentDir()
-const confy  *:string= thisDir/".."/"src"
+const root   *:string= thisDir/".."
+const src    *:string= dir.root/"src"
+const bin    *:string= dir.root/"bin"
+const lib    *:string= dir.bin/".lib"
+const confy  *:string= dir.src
 # Languages
 const C      *:string= thisDir/"C"
 const cpp    *:string= thisDir/"cpp"

@@ -48,14 +48,30 @@ type Lang * = object
   cross  *:Example
   full   *:Example
 #___________________
-func getConfig (lang :LangID) :Lang=
+proc submodule (trgDir, name, url :string) :string=
+  result = trgDir/name
+  if not dirExists(result): exec "git clone $1 $2" % [url, result]
+  result = result/"src"
+#___________________
+proc getConfig (lang :LangID) :Lang=
   ## @descr Returns the configuration options for building the examples for the specified `lang` id.
   if lang notin LangIDs: raise newException(IOError, "Asked for the configuration of the examples for an unknown lang.")
   var root :string= case lang
     of C   : dir.C
     of Cpp : dir.cpp
     of Nim : dir.nim
-  var cmd :string= "nim $1 --hints:off --noNimblePath --path:$2 confy.nims" % [if debug:"-d:debug" else:"", dir.confy]
+  # var cmd :string= "nim $1 --hints:off --noNimblePath --path:$2 confy.nims" % [if debug:"-d:debug" else:"", dir.confy]
+  var cmd :string= "$1 c -r $2 --hints:off --noNimblePath --path:$3 --path:$4 --path:$5 --path:$6 src/build.nim" % [
+    # dir.bin/".nim"/"bin"/"nim",
+    # "nimc",
+    "nim",
+    if debug:"-d:debug" else:"",
+    dir.confy,
+    helper.submodule(dir.lib, "nstd", "https://github.com/heysokam/nstd"),
+    helper.submodule(dir.lib, "zippy", "https://github.com/treeform/zippy"),
+    helper.submodule(dir.lib, "jsony", "https://github.com/treeform/jsony"),
+    ]
+  echo cmd
   Lang(id: lang,
     hello: Example(dir: root/dir.hello, cmd: cmd),
     cross: Example(dir: root/dir.cross, cmd: cmd),
@@ -83,3 +99,4 @@ proc buildHello *(lang :LangID) :void=
 proc buildAll *() :void=
   info "Building everything."
   for lang in LangID: lang.buildAll()
+
