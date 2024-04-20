@@ -18,6 +18,11 @@ import ../tool/logger
 #___________________
 func getContent(line,pattern :string) :string {.inline.}=  line.replace( pattern & ": \"", "").replace("\"", "")
 proc getInfo *() :Package=
+  # TODO:
+  #  Doesn't work on windows, and it is not used at the moment anywhere
+  #  Also, relying on nimble is too brittle. Parse it ourselves in some other way
+  discard
+  #[
   when debug: logger.info &"Getting package information from {cfg.rootDir}"
   let data :seq[string]= osproc.execProcess(&"{nim.getRealNimble()} dump", workingDir=cfg.rootDir.string).splitLines()
   for line in data:
@@ -33,4 +38,5 @@ proc getInfo *() :Package=
     if result.author == ""      : info2 "Package author wasn't found in .nimble"
     if result.description == "" : info2 "Package description wasn't found in .nimble"
     if result.license == ""     : info2 "Package license wasn't found in .nimble"
+  ]#
 
