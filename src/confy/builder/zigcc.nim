@@ -39,6 +39,7 @@ proc getTarget *(syst :System) :string=
   if syst == getHost(): return ""
   let zigSyst = helper.toZig(syst)
   result = &"-target {zigSyst.cpu}-{zigSyst.os}"
+  if syst.os == Linux: result.add "-gnu"
 
 #_____________________________
 # ZigCC: Compiler
