@@ -24,8 +24,8 @@ import ./minc as minc
 
 #_____________________________
 proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
-  let lang = obj.src.getLang()
-  case lang
+  if not dirExists(cfg.binDir/obj.sub): md cfg.binDir/obj.sub
+  case obj.src.getLang()
   of C       : c.compile(src, obj, force)
   of Cpp     : cpp.compile(src, obj, force)
   of Nim     : nim.compile(src, obj, force)

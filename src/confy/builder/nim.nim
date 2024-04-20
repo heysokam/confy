@@ -25,8 +25,9 @@ import ./zigcc/bin as z
 template getRealBin *() :string=
   if cfg.nim.systemBin: cfg.nim.cc else: string cfg.nimDir/"bin"/cfg.nim.cc
 proc getRealNimble *() :string=
-  let cc = &" --nim:{nim.getRealBin()}"
-  if cfg.nim.systemBin: "nimble" else: string(cfg.nimDir/"bin"/"nimble") & cc
+  let cc  = &" --nim:{nim.getRealBin()}"
+  let bin = "nimble"
+  if cfg.nim.systemBin: bin else: string(cfg.nimDir/"bin"/bin) & cc
 
 
 #_______________________________________

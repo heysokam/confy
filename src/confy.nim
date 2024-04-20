@@ -2,7 +2,6 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 ## @fileoverview Cable connector to all modules of the library
-{.define:ssl.}
 import ./confy/types       ; export types
 import ./confy/cfg         ; export cfg
 import ./confy/dirs        ; export dirs
