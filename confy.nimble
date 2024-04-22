@@ -15,7 +15,7 @@ license       = "MIT"
 # Dependencies
 requires "nim >= 1.9.1"
 requires "jsony"
-requires "zippy"
+requires "https://github.com/guzba/zippy"
 requires "https://github.com/heysokam/nstd#head"
 requires "https://github.com/heysokam/get.Lang#head"
 
