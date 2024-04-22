@@ -68,9 +68,11 @@ proc findNoExt *(file :DirFile; lang :Lang) :DirFile=
   # Failed the search. Return the same file
   result = file
 #___________________
-proc getFileList *(src :seq[DirFile]; dir :Path= cfg.srcDir) :seq[string]=
-  ## @descr Returns {@arg src} as a list of strings relative to {@arg dir}
-  for file in src: result.add file.path.relativePath(dir).string
+proc getFileList *(src :seq[DirFile]; dir :Path= cfg.srcDir; rel :bool= false) :seq[Path]=
+  ## @descr Returns {@arg src} as a list of paths relative to {@arg dir}
+  for file in src:
+    if rel : result.add file.path.relativePath(dir)
+    else   : result.add file.path
 
 #_____________________________
 # Dir Setup

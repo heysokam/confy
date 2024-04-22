@@ -37,7 +37,7 @@ proc download *(
   let link = trg.latest.url()
   let file = dir/link.lastPathPart
   if force or not file.fileExists:  dl.file(link, file)
-  if not fileExists( dir/zcfg.name ):  file.unzip(dir)
+  if not fileExists( dir/zcfg.name ):  file.unz(dir)
 
 #_____________________________
 proc initOrExists *(force=false) :bool=
