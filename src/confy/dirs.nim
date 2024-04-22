@@ -40,16 +40,20 @@ proc toDirFile *(file :Fil; dir :Dir= cfg.srcDir) :DirFile=
   if dir.string notin file.string: cerr &"The file {file} has been sent with an incorrect structure. It should be relative to {dir}, but isn't."
   result.dir  = dir
   result.file = file.string.replace(if not dir.string.endsWith(os.DirSep): dir.string & os.DirSep else: dir.string, "").Fil
+#___________________
 proc toDirFile *(files :seq[Fil]; dir :Dir= cfg.srcDir) :seq[DirFile]=
   ## @descr
   ##  Converts a list of files to the internal confy representation, as separate dir/files.
   ##  All files must be coming from the same srcDir
   for file in files: result.add file.toDirFile(dir)
+#___________________
 proc path *(file :DirFile) :Fil=  file.dir/file.file
   ## @descr Converts a DirFile to its complete path representation.
+#___________________
 proc join *(files :seq[DirFile]; sep :string= " ") :string=
   ## @descr Converts a list of DirFiles into a single string containing all their paths merged together
   for file in files: result.add file.path.string & sep
+#___________________
 proc findNoExt *(file :DirFile; lang :Lang) :DirFile=
   ## @descr
   ##  Find a file that has no extension, and return it readjusted when possible.
@@ -63,6 +67,10 @@ proc findNoExt *(file :DirFile; lang :Lang) :DirFile=
       return DirFile(dir: Path(res.dir), file: Path(res.name & res.ext))
   # Failed the search. Return the same file
   result = file
+#___________________
+proc getFileList *(src :seq[DirFile]; dir :Path= cfg.srcDir) :seq[string]=
+  ## @descr Returns {@arg src} as a list of strings relative to {@arg dir}
+  for file in src: result.add file.path.relativePath(dir).string
 
 #_____________________________
 # Dir Setup
