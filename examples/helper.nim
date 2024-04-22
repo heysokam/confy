@@ -68,7 +68,7 @@ proc getConfig (lang :LangID) :Lang=
     if debug:"-d:debug" else:"",
     dir.confy,
     helper.submodule(dir.lib, "nstd", "https://github.com/heysokam/nstd"),
-    helper.submodule(dir.lib, "zippy", "https://github.com/treeform/zippy"),
+    helper.submodule(dir.lib, "zippy", "https://github.com/guzba/zippy"),
     helper.submodule(dir.lib, "jsony", "https://github.com/treeform/jsony"),
     ]
   echo cmd
