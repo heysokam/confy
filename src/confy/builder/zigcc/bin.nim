@@ -3,6 +3,8 @@
 #:_____________________________________________________
 # @deps std
 import std/os
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ../../cfg
 import ../../tool/dl
@@ -25,9 +27,9 @@ proc exists (force=false) :bool=
 
 #_____________________________
 proc download *(
-    trg    : string = cfg.zigJson.string;
-    dir    : string = cfg.zigDir.string;
-    tmpDir : string = cfg.binDir.string;
+    trg    : Path = cfg.zigJson;
+    dir    : Path = cfg.zigDir;
+    tmpDir : Path = cfg.binDir;
     force  : bool   = false
   ) :void=
   ## @descr Downloads the correct zig binaries for the current hostCPU/hostOS.

@@ -7,6 +7,8 @@ import std/strformat
 import std/json
 # @deps External
 import pkg/jsony
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ../../types
 import ../../cfg
@@ -19,16 +21,16 @@ import ./types
 const master = "master"
 const index  = "https://ziglang.org/download/index.json"
 #_____________________________
-proc download (trg :string= cfg.zigJson.string) :void=
+proc download (trg :Path= cfg.zigJson) :void=
   ## Downloads the latest zig json from the website.
   let dir = trg.splitFile.dir
   if not dir.dirExists: createDir dir
   dl.file(index, trg)
-proc yesterday (trg :string= cfg.zigJson.string) :bool=  Fil(trg).noModSince(hours = 24)
+proc yesterday (trg :Path= cfg.zigJson) :bool=  Fil(trg).noModSince(hours = 24)
   ## Returns true if the json file hasn't been updated in the last 24h.
 
 #_____________________________
-proc parse (trg :string= cfg.zigJson.string; downl :bool= false) :ZigIndex=
+proc parse (trg :Path= cfg.zigJson; downl :bool= false) :ZigIndex=
   ## Parses the downloaded zig download index json, and returns a ZigVersion object.
   ## Downloads the file if it does not already exist, or if `downl` is omitted..
   if downl or not trg.fileExists or trg.yesterday(): trg.download()
@@ -67,7 +69,7 @@ proc latestData (trg :ZigIndex) :ZigData=
 proc latest (trg :ZigIndex) :string=
   ## Returns the name of the latest non-master version available in the given parsed index.
   result = trg.latestData.version
-proc latest *(trg :string= cfg.zigJson.string) :string=  trg.parse.latest()
+proc latest *(trg :Path= cfg.zigJson) :string=  trg.parse.latest()
   ## Returns the name of the latest non-master version available, using the json file.
 
 #_____________________________
@@ -80,7 +82,7 @@ proc url (vers :string; json :ZigIndex) :string=
   ## Returns a string with the `trg` version url from the given parsed `json` index.
   for ver in json:
     if ver.name == vers: return ver.data.url
-proc url *(vers :string; json :string= cfg.zigJson.string) :string=  vers.url( json.parse() )
+proc url *(vers :string; json :Path= cfg.zigJson) :string=  vers.url( json.parse() )
   ## Returns a string with the `trg` version url.
 
 

@@ -4,12 +4,14 @@
 # @deps std
 import std/strformat
 # @deps external
-import puppy
+import pkg/puppy
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ./logger
 import ../cfg
 
-proc file *(url, trgFile :string; report :bool= true) :void=
+proc file *(url :string; trgFile :Path; report :bool= true) :void=
   if report: log &"Downloading {url}\n{tab}as {trgFile}..."
   trgFile.writeFile( puppy.get(url).body )
 
