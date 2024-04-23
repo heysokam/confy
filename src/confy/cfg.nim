@@ -121,7 +121,8 @@ var srcDir       *:Dir=  rootDir/srcSub
 var binSub       *:Dir=  Dir "bin"
 var binDir       *:Dir=  rootDir/binSub
 var libDir       *:Dir=  rootDir/"lib"
-var docDir       *:Dir=  rootDir/"doc"
+var docSub       *:Dir=  Dir "doc"
+var docDir       *:Dir=  rootDir/docSub
 var examplesDir  *:Dir=  rootDir/"examples"
 var testsDir     *:Dir=  rootDir/"tests"
 #___________________
