@@ -13,6 +13,9 @@ when nims:
   type Path * = string
 else:
   from std/paths import Path
+# @deps ndk
+from nstd/types as nstd import nil
+
 
 #_________________________________________________
 # @section Error Management
@@ -136,4 +139,11 @@ type BuildTrg * = object
   version  *:string        ## @field version Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
   # Internals
   lang     *:Lang          ## @internal @field lang Main language of the app. Having any cpp files will make the app be Cpp
+
+
+#_______________________________________
+# @section Extra tools
+#___________________
+type VersT     = uint
+type Version * = nstd.Version[VersT]
 
