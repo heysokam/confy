@@ -146,6 +146,8 @@ proc adjustRemotes *(obj :var BuildTrg) :void=
   ##  - Adjusted to come from the folders stored in the obj.remotes list when the local file is missing.
   if cfg.verbose: log &"Adjusting remotes for {obj.trg}."
   for file in obj.src.mitems:
+    # Dont adjust object files. They don't need to be compiled
+    if file.path.string.endsWith(".o"): continue
     # Dont adjust if the file exists
     if file.path.fileExists:
       if cfg.verbose: log1 &"Local file exists. Not adjusting :  {file.path}"
