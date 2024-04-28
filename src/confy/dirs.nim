@@ -91,16 +91,28 @@ proc setup *(trg :Dir) :void=
 #_____________________________
 # Glob Path Creation
 #___________________
-proc glob *(dir :Dir; ext :string= ".c"; rec :bool= false) :seq[DirFile]=
+func shouldSkip (filters :openArray[string]; file :string) :bool=
+  for filter in filters:
+    if filter in file: return true
+#___________________
+proc glob *(
+    dir     : Dir;
+    ext     : string            = ".c";
+    rec     : bool              = false;
+    filters : openArray[string] = @[];
+  ) :seq[DirFile]=
   ## @descr
   ##  Globs every file in the given folder that has the given ext.
-  ##  `ext` the extension to search for. Default: `.c`
-  ##  `rec` recursive search in all folders and subfolders when true. Default: `false`
+  ##  `ext`     Extension to search for. Default: `.c`
+  ##  `rec`     Recursive search in all folders and subfolders when true. Default: `false`
+  ##  `filters` List of strings that will be used to exclude/filter out files that contain any of them
   if rec:
     for file in dir.string.walkDirRec:
+      if filters.shouldSkip(file): continue
       if file.endsWith(ext): result.add DirFile.new(dir, file.replace(dir.string, "") )
   else:
     for file in dir.string.walkDir:
+      if filters.shouldSkip(file.path): continue
       if file.path.endsWith(ext): result.add DirFile.new(dir, file.path.replace(dir.string, "") )
 
 #_____________________________
