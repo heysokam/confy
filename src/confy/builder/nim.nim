@@ -40,7 +40,7 @@ proc buildNimZ (
   result = nimz.build(
     trgDir  = cfg.zigDir,
     nim     = nim.getRealBin().Path,
-    zigBin  = zcfg.getRealBin().Path,
+    zigBin  = zcfg.getRealBin().Path.lastPathPart,
     force   = force,
     verbose = cfg.verbose,
     ) # << nim.buildNimZ( ... )
