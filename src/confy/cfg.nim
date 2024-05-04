@@ -2,7 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
-import std/os
+import std/os except getAppDir
 import std/cpuinfo as cpu
 # @deps ndk
 import nstd/paths
