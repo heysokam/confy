@@ -87,11 +87,13 @@ type Compiler * = enum Zig, GCC, Clang
 #_______________________________________
 # @section Target-specific
 #___________________
-type OS * = enum
+type OS *{.pure.}= enum
+  UndefinedOS = "UndefinedOS",
   Windows = "windows", Mac     = "macosx",  Linux   = "linux"
   NetBSD  = "netbsd",  FreeBSD = "freebsd", OpenBSD = "openbsd"
   Solaris = "solaris", Aix     = "aix",     Haiku   = "haiku",  Other   = "standalone"
 type CPU *{.pure.}= enum
+  UndefinedCPU = "UndefinedCPU",
   x86     = "i386",    x86_64    = "amd64",     arm         = "arm",         arm64    = "arm64",
   mips    = "mips",    mipsel    = "mipsel",    mips64      = "mips64",      mips64el = "mips64el", 
   powerpc = "powerpc", powerpc64 = "powerpc64", powerpc64el = "powerpc64el", sparc    = "sparc",
@@ -118,6 +120,11 @@ const ext * = Extensions(
   unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o",   ar: ".a"),
   win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj", ar: ".lib"),
   mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o",   ar: ".a"),  )
+
+#_______________________________________
+# @section Build Modes
+#___________________
+type BuildMode * = enum Release, Debug
 
 
 #_______________________________________
