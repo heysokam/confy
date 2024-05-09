@@ -18,10 +18,13 @@ export make.MakeInputs
 # @section Entry Point: Make Converter
 #_____________________________
 proc fromMake *(
-    targets    : MakeInputs;
-    tempDir    : Path;
-    targetsDir : Path;
-    renameCB   : RenameFunc = RenameFunc_default;
+    targets     : MakeInputs;
+    tempDir     : Path;
+    targetsDir  : Path;
+    renameCB    : RenameFunc    = RenameFunc_default;
+    headerTempl : static string = "";
+    unified     : bool          = true;
+    force       : bool          = false;
   ) :void=
   var makelists :MakeLists
   # Read/Write the Make commands
@@ -34,5 +37,5 @@ proc fromMake *(
 
   # Convert the Make commands into confy
   var codegens = make.parse.filter.toCodegenLists(makelists)
-  make.codegen.writeFiles(codegens, targetsDir)
+  make.codegen.writeFiles(codegens, targetsDir, headerTempl, unified, force)
 

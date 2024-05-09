@@ -130,33 +130,36 @@ proc getTargetCode (
 #___________________
 const RootDirDefault = "getAppDir()/\"..\"  # Assumes that the confy builder is output into `cfg.binDir`"
 proc getCode *(
-    list    : CodegenList;
-    trg     : FinalTarget;
-    rootDir : Path = cfg.rootDir;
+    list        : CodegenList;
+    trg         : FinalTarget;
+    rootDir     : Path = cfg.rootDir;
+    headerTempl : static string = "";
   ) :string=
   let RootDir :string= RootDirDefault
-  result = fmt( HeaderTempl ) & "\n" & list.getTargetCode(trg, rootDir, list.srcDir)
+  let Trg = trg.bin.lastPathPart
+  result = fmt( headerTempl ) & fmt( HeaderTempl ) & "\n" & list.getTargetCode(trg, rootDir, list.srcDir)
 #___________________
 proc getCode *(
-    list    : CodegenList;
-    rootDir : Path = cfg.rootDir;
+    list        : CodegenList;
+    rootDir     : Path = cfg.rootDir;
+    headerTempl : static string = "";
   ) :string=
   let RootDir :string= RootDirDefault
-  result = fmt(HeaderTempl)
-  for trg in list.trg: result.add "\n" & list.getTargetCode(trg, rootDir, list.srcDir)
-
-
-
+  for trg in list.trg:
+    let Trg = trg.bin.lastPathPart
+    result = fmt( headerTempl ) & fmt( HeaderTempl )
+    result.add "\n" & list.getTargetCode(trg, rootDir, list.srcDir)
 
 
 #_______________________________________
 # @section confy: Code Writing
 #_____________________________
 proc writeFile *(
-    list    : CodegenList;
-    trgDir  : Path;
-    unified : bool = true;
-    force   : bool = false;
+    list        : CodegenList;
+    trgDir      : Path;
+    headerTempl : static string = "";
+    unified     : bool = true;
+    force       : bool = false;
   ) :void=
   if unified:
     let mode   = ($list.trg[0].mode).normalize
@@ -165,7 +168,7 @@ proc writeFile *(
     let file   = (dir/list.name).addFileExt(".nim")
     md dir
     echo &"Writing generated code for {list.name} into:  {file}"
-    file.writeFile list.getCode(cfg.rootDir)
+    file.writeFile list.getCode(cfg.rootDir, headerTempl)
   else:
     for trg in list.trg:
       let mode   = ($trg.mode).normalize
@@ -174,15 +177,15 @@ proc writeFile *(
       md dir
       let file   = (dir/list.name).addFileExt(".nim")
       echo &"Writing generated code for {list.name} into:  {file}"
-      file.writeFile list.getCode(trg, cfg.rootDir)
-
+      file.writeFile list.getCode(trg, cfg.rootDir, headerTempl)
 #___________________
 proc writeFiles *(
-    lists   : CodegenLists;
-    trgDir  : Path;
-    unified : bool = true;
-    force   : bool = false;
+    lists       : CodegenLists;
+    trgDir      : Path;
+    headerTempl : static string = "";
+    unified     : bool = true;
+    force       : bool = false;
   ) :void=
   ## @descr Writes all files that are described in the {@arg lists} of CodegenList objects
-  for list in lists: list.writeFile(trgDir, unified, force)
+  for list in lists: list.writeFile(trgDir, headerTempl, unified, force)
 
