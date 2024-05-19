@@ -122,8 +122,16 @@ const ext * = Extensions(
   mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o",   ar: ".a"),  )
 
 #_______________________________________
-# @section Build Modes
+# @section Other Options
 #___________________
+type Name * = object
+  short  *:string
+  long   *:string
+  human  *:string
+type Repository * = object
+  server *:string= "https://github.com"
+  owner  *:string
+  name   *:string
 type BuildMode * = enum Release, Debug
 
 
