@@ -70,7 +70,7 @@ type Dependencies * = HashSet[Dependency]
 #_______________________________________
 # @section Compiler
 #___________________
-type Lang *{.pure.}= enum Unknown, C, Cpp, Nim, MinC
+type Lang *{.pure.}= enum Unknown, C, Cpp, Nim, MinC, Asm
   ## @descr Language of a code file, based on its extension
 type BinKind * = enum Program, SharedLibrary, StaticLibrary, Object, Module
   ## @descr Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc

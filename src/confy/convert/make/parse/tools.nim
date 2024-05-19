@@ -1,3 +1,6 @@
+#:_____________________________________________________
+#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
+#:_____________________________________________________
 # @deps ndk
 import nstd/paths
 # @deps make.parse

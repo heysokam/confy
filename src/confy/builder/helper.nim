@@ -50,6 +50,7 @@ func getLangFromExt (ext :string) :Lang=
   of ".cpp", ".cc" : result = Lang.Cpp
   of ".nim"        : result = Lang.Nim
   of ".cm"         : result = Lang.MinC
+  of ".s"          : result = Lang.Asm
   else             : result = Lang.Unknown
 #_____________________________
 proc getLang *(file :DirFile) :Lang=
@@ -67,6 +68,7 @@ proc getLang *(list :seq[DirFile]) :Lang=
   elif  Lang.MinC in langs: result = Lang.MinC
   elif  Lang.Cpp  in langs: result = Lang.Cpp
   elif  Lang.C    in langs: result = Lang.C
+  elif  Lang.Asm  in langs: result = Lang.Asm
   else: raise newException(CompileError, &"Unimplemented language found in {langs} for files:\n{list}")
 
 #_________________________________________________
@@ -129,7 +131,7 @@ func toAR *(file :Fil; os :OS) :Fil= file.changeFileExt(os.extAR())
 proc getCC *(lang :Lang; compiler :Compiler) :string=
   ## @descr Returns the correct command string to build with the given compiler for the given lang.
   case lang
-  of Lang.C:
+  of Lang.C, Lang.Asm:
     case compiler
     of Zig   : result = zcfg.getRealCC()
     of GCC   : cerr "GCC support has been deprecated. Use ZigCC instead."   # result = ccfg.gcc
@@ -142,7 +144,7 @@ proc getCC *(lang :Lang; compiler :Compiler) :string=
     of Clang : cerr "Clang support has been deprecated. Use ZigCC instead"  # result = ccfg.clangpp
     # else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
   of Lang.Unknown: raise newException(CompileError, &"Tried to getCC with Lang.{lang}. The input lang is either uninitialized, or support for it is not implemented in confy.")
-  else: raise newException(CompileError, &"Support for getCC with compiler {compiler} is currently not implemented.")
+  else: raise newException(CompileError, &"Support for getCC for Lang.{lang} and compiler {compiler} is currently not implemented.")
 #_____________________________
 proc getCC *(file :DirFile; compiler :Compiler) :string=  file.getLang.getCC(compiler)
   ## @descr Returns the correct command string to build the input file with the given compiler.

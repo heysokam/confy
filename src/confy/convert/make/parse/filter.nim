@@ -3,9 +3,9 @@
 #:_____________________________________________________
 # @deps std
 from std/tables import hasKey, `[]=`, `[]`, contains
-from std/sequtils import anyIt, filterIt, mapIt
+from std/sequtils import anyIt, filterIt, mapIt, toSeq
 # @deps ndk
-from nstd/sets import items, incl, len, `+`, `+=`, initHashset, initOrderedSet, contains
+import nstd/sets
 import nstd/strings
 import nstd/paths
 import confy
@@ -86,20 +86,21 @@ proc getSystem *(
 #_______________________________________
 # @descr Temporary Code objects for IR generation
 #_____________________________
-func toCodeFiles (src :OrderedSet[Path]; flags :OrderedSet[string]) :OrderedSet[CodeFile]=
+const SkipAssembler = ["-x", "assembler-with-cpp"]
+func toCodeFiles (src :OrderedSet[Path]; flags :OrderedSet[string]; assembler :bool= false) :OrderedSet[CodeFile]=
   ## @descr Converts the given src list into a CodeFile list, where all entries are given the input flags.
-  for file in src: result.incl CodeFile(file:file, flags:flags)
+  for file in src: result.incl CodeFile(file:file, flags: if assembler: flags else: flags.toSeq.filterIt( it notin SkipAssembler ).toOrderedSet())
 #___________________
-func getCodeFiles *(trg :RootTarget) :OrderedSet[CodeFile]=
+func getCodeFiles *(trg :RootTarget; assembler :bool= false) :OrderedSet[CodeFile]=
   ## @descr
   ##  Returns a list of code files used to build this target.
   ##  They are turned absolute based on the rootDir stored in {@arg trg}: `trg.root/file`
   ##  @note The root folder is where the makefile lives.
   # Direct case, without intermediate obj passes
-  if trg.isDirect(): return trg.src.toCodeFiles(trg.flags)
+  if trg.isDirect(): return trg.src.toCodeFiles(trg.flags, assembler)
   # Normal case, where files are first compiled with `-c` and then linked from `.o`
-  for ctrg in trg.deps:                                # For every dependency
-    result = result + ctrg.src.toCodeFiles(ctrg.flags) # Get the source code of the dependency
+  for ctrg in trg.deps:  # For every dependency
+    result = result + ctrg.src.toCodeFiles(ctrg.flags, assembler)  # Get the source code of the dependency
 #_____________________________
 func toCodeFolders (src :OrderedSet[Path]) :Hashset[Path]=
   ## Returns a list of unique folders where all of the files in the list are contained.
@@ -132,6 +133,8 @@ func getCC *(words :seq[string]) :string=
   ## @descr Finds the compiler command, which must always be the first word of the line:(seq[word])
   result = if words.len == 0: "" else: words[0]
 #___________________
+const LangSwitches = ["assembler-with-cpp"]
+#___________________
 func getSrc *(line :seq[string]) :OrderedSet[Path]=
   ## @descr Finds the source code files that are used on the given Make {@arg line}.
   var output :string
@@ -140,6 +143,7 @@ func getSrc *(line :seq[string]) :OrderedSet[Path]=
     elif word == "-o"         : output = line[id+1]; continue  # Binary output is always the next word after `-o`
     elif word.startsWith("-") : continue                       # Switches are not source code
     elif word == output       : continue                       # Binary output is not source code
+    elif word in LangSwitches : continue                       # Language switches for `-x<lang>` are not source code
     result.incl word.Path                                      # Otherwise we found a source code file
 #___________________
 func getFlags *(line :seq[string]) :OrderedSet[string]=
@@ -164,6 +168,18 @@ func findNonRoots (list :MakeList) :CTargets=
     if line.isRoot(): continue
     assert line != @[] and line.anyIt(it != "")
     result.add line.getCTarget()
+#___________________
+proc getRootTarget *(dep :CTarget; rootDir :Path) :RootTarget=
+  ## @descr Find the Root Target that this CTarget defines
+  result = RootTarget(
+    kind  : dep.kind,
+    trg   : dep.trg,
+    cc    : dep.cc,
+    root  : rootDir,
+    src   : dep.src,
+    deps  : initOrderedSet[CTarget](), # RootTargets do not have dependencies
+    flags : dep.flags,
+    ) # << RootTarget( ... )
 #___________________
 func getRootTarget (line :seq[string]; rootDir :Path) :RootTarget=
   result = RootTarget(
@@ -200,10 +216,10 @@ func findRoots *(
 #_____________________________
 proc toSplitTarget (trg :Path) :tuple[bin:Path, binDir:Path, subDir:Path]=
   let file = trg.string.split(DirSep)
-  assert file.len == 3, &"Tried to use the default `toSplitTarget` function on a path, but its format is incorrect. It should have a length of 3, but is {file.len} instead:\n  {trg}"
+  assert file.len in {3,4}, &"Tried to use the default `toSplitTarget` function on a path, but its format is incorrect. It should have a length of 3 or 4, but is {file.len} instead:\n  {trg}"
   result.binDir = file[0].Path
-  result.subDir = file[1].Path
-  result.bin    = file[2].Path
+  result.subDir = file[1..^2].join($DirSep).Path
+  result.bin    = file[^1].Path
 #___________________
 proc toFinal (
     root        : RootTarget;
@@ -213,6 +229,7 @@ proc toFinal (
     getCPU      : ToCPUFunc       = nil;
     splitTarget : SplitTargetFunc = nil;
     pattern     : string          = ".c";
+    assembler   : bool            = false;
   ) :FinalTarget=
   # Error check and report to CLI
   assert root.trg != "".Path
@@ -229,13 +246,35 @@ proc toFinal (
         if  getOS.isNil: filter.toOS  else: getOS,
         if getCPU.isNil: filter.toCPU else: getCPU
         ), # << getSyst(root.trg, ... )
+    deps    : newSeq[CodeFile](), # Empty deps list
+    src     : newSeq[CodeFile](), # Empty src list
     globs   : newSeq[CodeDir](),  # Empty glob
     excepts : newSeq[CodeDir](),  # Empty excepts
     lflags  : root.flags,
     ) # << FinalTarget( ... )
   (result.bin, result.binDir, result.subDir) = if splitTarget.isNil: filter.toSplitTarget(root.trg) else: splitTarget(root.trg)
 
+  # Add assembler dependencies to the list of explicit deps files of the FinalTarget
+  for dep in root.deps:
+    if not dep.flags.toSeq.isAssembler(): continue
+    result.deps.add CodeFile(file: dep.trg, flags: dep.flags)
+
+  # Assembler targets should get their source code list fully explicit
+  if assembler:
+    for file in root.src:
+      result.src.add CodeFile(file: file, flags: root.flags)
+
+  # Override `.o` files from mingw
+  if result.system.os == Windows:
+    if result.kind == Object: result.bin = result.bin.changeFileExt(".obj")
+    for src in result.src.mitems:
+      if src.file.endsWith(".o"): src.file = src.file.changeFileExt(".obj")
+    for dep in result.deps.mitems:
+      if dep.file.endsWith(".o"): dep.file = dep.file.changeFileExt(".obj")
+
   # Create the list of Excepts   (note: just gets the data from one object to the other, no fancy logic)
+  # 1.0 Skip searching globs+excepts for assembler targets
+  if assembler: return
   # 1.1 Find the code files
   let sources = root.getCodeFiles()
   FilterError.triggerIf sources.len == sources.type.default().len,
@@ -292,7 +331,12 @@ proc toFinals (
   ##  Creates a {@link FinalTarget} from the input {@arg list} of RootTarget
   ##  It will use {@arg getSystem} function to determine the system that the target of each line is being built for
   ##  Files will be searched for assuming they contain {@arg pattern} in their name
-  for trg in roots: result.add trg.toFinal(getMode, getSyst, getOS, getCPU, splitTarget, pattern)
+  ##  Dependencies will be searched for independently of {@arg pattern}
+  for trg in roots:
+    for dep in trg.deps:
+      if not dep.isAssembler(): continue
+      result.add dep.getRootTarget(trg.root).toFinal(getMode, getSyst, getOS, getCPU, splitTarget, pattern = ".s", assembler=true)
+    result.add trg.toFinal(getMode, getSyst, getOS, getCPU, splitTarget, pattern)
 #___________________
 proc toFinalTargets *(
     list        : MakeList;
@@ -313,7 +357,6 @@ proc toFinalTargets *(
   result = roots.toFinals(getMode, getSyst, getOS, getCPU, splitTarget, pattern)  # 3. Write the output into the result
 
 
-
 #_______________________________________
 # @descr Process MakeLists into Codegen Objects
 #_____________________________
@@ -330,7 +373,7 @@ proc toCodegenList *(
   ##  Converts the given makelist into its CodegenList representation.
   ##  Parses+Filters the inner lines of make output into their proper FinalTarget representation.
   ##  Stores the rest of the fields in the object as they were.
-  echo &"\nGenerating Codegen List for {list.name}"
+  echo &"\nGenerating Codegen List for:  {list.name}"
   result.name    = list.name
   result.key     = list.key
   result.trg     = list.toFinalTargets(list.root, getMode, getSyst, getOS, getCPU, splitTarget, pattern)

@@ -39,7 +39,7 @@ proc toDirFile *(file :Fil; dir :Dir= cfg.srcDir) :DirFile=
   if file.isObj: return DirFile(file: file, dir: Dir("")) # Do not adjust object files at all, since they don't need to be compiled.
   if dir.string notin file.string: cerr &"The file {file} has been sent with an incorrect structure. It should be relative to {dir}, but isn't."
   result.dir  = dir
-  result.file = file.string.replace(if not dir.string.endsWith(os.DirSep): dir.string & os.DirSep else: dir.string, "").Fil
+  result.file = file.replace(if not dir.endsWith(os.DirSep): dir.string & os.DirSep else: dir.string, "").Fil
 #___________________
 proc toDirFile *(files :seq[Fil]; dir :Dir= cfg.srcDir) :seq[DirFile]=
   ## @descr
@@ -91,29 +91,29 @@ proc setup *(trg :Dir) :void=
 #_____________________________
 # Glob Path Creation
 #___________________
-func shouldSkip (filters :openArray[string]; file :string) :bool=
+func shouldSkip (filters :openArray[Path]; file :Path) :bool=
   for filter in filters:
     if filter in file: return true
 #___________________
 proc glob *(
     dir     : Dir;
-    ext     : string            = ".c";
-    rec     : bool              = false;
-    filters : openArray[string] = @[];
+    ext     : string          = ".c";
+    rec     : bool            = false;
+    filters : openArray[Path] = @[];
   ) :seq[DirFile]=
   ## @descr
   ##  Globs every file in the given folder that has the given ext.
   ##  `ext`     Extension to search for. Default: `.c`
   ##  `rec`     Recursive search in all folders and subfolders when true. Default: `false`
-  ##  `filters` List of strings that will be used to exclude/filter out files that contain any of them
+  ##  `filters` List of paths that will be used to exclude/filter out files that contain any of them
   if rec:
-    for file in dir.string.walkDirRec:
+    for file in dir.walkDirRec:
       if filters.shouldSkip(file): continue
-      if file.endsWith(ext): result.add DirFile.new(dir, file.replace(dir.string, "") )
+      if file.string.endsWith(ext): result.add DirFile.new(dir, file.replace(dir.string, "") )
   else:
-    for file in dir.string.walkDir:
+    for file in dir.walkDir:
       if filters.shouldSkip(file.path): continue
-      if file.path.endsWith(ext): result.add DirFile.new(dir, file.path.replace(dir.string, "") )
+      if file.path.string.endsWith(ext): result.add DirFile.new(dir, file.path.replace(dir.string, "") )
 
 #_____________________________
 # Remotes Management

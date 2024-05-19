@@ -42,6 +42,7 @@ proc defaultExt *(lang :Lang) :string=
   case lang
   of Nim,C,Cpp : "." & ($lang).normalize
   of MinC      : ".cm"
+  of Asm       : ".s"
   of Unknown   : ""
 
 #_______________________________________

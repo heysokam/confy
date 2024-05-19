@@ -7,7 +7,7 @@ from std/hashes import Hash, hash
 from std/tables import Table
 from std/sequtils import anyIt, toSeq
 # @deps ndk
-from nstd/paths import Path, `==`, contains
+from nstd/paths import Path, `==`, contains, `<`
 from confy/types as confy import System, BuildMode, CPU, OS, BinKind
 
 
@@ -35,13 +35,14 @@ type MakeLists * = seq[MakeList]
 
 
 #_____________________________
-type ToCPUFunc     * = proc (cpu :string) :CPU {.nimcall.}
-type ToOSFunc      * = proc (os :string) :OS {.nimcall.}
-type GetSystemFunc * = proc (trg :Path; toOS :ToOSFunc; toCPU :ToCPUFunc) :System {.nimcall.}
-type GetModeFunc   * = proc (trg :string) :BuildMode {.nimcall.}
-type RenameFunc    * = proc (name :string) :string {.nimcall.}
+type ToCPUFunc        * = proc (cpu :string) :CPU {.nimcall.}
+type ToOSFunc         * = proc (os :string) :OS {.nimcall.}
+type GetSystemFunc    * = proc (trg :Path; toOS :ToOSFunc; toCPU :ToCPUFunc) :System {.nimcall.}
+type GetModeFunc      * = proc (trg :string) :BuildMode {.nimcall.}
+type SplitTargetFunc  * = proc (trg :Path) :tuple[bin:Path, binDir:Path, subDir:Path] {.nimcall.}
+type PostProccessFunc * = proc (content :string) :string {.nimcall.}
+type RenameFunc       * = proc (name :string) :string {.nimcall.}
 func RenameFunc_default *(name :string) :string= name
-type SplitTargetFunc * = proc (trg :Path) :tuple[bin:Path, binDir:Path, subDir:Path] {.nimcall.}
 
 
 #_____________________________
@@ -51,8 +52,9 @@ type CodeFile * = object
   ##  For storing temporary code files with their flags during IR generation
   file  *:Path
   flags *:OrderedSet[string]
+type CodeFiles * = seq[CodeFile]
 #_____________________________
-func contains *(list :openArray[CodeFile]; file :Path) :bool=  list.anyIt( (it.file in file) or (file in it.file) )
+func contains *(list :CodeFiles; file :Path) :bool=  list.anyIt( (it.file in file) or (file in it.file) )
   ## @descr
   ##  Returns true if the seq of CodeFiles contains the file's name, or viceversa.
   ##  Used by the keywords `in` and `notin`
@@ -111,6 +113,8 @@ type FinalTarget * = object
   mode     *:BuildMode           ## release/debug
   kind     *:BinKind             ## Program, SharedLib, etc
   system   *:System              ## CPU/OS
+  deps     *:CodeFiles           ## Explicit list of dependency files to add to the target. Taken from cfg.binDir
+  src      *:CodeFiles           ## Explicit list of source files to add to the target. Taken from cfg.srcDir
   globs    *:CodeDirs            ## Folders that can be globbed entirely
   excepts  *:CodeDirs            ## Folders that need to be filtered in some way
   lflags   *:OrderedSet[string]  ## Set of Linker Flags to compile this binary target
@@ -127,4 +131,13 @@ type CodegenList * = object
   srcDir   *:Path          ## Project folder where source code folder is stored
   rootDir  *:Path          ## Root folder of the project where make is called from
 type CodegenLists * = seq[CodegenList]
+
+
+#_____________________________
+type Connector * = object
+  ## @descr Final file that needs to be connected from the main builder.nim codegen file
+  path    *:Path
+  mode    *:BuildMode
+  system  *:System
+type Connectors * = seq[Connector]
 
