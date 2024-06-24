@@ -24,8 +24,12 @@ import ./minc as minc
 import ./assembler
 
 #_____________________________
-proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
-  if not dirExists(cfg.binDir/obj.sub): md cfg.binDir/obj.sub
+proc compile (
+    src   : PathList;
+    obj   : BuildTrg;
+    force : bool;
+  ) :void=
+  if not exists(cfg.binDir/obj.sub): md cfg.binDir/obj.sub
   case obj.src.getLang()
   of C       : c.compile(src, obj, force)
   of Cpp     : cpp.compile(src, obj, force)
@@ -35,18 +39,22 @@ proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
   of Unknown : cerr "Tried to compile and Unknown language."
 
 #_____________________________
-proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
-  if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
+proc build (
+    obj   : var BuildTrg;
+    run   : bool = false;
+    force : bool = false
+  ) :void=
+  if not obj.cc.exists: cerr &"Trying to compile {obj.trg.path} with {$obj.cc}, but the compiler binary couldn't be found."
   if not quiet: info.report(obj)  # Report build information to console when not quiet
-  if force and dirExists(cfg.cacheDir.string):
-    os.removeDir cfg.cacheDir.string  # Force building all files by removing the cacheDir
-  dirs.setup( cfg.cacheDir )          # Setup the cache folder for confy.
-  dirs.adjustRemotes( obj )           # Search for files in the remote folders, when they are missing in current.
-  obj.root.setup()                    # Setup the root folder of the project.
+  if force and exists(cfg.cacheDir):
+    cfg.cacheDir.remove       # Force building all files by removing the cacheDir
+  dirs.setup( cfg.cacheDir )  # Setup the cache folder for confy.
+  dirs.adjustRemotes( obj )   # Search for files in the remote folders, when they are missing in current.
+  obj.root.setup()            # Setup the root folder of the project.
   compile(obj.src, obj, force)
-  log &"Finished building {obj.trg}."
+  log &"Finished building  {obj.trg.path}"
   if run and obj.kind == Program:
-    let bin = string obj.root/obj.sub/obj.trg.toBin(obj.syst.os)
+    let bin = path obj.root/obj.sub/obj.trg.toBin(obj.syst.os)
     log &"Running {bin} ..."
     sh bin
 
@@ -55,7 +63,7 @@ const ReservedKeywords = ["all", "examples", "tests", "tasks"]
 #_____________________________
 proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
   if cfg.verbose: cfg.quiet = off  # Disable quiet when verbose is active.
-  if obj.trg.string in ReservedKeywords: cerr &"Found a target that uses a reserved keyword as its .trg= field:\n  {obj.trg}\nThe list of reserved keywords is:\n  {ReservedKeywords}"
+  if obj.trg.path in ReservedKeywords: cerr &"Found a target that uses a reserved keyword as its .trg= field:\n  {obj.trg.path}\nThe list of reserved keywords is:\n  {ReservedKeywords}"
   block checkKeywords:
     # Search for "all" and empty cases
     if state.keywordList.len == 0 and "all" in keywords:
@@ -63,7 +71,7 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= fals
     elif "all" in state.keywordList and "examples" notin keywords and "tests" notin keywords:
       break checkKeywords # Search for `all` keyword (always build when all is requested)
     # Search for object.target as a keyword in the user-requested list
-    if obj.trg.string in state.keywordList: break checkKeywords
+    if obj.trg.path in state.keywordList: break checkKeywords
     # Search inside the list of object-specific keywords
     for key in keywords:
       if key in state.keywordList: break checkKeywords
@@ -72,11 +80,11 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= fals
       of "examples":
         if "examples" notin state.keywordList: continue
         for file in obj.src: # Object is considered an example if one of its files is contained in cfg.examplesDir
-          if cfg.examplesDir.string in file.path.string: break checkKeywords
+          if cfg.examplesDir.path in file.path: break checkKeywords
       of "tests": # Object is considered a test if one of its files is contained in cfg.testsDir
         if "tests" notin state.keywordList: continue
         for file in obj.src:
-          if cfg.testsDir.string in file.path.string: break checkKeywords
+          if cfg.testsDir.path in file.path: break checkKeywords
       else:discard
     # Key was not requested, and not a preset key. Return without doing anything
     return
@@ -86,3 +94,4 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= fals
 proc build *(obj :BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
   var tmp :BuildTrg= obj
   tmp.build(keywords, run, force)
+

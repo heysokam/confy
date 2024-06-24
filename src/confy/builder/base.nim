@@ -22,7 +22,7 @@ import ./helper
 # Direct compilation
 #___________________
 proc direct *(
-    src      : DirFile;
+    src      : Fil;
     trg      : Fil;
     CC       : string;
     flags    : seq[string];
@@ -37,7 +37,7 @@ proc direct *(
   if helper.isBin(trg): trg.setExec()  # Set executable flags on the resulting binary.
 #___________________
 proc direct *(
-    src      : seq[DirFile];
+    src      : PathList;
     trg      : Fil;
     CC       : string;
     flags    : seq[string];
@@ -45,7 +45,7 @@ proc direct *(
   ) :void=
   ## @descr Builds the `src` list of files directly into the `trg` file.
   ## @note Doesn't compile an intermediate `.o` step.
-  let files = src.mapIt(it.path.string).join(" ")
+  let files = src.mapIt(it.path).join(" ")
   let flg   = flags.join(" ")
   let cmd   = &"{CC} {flg} {files} -o {trg}"
   if not quiet: echo &"{quietStr} {trg}"
@@ -58,7 +58,7 @@ proc direct *(
 # Base: Linker
 #___________________
 proc link *(
-    src   : seq[DirFile];
+    src   : PathList;
     trg   : Fil;
     lang  : Lang;
     CC    : Compiler;
@@ -71,7 +71,7 @@ proc link *(
 # Base: Compiler
 #___________________
 proc compileNoObj *(
-    src      : seq[DirFile];
+    src      : PathList;
     trg      : Fil;
     CC       : Compiler;
     flags    : Flags;
@@ -82,22 +82,22 @@ proc compileNoObj *(
   direct(src, trg, src.getCC(CC), flags.cc, quietStr)
 #___________________
 proc compileToObj *(
-    src      : seq[DirFile];
+    src      : PathList;
     dir      : Dir;
     syst     : System;
     CC       : Compiler;
     flags    : Flags;
     quietStr : string;
-  ) :seq[DirFile] {.discardable.}=
+  ) :PathList {.discardable.}=
   ## @descr Compiles the given `src` list of files as objects, and outputs them into the `dir` folder.
   ## @returns The list of compiled files.
   for file in src:
-    let trg = (dir/file.path.lastPathPart).toObj(syst.os)
+    let trg = (dir/file.basename).toObj(syst.os)
     file.direct(trg, file.getCC(CC) & " -c", flags.cc & flags.ld, quietStr)
-    result.add DirFile.new(dir, trg.string.replace(dir.string, ""))
+    result.add Path.new(dir, trg.basename)
 #___________________
 proc compileToMod *(
-    src      : seq[DirFile];
+    src      : PathList;
     dir      : Dir;
     CC       : Compiler;
     flags    : Flags;
@@ -105,6 +105,6 @@ proc compileToMod *(
   ) :void=
   ## Compiles the given `src` list of files as named modules, and outputs them into the `dir` folder.
   for file in src:
-    let trg = file.chgDir(dir).path.changeFileExt(".pcm").Fil
+    let trg = file.chgDir(dir).changeExt(".pcm")
     file.direct(trg, file.getCC(CC) & " -c", flags.cc, quietStr)
 

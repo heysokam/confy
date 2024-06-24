@@ -2,6 +2,7 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
+from std/os import `/`
 from std/sets import HashSet, incl, items, len, toHashSet
 from std/sequtils import toSeq
 # @deps nstd
@@ -27,7 +28,7 @@ import ../tool/logger
 #   let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
 #   nim &"c --outDir:{cfg.binDir} {paths} "&opts.join(" ")
 proc nimInstall *(vers :string= cfg.nim.vers) :void=
-  if cfg.nimDir.dirExists: return
+  if cfg.nimDir.exists: return
   info "Installing nim "&vers
   git "clone", cfg.nim.url, cfg.nimDir, "-b", vers, "--depth 1"
   withDir cfg.nimDir: sh "./build_all.sh"
@@ -43,7 +44,7 @@ func new *(_:typedesc[Dependencies]; deps :varargs[Dependency]) :Dependencies=  
 func to *(dep :Dependency; lang :Lang) :string=
   ## @descr Returns a string with the given {@arg dep} dependency converted to the format understood by the compiler of the given {@arg lang}.
   case lang
-  of Nim : "--path:"&dep.dir.string
+  of Nim : "--path:"&dep.dir.path
   else:""
 func to *(deps :Dependencies; lang :Lang) :string=
   ## @descr Returns a string with the given {@arg deps} dependencies converted to the format understood by the compiler of the given {@arg lang}.
@@ -52,15 +53,20 @@ func to *(deps :Dependencies; lang :Lang) :string=
     for dep in deps: result.add " "&dep.to(lang)
   else: result = ""
 #___________________
-proc submodule *(name :string; url :string= ""; code :Dir|string= cfg.srcSub; shallow :bool= true) :Dependency {.discardable.}=
+proc submodule *(
+    name    : string;
+    url     : string= "";
+    code    : Dir|string= cfg.srcSub;
+    shallow : bool= true
+  ) :Dependency {.discardable.}=
   ## @descr Installs the given dependency as a submodule for the project
   result = Dependency(
     name : name,
     url  : url,
     src  : when code is string: code.Path else: code,
-    dir  : absolutePath( cfg.libDir/name/code )
+    dir  : paths.absolute( cfg.libDir/name/code )
     ) # << Dependency( ... )
-  if not dirExists(cfg.libDir)               : md cfg.libDir
-  if not fileExists(cfg.libDir/".gitignore") : writeFile(cfg.libDir/".gitignore", "*\n!.gitignore")
-  if not dirExists(cfg.libDir/name)          : git "clone", &"{url} {cfg.libDir/name}", if shallow: " --depth 1" else: ""
+  if not cfg.libDir.exists               : md cfg.libDir
+  if not exists(cfg.libDir/".gitignore") : writeFile(cfg.libDir.path/".gitignore", "*\n!.gitignore")
+  if not exists(cfg.libDir/name)         : git "clone", &"{url} {cfg.libDir/name}", if shallow: " --depth 1" else: ""
 

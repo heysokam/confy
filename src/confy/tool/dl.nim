@@ -11,7 +11,7 @@ import nstd/paths
 import ./logger
 import ../cfg
 
-proc file *(url :string; trgFile :Path; report :bool= true) :void=
+proc file *(url :string; trgFile :Fil; report :bool= true) :void=
   if report: log &"Downloading {url}\n{tab}as {trgFile}..."
-  trgFile.writeFile( puppy.get(url).body )
+  trgFile.write( puppy.get(url).body )
 

@@ -2,7 +2,6 @@
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
 # @deps std
-import std/os except getAppDir
 import std/cpuinfo as cpu
 # @deps ndk
 import nstd/paths
@@ -12,9 +11,7 @@ import ./flags as fl
 
 #___________________
 # General
-var cores *:int=
-  when nims : 1
-  else      : (0.8 * cpu.countProcessors().float).int
+var cores *:int= (0.8 * cpu.countProcessors().float).int
   ## @descr Total cores to use for compiling.  @default 80% of max)
 
 #___________________
@@ -111,17 +108,15 @@ var fakeRun *:bool=  off
 #_____________________________
 # Project: Folders
 #___________________
-var rootDir *:Dir=
-  when nims : Dir(".")               # Assumes the nimble/nims file is in root/, and is called from that folder.
-  else      : Dir(getAppDir()/"..")  # Assume the builder is inside root/bin/
+var rootDir *:Dir=  paths.getAppDir()/".."  # Assume the builder is inside root/bin/
 #___________________
 # Root Folders
-var srcSub       *:Dir=  Dir "src"
+var srcSub       *:Dir=  Dir.new("src")
 var srcDir       *:Dir=  rootDir/srcSub
-var binSub       *:Dir=  Dir "bin"
+var binSub       *:Dir=  Dir.new("bin")
 var binDir       *:Dir=  rootDir/binSub
 var libDir       *:Dir=  rootDir/"lib"
-var docSub       *:Dir=  Dir "doc"
+var docSub       *:Dir=  Dir.new("doc")
 var docDir       *:Dir=  rootDir/docSub
 var examplesDir  *:Dir=  rootDir/"examples"
 var testsDir     *:Dir=  rootDir/"tests"
@@ -135,10 +130,10 @@ var mincDir      *:Dir=  binDir/".minc"
 #_________________________________________________
 # Project: Files
 #___________________
-var file    *:Fil=  "build.nim".Fil
-  ## File used for storing the builder config/app.
-var zigJson *:Fil=  zigDir/"versions.json"
-  ## Zig download index json file.
+var file    *:Fil=  Fil.new("build.nim")
+  ## @descr File used for storing the builder config/app.
+var zigJson *:Fil=  Fil.new(zigDir, "versions.json")
+  ## @descr Zig download index json file.
 
 
 #_________________________________________________

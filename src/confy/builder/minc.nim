@@ -22,19 +22,19 @@ import ./zigcc/zcfg
 #_____________________________
 const KnownExts = [".cm",".nim"]
 template getRealBin *() :string=
-  if cfg.minc.systemBin: cfg.minc.cc else: string cfg.mincDir/"bin"/cfg.minc.cc
+  if cfg.minc.systemBin: cfg.minc.cc else: path cfg.mincDir/"bin"/cfg.minc.cc
 
 
 #_____________________________________________________
 # @section MinC: Builder
 #_____________________________
-proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
+proc compile *(src :PathList; obj :BuildTrg; force :bool= false) :void=
   var srcFile :string
   var cfiles  :string
   for file in src:
-    case file.file.splitFile.ext
-    of KnownExts : srcFile = file.path.string  # TODO:maybe? Multi-file support ?
-    of ".c"      : cfiles.add &"--cFile:{file.path.string} "
+    case file.ext
+    of KnownExts : srcFile = file.path  # TODO:maybe? Multi-file support ?
+    of ".c"      : cfiles.add &"--cFile:{file.path} "
     else         : continue
   let typFlag = case obj.kind
     of SharedLibrary : "--passL=\"-shared\""

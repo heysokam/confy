@@ -22,15 +22,6 @@ proc sh *(cmd :string; dbg :bool= false) :void=
   if cfg.fakeRun: return
   if os.execShellCmd(cmd) != 0: raise newException(OSError, &"Failed to run shell command:  {cmd}")
 proc git *(args :varargs[string,`$`]) :void= sh cfg.gitBin&" "&args.join(" ")
-#___________________
-# Access time
-when not nims:
-  from nstd/paths import lastMod, noModSince
-  export lastMod, noModSince
-#_____________________________
-# Files
-proc setExec *(trg :Fil) :void=  os.setFilePermissions(trg.string, {FilePermission.fpUserExec}, followSymlinks = false)
-  ## @descr Sets the given `trg` binary flags to be executable for the current user.
 
 
 #_______________________________________

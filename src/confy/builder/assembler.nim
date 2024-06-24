@@ -1,6 +1,8 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
+# @deps ndk
+import nstd/paths
 # @deps confy
 import ../tools
 import ../types
@@ -11,7 +13,7 @@ import ./zigcc
 # Assembler: Compiler
 #___________________
 proc compile *(
-  src   : seq[DirFile];
+  src   : PathList;
   obj   : BuildTrg;
   force : bool= false;
   ) :void=

@@ -6,6 +6,7 @@ import std/os
 # @deps ndk
 import nstd/paths
 import nstd/strings
+import nstd/typetools
 # @deps confy
 import ./types
 import ./tool/helper
@@ -18,7 +19,7 @@ const InfoTemplate = """
 {cfg.prefix}Building {obj.kind} | {obj.trg} in {obj.root}:
 
   Version:          {version}
-  Target Binary:    {obj.trg.string.lastPathPart}
+  Target Binary:    {obj.trg.lastPathPart}
   Target Platform:  {obj.syst.os}
   Target Arch:      {obj.syst.cpu}
   Host Platform:    {getHost().os}
@@ -32,8 +33,8 @@ const InfoTemplate = """
 """
 proc report *(obj :BuildTrg) :void=
   ## Reports information about the BuildTrg object in CLI.
-  let version = if obj.version != ""    : obj.version   else: NoValue
-  let remotes = if obj.remotes.len > 0  : $obj.remotes  else: NoValue
-  let subdir  = if obj.sub.string != "" : $obj.sub      else: NoValue
+  let version = if obj.version.toString != "" : obj.version.toString   else: NoValue
+  let remotes = if obj.remotes.len > 0        : $obj.remotes  else: NoValue
+  let subdir  = if $obj.sub != ""             : $obj.sub      else: NoValue
   echo fmt( InfoTemplate )
 

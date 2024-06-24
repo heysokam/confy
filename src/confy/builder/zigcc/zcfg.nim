@@ -19,11 +19,11 @@ const zar    = name&" ar"
 #___________________
 # Cannot be let/var, otherwise they are not configurable by zigcc.systemBin
 template getRealCC  *() :string=
-  if cfg.zigcc.systemBin: zcc  else: string cfg.zigDir/( name & ext & cc)
+  if cfg.zigcc.systemBin: zcc  else: path cfg.zigDir/( name & ext & cc)
 template getRealCCP *() :string=
-  if cfg.zigcc.systemBin: zpp  else: string cfg.zigDir/( name & ext & cpp)
+  if cfg.zigcc.systemBin: zpp  else: path cfg.zigDir/( name & ext & cpp)
 template getRealAR  *() :string=
-  if cfg.zigcc.systemBin: zar  else: string cfg.zigDir/( name & ext & ar)
+  if cfg.zigcc.systemBin: zar  else: path cfg.zigDir/( name & ext & ar)
 template getRealBin *() :string=
-  if cfg.zigcc.systemBin: name else: string cfg.zigDir/( name & ext )
+  if cfg.zigcc.systemBin: name else: path cfg.zigDir/( name & ext )
 

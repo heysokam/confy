@@ -26,7 +26,7 @@ proc getCC *(lang :Lang) :string=
   of Cpp : result = zcfg.getRealCCP()
   else   : result = "echo"
 #___________________
-proc getCC *(src :seq[DirFile]) :string=
+proc getCC *(src :PathList) :string=
   ## @descr Gets the correct CC command for the given source files list extension.
   var cmds :seq[string]
   for file in src:  cmds.add file.getLang.getCC
@@ -45,7 +45,7 @@ proc getTarget *(syst :System) :string=
 # ZigCC: Compiler
 #___________________
 proc compileStatic *(
-    src      : seq[DirFile];
+    src      : PathList;
     trg      : Fil;
     root     : Dir;
     CC       : Compiler;
@@ -60,7 +60,11 @@ proc compileStatic *(
   let ar = (root/trg).toAR(syst.os)
   sh &"{zcfg.getRealAR()} -rc{verb} {ar} {objs}", cfg.verbose
 #___________________
-proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
+proc compile *(
+    src   : PathList;
+    obj   : BuildTrg;
+    force : bool;
+  ) :void=
   ## @descr Compiles the given `src` list of files with ZigCC.
   case obj.kind
   of Program:        base.direct(src, obj.root/obj.sub/obj.trg.toBin(obj.syst.os), src.getCC, obj.flags.cc & obj.flags.ld & @[obj.syst.getTarget()], cfg.Cstr)
