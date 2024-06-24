@@ -86,9 +86,30 @@ fn BuildTrg(comptime T: type) type {
     }
 
     pub fn build(trg :*const @This()) void {
-      std.debug.print("BuildTrg.build {}\n", .{trg});
+      std.debug.print("BuildTrg.build {any}\n", .{trg});
       trg.deps[0].clone();
     }
+
+    // @TODO:
+    // const Obj = struct {
+    //     one: []const u8,
+    //     two: u8,
+    //
+    //     pub fn format(
+    //         value: Obj,
+    //         comptime fmt: []const u8,
+    //         options: std.fmt.FormatOptions,
+    //         writer: anytype
+    //     ) !void {
+    //         _ = fmt; // autofix
+    //         _ = options; // autofix
+    //         try writer.writeAll("Obj{\n");
+    //         try writer.print("\tone = {s},\n", .{value.one});
+    //         try writer.print("\ttwo = {d},\n", .{value.two});
+    //         try writer.writeAll("}\n");
+    //     }
+    // };
+
   };
 }
 
