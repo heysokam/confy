@@ -1,7 +1,7 @@
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-import std/[ os,strformat ]
+when not defined(nimscript) : import system/nimscript # Silence nimsuggest noise
 
 #_____________________________
 # Package
