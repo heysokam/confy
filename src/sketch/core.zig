@@ -1,6 +1,6 @@
-//:_____________________________________________________________________
-//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
-//:_____________________________________________________________________
+//:_____________________________________________________
+//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
+//:_____________________________________________________
 //! @fileoverview
 //!  Confy : Comfortable and Configurable Buildsystem
 //!  @todo : Docs here
@@ -20,7 +20,7 @@ pub const P_ = struct {
   // @deps std
   const std = @import("std");
   // @deps zstd
-  const zstd = @import("./src/lib/zstd.zig");
+  const zstd = @import("zstd");
   const echo = zstd.echo;
   const confy = @import("./src/confy.zig");
   const cstr = zstd.T.cstr;

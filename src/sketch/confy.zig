@@ -1,14 +1,10 @@
-//:_____________________________________________________________________
-//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
-//:_____________________________________________________________________
+//:_____________________________________________________
+//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
+//:_____________________________________________________
 // @deps std
 const std = @import("std");
 // @deps zstd
-const zstd = @import("./lib/zstd.zig");
-
-//______________________________________
-// @section zstd Ergonomics
-//____________________________
+const zstd      = @import("zstd");
 const cstr      = zstd.T.cstr;
 const cstr_List = zstd.T.cstr_List;
 const echo      = zstd.echo;
