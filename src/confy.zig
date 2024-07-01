@@ -7,6 +7,12 @@
 //_____________________________________________________|
 const confy = @This();
 
+//______________________________________
+// @section Forward Export zstd tools
+//____________________________
+const zstd = @import("zstd");
+pub const Name = zstd.Name;
+
 
 //______________________________________
 // @section Forward Export Confy tools
