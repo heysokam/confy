@@ -5,7 +5,7 @@
 //__________________________________________|
 const Package = @This();
 // @deps zstd
-const zstd = @import("zstd");
+const zstd = @import("../lib/zstd.zig");
 const cstr = zstd.cstr;
 const Name = zstd.Name;
 // @deps confy

@@ -10,7 +10,7 @@ const confy = @This();
 //______________________________________
 // @section Forward Export zstd tools
 //____________________________
-const zstd = @import("zstd");
+const zstd = @import("./lib/zstd.zig");
 pub const Name = zstd.Name;
 
 

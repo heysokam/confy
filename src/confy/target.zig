@@ -7,7 +7,7 @@ const BuildTrg = @This();
 // @deps std
 const std = @import("std");
 // @deps zstd
-const zstd    = @import("zstd");
+const zstd    = @import("../lib/zstd.zig");
 const cstr    = zstd.cstr;
 const Version = zstd.Version;
 // @deps confy

@@ -7,10 +7,10 @@
 //_____________________________________________________|
 const Git = @This();
 // @deps std
-const std   = @import("std");
+const std = @import("std");
 // @deps zstd
-const zstd  = @import("zstd");
-const cstr  = zstd.cstr;
+const zstd = @import("../lib/zstd.zig");
+const cstr = zstd.cstr;
 
 pub const Info = struct {
   baseURL :cstr= "https://github.com/",
