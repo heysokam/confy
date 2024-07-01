@@ -38,5 +38,6 @@ pub const P_ = struct {
       }); // << confy.Program.new(.{ ... })
     cfy.build();
   }
+  const dir :std.fs.Dir= undefined;
 };
 
