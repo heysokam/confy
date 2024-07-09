@@ -1,3 +1,9 @@
+
+{.warning:"""
+The Nim-based confy toolset is deprecated,
+and will be removed as soon as the zig rewrite is completed.
+""".}
+
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
@@ -21,13 +27,13 @@ requires "https://github.com/heysokam/get.Lang#head"
 
 #_____________________________
 # Folders
-srcDir = "src/nim"
+srcDir = "src/deprecated"
 binDir = "bin"
 
 #_____________________________
 # Examples
 #___________________
-import ./src/nim/examples/helper
+import ./src/deprecated/examples/helper
 task examples,    "Builds all examples for all languages."                           : helper.buildAll()
 task examplesC,   "Builds all examples for the C   programming language."            : helper.buildAll( C   )
 task examplesCpp, "Builds all examples for the C++ programming language."            : helper.buildAll( Cpp )

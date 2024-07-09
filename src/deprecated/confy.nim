@@ -1,3 +1,9 @@
+
+{.warning:"""
+The Nim-based confy toolset is deprecated,
+and will be removed as soon as the zig rewrite is completed.
+""".}
+
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________

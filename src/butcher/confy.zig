@@ -1,6 +1,6 @@
-//:_____________________________________________________
-//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-//:_____________________________________________________
+//!:______________________________________________________
+//! ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
+//!:______________________________________________________
 //! @fileoverview
 //!  Confy : Comfortable and Configurable Buildsystem
 //!  @todo : Docs here
