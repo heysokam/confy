@@ -1,6 +1,6 @@
-//:_____________________________________________________
-//  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-//:_____________________________________________________
+//:______________________________________________________________________
+//  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
+//:______________________________________________________________________
 //! @fileoverview Package Information Tools
 //__________________________________________|
 const Package = @This();
@@ -9,12 +9,13 @@ const zstd = @import("../lib/zstd.zig");
 const cstr = zstd.cstr;
 const Name = zstd.Name;
 // @deps confy
-const Git  = @import("./git.zig");
+const Git = @import("./git.zig");
 
 
 //______________________________________
-// @section Package Tools
+// @section Package Metadata
 //____________________________
+/// @descr Describes metadata/information about a Package, and provides tool to manage it.
 pub const Info = struct {
   name     :Name,
   author   :Name,
@@ -22,6 +23,11 @@ pub const Info = struct {
   license  :cstr,
   git      :Git.Info,
 };
+
+//______________________________________
+// @section Package Folders
+//____________________________
+/// @descr Describes the folder structure of a Package, and provides tool to manage it.
 pub const Dirs = struct {
   root  :cstr= ".",
   bin   :cstr= "bin",
