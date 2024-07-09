@@ -14,15 +14,15 @@ const cstr = zstd.cstr;
 //______________________________________
 /// @descr Describes metadata/information about a Git repository, and provides tool to manage it.
 pub const Info = struct {
-  baseURL :cstr= "https://github.com/",
+  baseURL :cstr= "https://github.com",
   owner   :cstr,
   repo    :cstr,
 
   //______________________________________
   const Templ = "{s}/{s}/{s}";
   /// @descr Provides the functionality required for {@link Git.Info} objects to work with default zig formatting functions.
-  pub fn format (G :*Git.Info, comptime _:[]const u8, _:std.fmt.FormatOptions, writer :anytype) !void {
-    try writer.print(Git.Templ, .{G.baseURL, G.owner, G.repo});
+  pub fn format (G :*const Git.Info, comptime _:[]const u8, _:std.fmt.FormatOptions, writer :anytype) !void {
+    try writer.print(Git.Info.Templ, .{G.baseURL, G.owner, G.repo});
   }
 
   //______________________________________
@@ -30,7 +30,7 @@ pub const Info = struct {
   /// @note
   ///  Allocates a {@link cstr} owned by the caller.
   ///  Use the provided {@link Git.Info.format} function if you need/prefer to not allocate.
-  pub fn URL (G :*Git.Info, A :std.mem.Allocator) cstr {
+  pub fn URL (G :*const Git.Info, A :std.mem.Allocator) cstr {
     return std.fmt.allocPrint(A, "{s}", .{G});
   }
 };

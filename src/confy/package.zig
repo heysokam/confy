@@ -8,6 +8,8 @@ const Package = @This();
 const zstd = @import("../lib/zstd.zig");
 const cstr = zstd.cstr;
 const Name = zstd.Name;
+const echo = zstd.echo;
+const prnt = zstd.prnt;
 // @deps confy
 const Git = @import("./git.zig");
 
@@ -22,6 +24,27 @@ pub const Info = struct {
   version  :cstr,
   license  :cstr,
   git      :Git.Info,
+
+  pub fn report (I:*const Info) void {
+    prnt(
+    \\
+    \\ ...............................
+    \\ ::  Name         :  {s}
+    \\ ::  Description  :  {s}
+    \\ ::  Author       :  {s}
+    \\ ::  License      :  {s}
+    \\ ::  Repository   :  {s}
+    \\ ::...............:
+    \\
+    \\
+    , .{
+      I.name.long    orelse I.name.short,   // Name
+      I.name.human   orelse "...",          // Description
+      I.author.human orelse I.author.short, // Author
+      I.license,                            // License
+      I.git,                                // Repository
+      });
+  }
 };
 
 //______________________________________
