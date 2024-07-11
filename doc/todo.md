@@ -1,0 +1,2 @@
+- [ ] Give context/info about the target when building/running.
+- [ ] Stop process when a previous step failed
