@@ -1,6 +1,7 @@
-//:______________________________________________________________________
-//  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
-//:______________________________________________________________________
+//!:______________________________________________________________________
+//! ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
+//!:______________________________________________________________________
+//!
 //! @fileoverview
 //!  Automated Git Tag manager
 //!  Creates tags for commits that modified an specified version file,
@@ -142,7 +143,7 @@ pub fn main() !void {
     newTags += 1;
   }
   if (newTags == 0) { echo("graffiti: No tags to write."); return; }
-  echo("graffiti: Done.");
   try git.tag.push(A.allocator());
+  echo("graffiti: Done.");
 }
 
