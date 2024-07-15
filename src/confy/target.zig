@@ -9,12 +9,13 @@ const BuildTrg = @This();
 const std = @import("std");
 // @deps zstd
 const zstd    = @import("../lib/zstd.zig");
-const cstr    = zstd.cstr;
 const cstr_List = zstd.cstr_List;
+const cstr    = zstd.cstr;
 const seq     = zstd.seq;
 const Version = zstd.Version;
 const echo    = zstd.echo;
 const prnt    = zstd.prnt;
+const Lang    = zstd.Lang;
 // @deps confy
 const cfg        = @import("./cfg.zig");
 const Submodule  = @import("./submodule.zig");
@@ -22,7 +23,6 @@ const Submodules = Submodule.List;
 const Confy      = @import("./core.zig");
 
 pub const Kind = enum { program, static, lib, unittest };
-pub const Lang = enum { None, M, Zig, C, Cpp, Nim, Asm, Unknown };
 const LangPriority = [_]Lang{ .Cpp, .Zig, .C, .M, .Nim, .Asm, .Unknown };
 const CodeList = seq(cstr);
 
@@ -48,23 +48,8 @@ lang     :Lang= Lang.None,
 /// @section Language Management tools
 //____________________________
 const lang = struct {
-  /// @descr Returns the language of the {@arg ext} extension. An empty extension will return Unknown lang.
-  fn fromExt (ext :cstr) Lang {
-    const result = if (std.mem.eql(u8, ext, "cpp")) Lang.Cpp
-      else if (std.mem.eql(u8, ext, ".cc" )) Lang.Cpp
-      else if (std.mem.eql(u8, ext, ".c"  )) Lang.C
-      else if (std.mem.eql(u8, ext, ".cm" )) Lang.M
-      else if (std.mem.eql(u8, ext, ".zm" )) Lang.M
-      else if (std.mem.eql(u8, ext, ".zig")) Lang.Zig
-      else if (std.mem.eql(u8, ext, ".nim")) Lang.Nim
-      else if (std.mem.eql(u8, ext, ".s"  )) Lang.Asm
-      else Lang.Unknown;
-    return result;
-  }
-
-  /// @descr Returns the language of the {@arg file}, based on its extension. An empty extension will return Unknown lang.
-  fn fromFile (file :cstr) Lang { return lang.fromExt(std.fs.path.extension(file)); }
-
+  const fromExt  = Lang.fromExt;
+  const fromFile = Lang.fromFile;
   /// @descr Returns the preferred language of the {@arg src} CodeList, based on the extension priorities for each lang.
   /// @note List of files that contain C++ code will be assumed to be targeting a C++ compiler, even if they combine C code in them.
   /// @note List of files that contain Zig code will be assumed to be targeting a Zig compiler, even if they combine C code in them.
@@ -80,24 +65,19 @@ const lang = struct {
     }
     return Lang.Unknown;
   }
+  // TODO:
+  // proc findExt *(file :DirFile) :string=
+  //   ## @descr
+  //   ##  Finds the extension of a file that is sent without it.
+  //   ##  Walks the file's dir, and matches all entries found against the full path of the given input file.
+  //   ## @raises IOError if the file does have an extension already.
+  //   if file.file.string.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
+  //   let filepath = file.dir/file.file
+  //   for found in file.dir.string.walkDir:
+  //     if found.kind == pcDir: continue
+  //     if filepath.string in found.path: return found.path.splitFile.ext
+  //   raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
 };
-
-
-
-
-// TODO:
-// proc findExt *(file :DirFile) :string=
-//   ## @descr
-//   ##  Finds the extension of a file that is sent without it.
-//   ##  Walks the file's dir, and matches all entries found against the full path of the given input file.
-//   ## @raises IOError if the file does have an extension already.
-//   if file.file.string.splitFile.ext != "": raise newException(IOError, &"Tried to find the extension of a file that already has one.\n  {file.dir/file.file}")
-//   let filepath = file.dir/file.file
-//   for found in file.dir.string.walkDir:
-//     if found.kind == pcDir: continue
-//     if filepath.string in found.path: return found.path.splitFile.ext
-//   raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
-
 
 
 
