@@ -13,6 +13,7 @@ const http = std.http;
 // @deps zstd
 const zstd = @import("./lib/zstd.zig");
 const cstr = zstd.cstr;
+const cstr_List = zstd.cstr_List;
 const echo = zstd.echo;
 const prnt = zstd.prnt;
 const git  = zstd.git;
@@ -21,11 +22,20 @@ const Prefix = "Ͼ gman: ";
 
 const commits = struct {
   // TODO:   const SkipTags * = ["git:", "doc:", "tst:", "bld:", "fmt:"]
-  fn filter (list :*git.Commit.List, last :cstr) void {
+  const FilterTags = &.{"git:", "doc:", "tst:", "bld:", "fmt:"};
+  fn shouldFilter (C :*const git.Commit, tags :cstr_List) bool {
+    for (tags) | tag | {
+      if (std.mem.startsWith(u8, C.msg, tag)) return true;
+    }
+    return false;
+  }
+  fn filter (list :*git.Commit.List, last :cstr, skip :cstr_List) void {
     var to :usize= 0;
     var found :bool= false;
     for (0..list.items.len) | from | {
       list.items[to] = list.items[from]; // Move the items backwards when needed
+      // Skip the tags that we don't want to track
+      if (gman.commits.shouldFilter(&list.items[to], skip)) continue;
       // Save items that match the condition: Increment target index by one, so that we don't override this item on the next iteration step
       if (found) to += 1;  // Keep commits that match the condition
       if (std.mem.eql(u8, list.items[to].hash, last)) found = true;
@@ -33,13 +43,13 @@ const commits = struct {
     list.shrinkRetainingCapacity(to);
   }
 
-  fn pending (lastcommit :cstr, A :std.mem.Allocator) !git.Commit.List {
+  fn pending (lastcommit :cstr, skip :cstr_List, A :std.mem.Allocator) !git.Commit.List {
     // Get the list of commits from last to current
     var result = try git.log.commits.all(A);
     // Get the last commit that was sent, and filter the resulting list
     const last = try gman.secret.read(lastcommit, A);
     defer A.free(last);
-    gman.commits.filter(&result, last);
+    gman.commits.filter(&result, last, skip);
     return result;
   }
 
@@ -244,7 +254,7 @@ pub fn main () !void {
   };
 
   // Run the process
-  const list = try gman.commits.pending(lastcommit, A.allocator());
+  const list = try gman.commits.pending(lastcommit, gman.commits.FilterTags, A.allocator());
   try discord.commits.send(&list, &R, hook);
   try gman.commits.save(&list, lastcommit);
 }
