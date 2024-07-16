@@ -121,6 +121,10 @@ pub fn write (T :*const git.Tag, commit :*const git.Commit) !void {
   try C.exec();
 }
 
+
+//______________________________________
+// @section Entry Point
+//____________________________
 pub fn main() !void {
   echo("graffiti: Running ...");
   var A = std.heap.ArenaAllocator.init(std.heap.page_allocator);
