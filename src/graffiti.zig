@@ -134,8 +134,11 @@ pub fn main() !void {
   defer args.deinit();
   _ = args.next();              // arg0
   const cli_file = args.next(); // arg1
+  const cli_push = args.next(); // arg2
+  // CLI options
+  const file = cli_file orelse "confy.nimble";                     // Get the name of the file that contains the version
+  const push = !std.mem.eql(u8, cli_push orelse "", "--noPush");   // Push tags by default, unless specified otherwise
 
-  const file  = cli_file orelse "confy.nimble";                    // Get the name of the file that contains the version
   var commits = try git.log.commits.forFile(file, A.allocator());  // Get the full list of commits for that file
   try graffiti.filter(&commits, file);                             // Remove the commits that didn't modify the version
   const tags = try git.tag.all(A.allocator());                     // Get list of existing Version tags
@@ -147,7 +150,7 @@ pub fn main() !void {
     newTags += 1;
   }
   if (newTags == 0) { echo("graffiti: No tags to write."); return; }
-  try git.tag.push(A.allocator());
+  if (push) try git.tag.push(A.allocator());
   echo("graffiti: Done.");
 }
 
