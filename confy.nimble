@@ -7,7 +7,8 @@ and will be removed as soon as the zig rewrite is completed.
 #:_____________________________________________________
 #  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
 #:_____________________________________________________
-when not defined(nimscript): import system/nimscript  # Silence nimsuggest errors
+when not defined(nimscript) : import system/nimscript # Silence nimsuggest errors
+
 
 #_____________________________
 # Package
