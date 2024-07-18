@@ -258,3 +258,4 @@ pub fn main () !void {
   try discord.commits.send(&list, &R, hook);
   try gman.commits.save(&list, lastcommit);
 }
+
