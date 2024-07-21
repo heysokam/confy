@@ -21,10 +21,11 @@ const cfg        = @import("./cfg.zig");
 const Submodule  = @import("./submodule.zig");
 const Submodules = Submodule.List;
 const Confy      = @import("./core.zig");
+const CodeList   = @import("./code.zig");
+const FlagList   = @import("./flags.zig");
 
 pub const Kind = enum { program, static, lib, unittest };
 const LangPriority = [_]Lang{ .Cpp, .Zig, .C, .M, .Nim, .Asm, .Unknown };
-const CodeList = seq(cstr);
 
 
 kind     :Kind,
@@ -33,6 +34,7 @@ builder  :*Confy,
 
 trg      :cstr,
 src      :CodeList,
+flags    :?FlagList= null,
 sub      :cstr,
 deps     :Submodules,
 version  :Version= zstd.version(0,0,0),
@@ -55,7 +57,7 @@ const lang = struct {
   /// @note List of files that contain Zig code will be assumed to be targeting a Zig compiler, even if they combine C code in them.
   fn get (src :CodeList) Lang {
     var langs = std.EnumSet(Lang).initEmpty();
-    for (src.items) | file | langs.insert(lang.fromFile(file));
+    for (src.files.items) | file | langs.insert(lang.fromFile(file));
     if (langs.count() == 1) {
       var it = langs.iterator(); return it.next().?;
     } else {
@@ -84,15 +86,22 @@ const lang = struct {
 //____________________________________
 // @section Build Target Management tools
 //____________________________
+// BuildTrg Creation Arguments: Flags
+const Flags_args = struct {
+  cc  :cstr_List,
+  ld  :cstr_List,
+};
+// BuildTrg Creation Arguments
 const BuildTrg_args = struct {
   trg     : cstr,
-  src     : ?cstr_List= null,
-  entry   : ?cstr = null,
-  cfg     : cfg   = cfg{},
-  sub     : cstr  = "",
+  src     : ?cstr_List  = null,
+  flags   : ?Flags_args = null,
+  entry   : ?cstr       = null,
+  cfg     : ?cfg        = null,
+  sub     : cstr        = "",
   deps    : ?[]const Submodule= null,
-  version : cstr  = "0.0.0",
-  lang    : ?Lang = null,
+  version : cstr        = "0.0.0",
+  lang    : ?Lang       = null,
 };
 
 //_____________________________________
@@ -106,17 +115,22 @@ pub fn new(
     .builder = confy,
     .kind    = kind,
     .trg     = args.trg,
-    .cfg     = args.cfg,
+    .cfg     = args.cfg orelse confy.cfg,
     .sub     = args.sub,
     .version = Version.parse(args.version) catch zstd.version(0,0,0),
     .src     = undefined,
     .deps    = undefined,
   };
-  result.src  = CodeList.init(result.builder.A.allocator());
-  result.deps = Submodules.init(result.builder.A.allocator());
-  if (args.entry != null) try result.src.append(args.entry.?);
-  if (args.src  != null) { for (args.src.?)  | file | { try result.src.append(file); } }
-  if (args.deps != null) { for (args.deps.?) | dep  | { try result.deps.append(dep); } }
+  result.src   = CodeList.create(result.builder.A.allocator());
+  result.deps  = Submodules.init(result.builder.A.allocator());
+  result.flags = FlagList.create(result.builder.A.allocator());
+  if (args.entry != null) { try result.src.addFile(args.entry.?); }
+  if (args.src   != null) { try result.src.addList(args.src.?); }
+  if (args.deps  != null) { for (args.deps.?) | dep  | { try result.deps.append(dep); } }
+  if (args.flags != null) {
+    try result.flags.?.addCCList(args.flags.?.cc);
+    try result.flags.?.addLDList(args.flags.?.ld);
+  }
   result.lang = args.lang orelse BuildTrg.lang.get(result.src);
   return result;
 }
@@ -166,9 +180,9 @@ const zig = struct {
     // Add the binary output
     try args.append(try zig.getEmitBin(trg));
     // Add the code
-    try args.appendSlice(trg.src.items);
+    try args.appendSlice(trg.src.files.items);
     // Report to CLI and build
-    echo("ᛝ confy: Building target binary ...");
+    echo("ᛝ confy: Building Zig target binary ...");
     try zstd.shell.run(args.items, trg.builder.A.allocator());
     echo("ᛝ confy: Done Building.");
   }
@@ -178,25 +192,58 @@ const C = struct {
   //_____________________________________
   /// @descr Orders confy to build the resulting binary for this C BuildTrg.
   fn build (trg :*const BuildTrg) !void {
-    _=trg;
+    var cc = zstd.shell.Cmd.create(trg.builder.A.allocator());
+    defer cc.destroy();
+    try cc.add(try zig.getCC(trg));
+    switch(trg.lang) {
+      .C   => try cc.add("cc"),  // zig cc   for C code
+      .Cpp => try cc.add("c++"), // zig c++  for Cpp code
+      else => {},
+    }
+    switch (trg.kind) {
+     .program     => {}, //try cc.add("build-exe"),
+     .lib,        => try cc.add("-shared"),
+     .static      => {}, //try cc.add("build-lib"),
+     .unittest    => {}, //try cc.add("test"),
+    }
+
+    try cc.addList(trg.src.files.items);
+    try cc.addList(trg.flags.?.cc.items);
+    try cc.addList(trg.flags.?.ld.items);
+    try cc.addList(&.{"-o", try trg.getBin()});
+
+    prnt("{s} Building C target binary: {s} ...\n", .{trg.cfg.prefix, try trg.getBin()});
+    if (trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
+    try cc.run();
+    prnt("{s} Done Building.\n", .{trg.cfg.prefix});
   }
 };
+
+//_____________________________________
+/// @descr Adds the given {@arg L} CodeList of source code files to the {@arg trg}
+pub fn add (trg :*BuildTrg, L :CodeList) !void { try trg.src.add(L); }
+//_____________________________________
+/// @descr Adds the given {@arg L} FlagList of compiler flags to the {@arg trg}
+pub fn set (trg :*BuildTrg, L :FlagList) !void {
+  try trg.flags.?.add(L);
+}
 
 //_____________________________________
 /// @descr Orders confy to build the resulting binary for this BuildTrg.
 pub fn build (trg :*const BuildTrg) !void {
   // @note Sends the control flow of the builder into the relevant function to build the resulting binary for this BuildTrg.
   switch (trg.lang) {
-    .Zig => try zig.build(trg),
-    .C   => try C.build(trg),
-    else => unreachable,
+    .Zig      => try zig.build(trg),
+    .C, .Cpp, => try C.build(trg),
+    .Nim      => std.debug.panic("Support for compiling Nim has not been reimplemented yet.\n", .{}),
+    else => std.debug.panic("Found a language that has no implemented build command:  {s}\n", .{@tagName(trg.lang)}),
   }
 }
 
 //_____________________________________
 /// @descr Orders confy to run the resulting binary for this BuildTrg.
 pub fn run (trg :*const BuildTrg) !void {
-  echo("ᛝ confy: Running ...");
+  prnt("{s} Running {s} ...\n", .{trg.cfg.prefix, try trg.getBin()});
   try zstd.shell.run(&.{try trg.getBin()}, trg.builder.A.allocator());
 }
 
