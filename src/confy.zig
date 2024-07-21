@@ -27,4 +27,5 @@ pub const StaticLib = BuildTrg.StaticLib;
 pub const SharedLib = BuildTrg.SharedLib;
 pub const UnitTest  = BuildTrg.UnitTest;
 pub const CodeList  = @import("./confy/code.zig");
+pub const FlagList  = @import("./confy/flags.zig");
 
