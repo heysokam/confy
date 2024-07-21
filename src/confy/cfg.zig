@@ -10,6 +10,7 @@ const std = @import("std");
 const zstd = @import("../lib/zstd.zig");
 const cstr = zstd.cstr;
 
+prefix  :cstr= "ᛝ confy:",
 verbose :bool= false,
 quiet   :bool= false,
 dir     :ProjectDirs= ProjectDirs{},
