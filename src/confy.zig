@@ -12,6 +12,7 @@ const confy = @This();
 //____________________________
 const zstd = @import("./lib/zstd.zig");
 pub const Name = zstd.Name;
+pub const echo = zstd.echo;
 
 
 //______________________________________
