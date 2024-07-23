@@ -11,8 +11,12 @@ const confy = @This();
 // @section Forward Export zstd tools
 //____________________________
 const zstd = @import("./lib/zstd.zig");
-pub const Name = zstd.Name;
-pub const echo = zstd.echo;
+pub const Name      = zstd.Name;
+pub const echo      = zstd.echo;
+pub const cstr      = zstd.cstr;
+pub const cstr_List = zstd.cstr_List;
+pub const Lang      = zstd.Lang;
+pub const System    = zstd.System;
 
 
 //______________________________________
