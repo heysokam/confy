@@ -12,10 +12,12 @@ const zstd    = @import("../lib/zstd.zig");
 const cstr_List = zstd.cstr_List;
 const cstr    = zstd.cstr;
 const seq     = zstd.seq;
+const str     = zstd.str;
 const Version = zstd.Version;
 const echo    = zstd.echo;
 const prnt    = zstd.prnt;
 const Lang    = zstd.Lang;
+const System  = zstd.System;
 // @deps confy
 const cfg        = @import("./cfg.zig");
 const Submodule  = @import("./submodule.zig");
@@ -123,7 +125,7 @@ pub fn new(
   };
   result.src   = CodeList.create(result.builder.A.allocator());
   result.deps  = Submodules.init(result.builder.A.allocator());
-  result.flags = FlagList.create(result.builder.A.allocator());
+  result.flags = FlagList.create.empty(result.builder.A.allocator());
   if (args.entry != null) { try result.src.addFile(args.entry.?); }
   if (args.src   != null) { try result.src.addList(args.src.?); }
   if (args.deps  != null) { for (args.deps.?) | dep  | { try result.deps.append(dep); } }
@@ -144,12 +146,45 @@ pub fn StaticLib (args :BuildTrg_args, confy :*Confy) !BuildTrg { return BuildTr
 /// @descr Creates a new {@link BuildTrg} object that can be used by confy to run a set of UnitTests.
 pub fn UnitTest  (args :BuildTrg_args, confy :*Confy) !BuildTrg { return BuildTrg.new(BuildTrg.Kind.unittest, args, confy); }
 
+//_____________________________________
+/// @descr Adds the given {@arg L} CodeList of source code files to the {@arg trg}
+pub fn add (trg :*BuildTrg, L :CodeList) !void { try trg.src.add(L); }
+//_____________________________________
+/// @descr Adds the given {@arg L} FlagList of compiler flags to the {@arg trg}
+pub fn set (trg :*BuildTrg, L :FlagList) !void {
+  try trg.flags.?.add(L);
+}
 
-fn getBin (trg :*const BuildTrg) !cstr {
-  return switch(trg.kind) {
-    .unittest => try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, "test"}),
-    else      => try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.sub, trg.trg}),
-    };
+
+/// @descr
+///  Options to configure the building process. Provides sane defaults when implicit.
+///  _Shouldn't be needed unless you need extra-explicit configuration options for some very specific reason._
+pub const BuildOptions = struct {
+  /// @descr Appends the CPU architecture of the system to the final binary, right before its extension
+  /// @example
+  ///  trg.bin    : thing
+  ///  system.Cpu : x86_64
+  ///  output     : thingx86_64.ext
+  appendCpu  :bool=  false,
+  /// @descr Always add the -target triple to the compilation command, even when not cross-compiling.
+  explicitSystem  :bool=  false,
+};
+
+fn getBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
+  // Simple case: early return for unittests
+  if (trg.kind == .unittest) return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, "test"});
+  // Create the final binary name
+  var result = str.init(trg.builder.A.allocator());
+  const W = result.writer();
+  try W.print("{s}", .{try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.sub, trg.trg})});
+  if (opts.appendCpu) try W.print("{s}", .{@tagName(system.cpu)});
+  switch (trg.kind) {
+    .program => try W.print("{s}", .{system.os.exeFileExt(system.cpu)}),
+    .lib     => try W.print("{s}", .{system.os.dynamicLibSuffix()}),
+    .static  => try W.print("{s}", .{system.os.staticLibSuffix(system.abi)}),
+    else     => unreachable,
+    } //:: switch (trg.kind)
+  return try result.toOwnedSlice();
 }
 
 const zig = struct {
@@ -160,12 +195,12 @@ const zig = struct {
   fn getCacheDir (trg :*const BuildTrg) !cstr {
     return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.cache, "zig"});
   }
-  fn getEmitBin (trg :*const BuildTrg) !cstr {
-    return try std.fmt.allocPrint(trg.builder.A.allocator(), "-femit-bin={s}", .{try trg.getBin()});
+  fn getEmitBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
+    return try std.fmt.allocPrint(trg.builder.A.allocator(), "-femit-bin={s}", .{try trg.getBin(system, opts)});
   }
   //_____________________________________
   /// @descr Orders confy to build the resulting binary for this Zig BuildTrg.
-  fn build (trg :*const BuildTrg) !void {
+  fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void {
     // Create the compilation command
     var args = seq(cstr).init(trg.builder.A.allocator());
     try args.append(try zig.getCC(trg));
@@ -178,7 +213,7 @@ const zig = struct {
     const cache = try zig.getCacheDir(trg);
     try args.appendSlice(&.{"--cache-dir", cache, "--global-cache-dir", cache});
     // Add the binary output
-    try args.append(try zig.getEmitBin(trg));
+    try args.append(try zig.getEmitBin(trg, system, opts));
     // Add the code
     try args.appendSlice(trg.src.files.items);
     // Report to CLI and build
@@ -191,7 +226,7 @@ const zig = struct {
 const C = struct {
   //_____________________________________
   /// @descr Orders confy to build the resulting binary for this C BuildTrg.
-  fn build (trg :*const BuildTrg) !void {
+  fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void {
     var cc = zstd.shell.Cmd.create(trg.builder.A.allocator());
     defer cc.destroy();
     try cc.add(try zig.getCC(trg));
@@ -207,12 +242,25 @@ const C = struct {
      .unittest    => {}, //try cc.add("test"),
     }
 
+    // Add the cross-compilation target when needed
+    if (system.cross() or opts.explicitSystem) {
+      const target = try system.zigTriple(trg.builder.A.allocator());
+      try cc.addList(&.{"-target", target});
+      // FIX: target string will leak. How to defer dealloc from inside the if?
+    }
+
+    // Add the code and flags
     try cc.addList(trg.src.files.items);
     try cc.addList(trg.flags.?.cc.items);
     try cc.addList(trg.flags.?.ld.items);
-    try cc.addList(&.{"-o", try trg.getBin()});
 
-    prnt("{s} Building C target binary: {s} ...\n", .{trg.cfg.prefix, try trg.getBin()});
+    // Add the target binary that will be output
+    const bin = try trg.getBin(system, opts);
+    defer trg.builder.A.allocator().free(bin);
+    try cc.addList(&.{"-o", bin});
+
+    // Report to CLI and run the command
+    prnt("{s} Building C target binary: {s} ...\n", .{trg.cfg.prefix, bin});
     if (trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
     try cc.run();
     prnt("{s} Done Building.\n", .{trg.cfg.prefix});
@@ -220,28 +268,27 @@ const C = struct {
 };
 
 //_____________________________________
-/// @descr Adds the given {@arg L} CodeList of source code files to the {@arg trg}
-pub fn add (trg :*BuildTrg, L :CodeList) !void { try trg.src.add(L); }
-//_____________________________________
-/// @descr Adds the given {@arg L} FlagList of compiler flags to the {@arg trg}
-pub fn set (trg :*BuildTrg, L :FlagList) !void {
-  try trg.flags.?.add(L);
-}
-
-//_____________________________________
-/// @descr Orders confy to build the resulting binary for this BuildTrg.
-pub fn build (trg :*const BuildTrg) !void {
+/// @descr Orders confy to build the resulting binary of {@arg trg} for the given {@arg system}
+pub fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void {
   // @note Sends the control flow of the builder into the relevant function to build the resulting binary for this BuildTrg.
   switch (trg.lang) {
-    .Zig      => try zig.build(trg),
-    .C, .Cpp, => try C.build(trg),
+    .Zig      => try zig.buildFor(trg, system, opts),
+    .C, .Cpp, => try C.buildFor(trg, system, opts),
     .Nim      => std.debug.panic("Support for compiling Nim has not been reimplemented yet.\n", .{}),
     else => std.debug.panic("Found a language that has no implemented build command:  {s}\n", .{@tagName(trg.lang)}),
   }
 }
+//_____________________________________
+/// @descr Orders confy to build the resulting binary of {@arg trg} for all of the {@arg systems}
+pub fn buildForAll (trg :*const BuildTrg, systems :[]const System, opts:BuildOptions) !void {
+  for (systems) | system | { try trg.buildFor(system, opts); }
+}
+//_____________________________________
+/// @descr Orders confy to build the resulting binary of {@arg trg} for the host system, using the default {@link BuildOptions}.
+pub fn build (trg :*const BuildTrg) !void { try trg.buildFor(System.host(), .{}); }
 
 //_____________________________________
-/// @descr Orders confy to run the resulting binary for this BuildTrg.
+/// @descr Orders confy to run the resulting binary of {@arg trg}.
 pub fn run (trg :*const BuildTrg) !void {
   prnt("{s} Running {s} ...\n", .{trg.cfg.prefix, try trg.getBin()});
   try zstd.shell.run(&.{try trg.getBin()}, trg.builder.A.allocator());
