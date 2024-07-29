@@ -148,7 +148,10 @@ pub fn UnitTest  (args :BuildTrg_args, confy :*Confy) !BuildTrg { return BuildTr
 
 //_____________________________________
 /// @descr Adds the given {@arg L} CodeList of source code files to the {@arg trg}
-pub fn add (trg :*BuildTrg, L :CodeList) !void { try trg.src.add(L); }
+pub fn add (trg :*BuildTrg, L :CodeList) !void {
+  try trg.src.add(L);
+  if (trg.lang == .Unknown) trg.lang = BuildTrg.lang.get(trg.src);
+}
 //_____________________________________
 /// @descr Adds the given {@arg L} FlagList of compiler flags to the {@arg trg}
 pub fn set (trg :*BuildTrg, L :FlagList) !void {

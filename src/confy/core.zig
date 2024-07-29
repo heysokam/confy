@@ -1,7 +1,7 @@
 //:______________________________________________________________________
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
 //:______________________________________________________________________
-const Confy = @This();
+pub const Confy = @This();
 const std = @import("std");
 const Cfg = @import("./cfg.zig");
 

@@ -22,6 +22,7 @@ pub const System    = zstd.System;
 //______________________________________
 // @section Forward Export Confy tools
 //____________________________
+pub const Confy     = @import("./confy/core.zig").Confy;
 pub const init      = @import("./confy/core.zig").init;
 pub const Git       = @import("./confy/git.zig");
 pub const Package   = @import("./confy/package.zig");
