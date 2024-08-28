@@ -293,7 +293,10 @@ pub fn build (trg :*const BuildTrg) !void { try trg.buildFor(System.host(), .{})
 //_____________________________________
 /// @descr Orders confy to run the resulting binary of {@arg trg}.
 pub fn run (trg :*const BuildTrg) !void {
-  prnt("{s} Running {s} ...\n", .{trg.cfg.prefix, try trg.getBin()});
-  try zstd.shell.run(&.{try trg.getBin()}, trg.builder.A.allocator());
+  prnt("{s} Running {s} ...\n", .{trg.cfg.prefix, try trg.getBin(System.host(), .{})});
+  try zstd.shell.run(&.{try trg.getBin(System.host(), .{})}, trg.builder.A.allocator());
 }
+
+// TODO: What was this reference code for?
+//fn getBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
 
