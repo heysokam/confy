@@ -90,8 +90,8 @@ const lang = struct {
 //____________________________
 // BuildTrg Creation Arguments: Flags
 const Flags_args = struct {
-  cc  :cstr_List,
-  ld  :cstr_List,
+  cc  :cstr_List= &.{},
+  ld  :cstr_List= &.{},
 };
 // BuildTrg Creation Arguments
 const BuildTrg_args = struct {
@@ -108,7 +108,7 @@ const BuildTrg_args = struct {
 
 //_____________________________________
 /// @descr Creates a new {@link BuildTrg} object that can be used by confy to build the given binary {@arg kind}.
-pub fn new(
+pub fn new (
     kind  : BuildTrg.Kind,
     args  : BuildTrg_args,
     confy : *Confy,
@@ -204,25 +204,41 @@ const zig = struct {
   //_____________________________________
   /// @descr Orders confy to build the resulting binary for this Zig BuildTrg.
   fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void {
+    var cc = zstd.shell.Cmd.create(trg.builder.A.allocator());
+    defer cc.destroy();
+
     // Create the compilation command
-    var args = seq(cstr).init(trg.builder.A.allocator());
-    try args.append(try zig.getCC(trg));
+    try cc.add(try zig.getCC(trg));
     switch (trg.kind) {
-     .program     => try args.append("build-exe"),
-     .lib,.static => try args.append("build-lib"),
-     .unittest    => try args.append("test"),
+     .program     => try cc.add("build-exe"),
+     .lib,.static => try cc.add("build-lib"),
+     .unittest    => try cc.add("test"),
     }
+
     // Add the cache folder args
     const cache = try zig.getCacheDir(trg);
-    try args.appendSlice(&.{"--cache-dir", cache, "--global-cache-dir", cache});
+    try cc.addList(&.{"--cache-dir", cache, "--global-cache-dir", cache});
+    // Add the cross-compilation target when needed
+    if (system.cross() or opts.explicitSystem) {
+      const target = try system.zigTriple(trg.builder.A.allocator());
+      try cc.addList(&.{"-target", target});
+      // FIX: target string will leak. How to defer dealloc from inside the if?
+    }
     // Add the binary output
-    try args.append(try zig.getEmitBin(trg, system, opts));
+    try cc.add(try zig.getEmitBin(trg, system, opts));
+    // Add the flags
+    try cc.addList(trg.flags.?.cc.items);
+    try cc.addList(trg.flags.?.ld.items);
     // Add the code
-    try args.appendSlice(trg.src.files.items);
+    try cc.addList(trg.src.files.items);
+
     // Report to CLI and build
-    echo("ᛝ confy: Building Zig target binary ...");
-    try zstd.shell.run(args.items, trg.builder.A.allocator());
-    echo("ᛝ confy: Done Building.");
+    const bin = try trg.getBin(system, opts);
+    defer trg.builder.A.allocator().free(bin);
+    prnt("{s} Building Zig target binary: {s} ...\n", .{trg.cfg.prefix, bin});
+    if (trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
+    prnt("{s} Done Building.\n", .{trg.cfg.prefix});
+    try cc.run();
   }
 };
 
