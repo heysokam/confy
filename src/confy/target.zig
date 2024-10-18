@@ -19,7 +19,7 @@ const prnt    = zstd.prnt;
 const Lang    = zstd.Lang;
 const System  = zstd.System;
 // @deps confy
-const cfg        = @import("./cfg.zig");
+const Cfg        = @import("./cfg.zig");
 const Submodule  = @import("./submodule.zig");
 const Submodules = Submodule.List;
 const Confy      = @import("./core.zig");
@@ -31,7 +31,7 @@ const LangPriority = [_]Lang{ .Cpp, .Zig, .C, .M, .Nim, .Asm, .Unknown };
 
 
 kind     :Kind,
-cfg      :cfg,
+cfg      :Cfg,
 builder  :*Confy,
 
 trg      :cstr,
@@ -51,7 +51,7 @@ lang     :Lang= Lang.None,
 //____________________________________
 /// @section Language Management tools
 //____________________________
-const lang = struct {
+const language = struct {
   const fromExt  = Lang.fromExt;
   const fromFile = Lang.fromFile;
   /// @descr Returns the preferred language of the {@arg src} CodeList, based on the extension priorities for each lang.
@@ -59,7 +59,7 @@ const lang = struct {
   /// @note List of files that contain Zig code will be assumed to be targeting a Zig compiler, even if they combine C code in them.
   fn get (src :CodeList) Lang {
     var langs = std.EnumSet(Lang).initEmpty();
-    for (src.files.items) | file | langs.insert(lang.fromFile(file));
+    for (src.files.items) | file | langs.insert(BuildTrg.language.fromFile(file));
     if (langs.count() == 1) {
       var it = langs.iterator(); return it.next().?;
     } else {
@@ -99,7 +99,7 @@ const BuildTrg_args = struct {
   src     : ?cstr_List  = null,
   flags   : ?Flags_args = null,
   entry   : ?cstr       = null,
-  cfg     : ?cfg        = null,
+  cfg     : ?Cfg        = null,
   sub     : cstr        = "",
   deps    : ?[]const Submodule= null,
   version : cstr        = "0.0.0",
@@ -133,7 +133,7 @@ pub fn new (
     try result.flags.?.addCCList(args.flags.?.cc);
     try result.flags.?.addLDList(args.flags.?.ld);
   }
-  result.lang = args.lang orelse BuildTrg.lang.get(result.src);
+  result.lang = args.lang orelse BuildTrg.language.get(result.src);
   return result;
 }
 //_____________________________________
@@ -150,7 +150,7 @@ pub fn UnitTest  (args :BuildTrg_args, confy :*Confy) !BuildTrg { return BuildTr
 /// @descr Adds the given {@arg L} CodeList of source code files to the {@arg trg}
 pub fn add (trg :*BuildTrg, L :CodeList) !void {
   try trg.src.add(L);
-  if (trg.lang == .Unknown) trg.lang = BuildTrg.lang.get(trg.src);
+  if (trg.lang == .Unknown) trg.lang = BuildTrg.language.get(trg.src);
 }
 //_____________________________________
 /// @descr Adds the given {@arg L} FlagList of compiler flags to the {@arg trg}
