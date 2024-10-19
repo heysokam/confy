@@ -13,7 +13,9 @@ const cstr = zstd.cstr;
 prefix  :cstr= "ᛝ confy:",
 verbose :bool= false,
 quiet   :bool= false,
+force   :bool= false,
 dir     :ProjectDirs= ProjectDirs{},
+nim     :Nim= Nim{},
 
 const ProjectDirs = struct {
   root  :cstr= ".",
@@ -24,12 +26,11 @@ const ProjectDirs = struct {
   zig   :cstr= ".zig",
   min   :cstr= ".M",
   nim   :cstr= ".nim",
-};
+}; //:: cfg.ProjectDirs
 
-// TODO:
-// pub fn init(B :*std.Build) cfg {
-//   const result :cfg= cfg{};
-//   _=B;
-//   return result;
-// }
+const Nim = struct {
+  zigcc  :cstr= "zigcc",
+  zigcpp :cstr= "zigcpp",
+  unsafeFunctionPointers :bool= false,
+}; //:: cfg.Nim
 

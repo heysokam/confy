@@ -4,13 +4,15 @@
 //! @fileoverview Submodule Management
 //______________________________________|
 pub const Submodule = @This();
+// @deps std
+const std = @import("std");
 // @deps zstd
 const zstd = @import("../lib/zstd.zig");
 const cstr = zstd.cstr;
 
 name :cstr,
 url  :cstr,
-src  :cstr= default.src_subDir,
+src  :?cstr= Submodule.default.src_subDir,
 
 /// @descr Describes a sequence/list of {@link Submodule} objects
 pub const List = zstd.seq(Submodule);
@@ -20,17 +22,26 @@ pub const default = struct {
   const src_subDir = "src";
 };
 
-pub fn new(args :struct{
+pub fn new (in :struct{
     name : cstr,
     url  : cstr,
-    src  : cstr = default.src_subDir,
+    src  : ?cstr = Submodule.default.src_subDir,
   }) Submodule {
   return Submodule{
-    .name = args.name,
-    .url  = args.url,
-    .src  = args.src,
+    .name = in.name,
+    .url  = in.url,
+    .src  = in.src,
   };
 }
+
+pub fn toNim (
+    S : *const Submodule,
+    D : cstr,
+    A : std.mem.Allocator,
+  ) !cstr {
+  if (S.src == null) { return try std.fmt.allocPrint(A, "--path:{s}/{s}",     .{D, S.name});          }
+  else               { return try std.fmt.allocPrint(A, "--path:{s}/{s}/{s}", .{D, S.name, S.src.?}); }
+} //:: Submodule.toNim
 
 // pub fn clone(S :*const Submodule) void {
 //   std.debug.print("...............\n", .{});

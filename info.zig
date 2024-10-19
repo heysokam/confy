@@ -1,7 +1,7 @@
 //:______________________________________________________________________
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
 //:______________________________________________________________________
-const version     = "0.6.15";
+const version     = "0.6.16";
 const name        = "confy";
 const description = "ᛝ confy | Comfortable and Configurable Buildsystem";
 const author      = "heysokam";

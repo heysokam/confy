@@ -43,6 +43,7 @@ version  :Version= zstd.version(0,0,0),
 // system   :std.Build.ResolvedTarget= undefined,
 // optim    :std.builtin.OptimizeMode= undefined,
 // priv     :BuildTrg.Private= undefined,
+args     :cstr_List,
 
 /// @description Forces the target to be built with the given {@link Lang} when specified. Will search by file extensions otherwise.
 lang     :Lang= Lang.None,
@@ -101,6 +102,7 @@ const BuildTrg_args = struct {
   entry   : ?cstr       = null,
   cfg     : ?Cfg        = null,
   sub     : cstr        = "",
+  args    : ?cstr_List  = null,
   deps    : ?[]const Submodule= null,
   version : cstr        = "0.0.0",
   lang    : ?Lang       = null,
@@ -122,13 +124,14 @@ pub fn new (
     .version = Version.parse(args.version) catch zstd.version(0,0,0),
     .src     = undefined,
     .deps    = undefined,
+    .args    = args.args orelse &.{},
   };
   result.src   = CodeList.create(result.builder.A.allocator());
   result.deps  = Submodules.init(result.builder.A.allocator());
   result.flags = FlagList.create.empty(result.builder.A.allocator());
   if (args.entry != null) { try result.src.addFile(args.entry.?); }
   if (args.src   != null) { try result.src.addList(args.src.?); }
-  if (args.deps  != null) { for (args.deps.?) | dep  | { try result.deps.append(dep); } }
+  if (args.deps  != null) { for (args.deps.?) |dep| { try result.deps.append(dep); } }
   if (args.flags != null) {
     try result.flags.?.addCCList(args.flags.?.cc);
     try result.flags.?.addLDList(args.flags.?.ld);
@@ -192,15 +195,11 @@ fn getBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
 
 const zig = struct {
   //_____________________________________
-  fn getCC (trg :*const BuildTrg) !cstr {
-    return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.zig, "zig"});
-  }
-  fn getCacheDir (trg :*const BuildTrg) !cstr {
-    return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.cache, "zig"});
-  }
-  fn getEmitBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
+  fn getCC       (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.zig, "zig"});  }
+  fn getCacheDir (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.cache, "zig"});  }
+  fn getEmitBin  (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
     return try std.fmt.allocPrint(trg.builder.A.allocator(), "-femit-bin={s}", .{try trg.getBin(system, opts)});
-  }
+  } //:: BuildTrg.zig.getEmitBin
   //_____________________________________
   /// @descr Orders confy to build the resulting binary for this Zig BuildTrg.
   fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void {
@@ -229,6 +228,9 @@ const zig = struct {
     // Add the flags
     try cc.addList(trg.flags.?.cc.items);
     try cc.addList(trg.flags.?.ld.items);
+    // Add the extra/custom commands requested by the user
+    for (trg.args) |arg| try cc.add(arg);
+
     // Add the code
     try cc.addList(trg.src.files.items);
 
@@ -239,8 +241,8 @@ const zig = struct {
     if (trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
     prnt("{s} Done Building.\n", .{trg.cfg.prefix});
     try cc.run();
-  }
-};
+  } //:: BuildTrg.zig.buildFor
+}; //:: BuildTrg.zig
 
 const C = struct {
   //_____________________________________
@@ -268,6 +270,9 @@ const C = struct {
       // FIX: target string will leak. How to defer dealloc from inside the if?
     }
 
+    // Add the extra/custom commands requested by the user
+    for (trg.args) |arg| try cc.add(arg);
+
     // Add the code and flags
     try cc.addList(trg.src.files.items);
     try cc.addList(trg.flags.?.cc.items);
@@ -283,8 +288,88 @@ const C = struct {
     if (trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
     try cc.run();
     prnt("{s} Done Building.\n", .{trg.cfg.prefix});
-  }
-};
+  } //:: BuildTrg.C.buildFor
+}; //:: BuildTrg.C
+
+const nim = struct {
+  // @reference
+  //  clang.cppCompiler = "zigcpp"
+  //  clang.cppXsupport = "-std=C++20"
+  //  nim c --cc:clang --clang.exe="zigcc" --clang.linkerexe="zigcc" --opt:speed hello.nim
+  // const CCTempl = "{nim} {nimBackend} -d:zig --cc:clang --clang.exe=\"{zigcc}\" --clang.linkerexe=\"{zigcc}\" --clang.cppCompiler=\"{zigcpp}\" --clang.cppXsupport=\"-std=c++20\"";
+  //_____________________________________
+  fn getCC       (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.nim, "/bin/nim"});  }
+  fn getZigCC    (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.zig, "zigcc"});  }
+  fn getZigCPP   (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.zig, "zigcpp"});  }
+  fn getCacheDir (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.cache, "nim"});  }
+  //_____________________________________
+  /// @descr Orders confy to build the resulting binary for this C BuildTrg.
+  fn buildFor (trg :*const BuildTrg, S :System, in:BuildOptions) !void {
+    const A = trg.builder.A.allocator();
+    var cc = zstd.shell.Cmd.create(trg.builder.A.allocator());
+    defer cc.destroy();
+
+    // Create the base compilation command
+    const nimBin = try nim.getCC(trg);
+    defer A.free(nimBin);
+    try cc.add(nimBin);
+    try cc.add("c");
+    // Add ZigCC support
+    try cc.add("-d:zig");
+    try cc.add("--cc:clang");
+    const zigcc  = try nim.getZigCC(trg);  defer A.free(zigcc);
+    const zigcpp = try nim.getZigCPP(trg); defer A.free(zigcpp);
+    try cc.add(try std.fmt.allocPrint(A, "--clang.exe={s}", .{zigcc}));
+    try cc.add(try std.fmt.allocPrint(A, "--clang.linkerexe={s}", .{zigcc}));
+    try cc.add(try std.fmt.allocPrint(A, "--clang.cppCompiler={s}", .{zigcpp}));
+    try cc.add("--clang.cppXsupport=\"-std=c++20\"");
+
+    // Add the NimCC specific options
+    if (trg.cfg.force) { try cc.add("-f"); }
+    if (trg.cfg.verbose) { try cc.add("--verbosity:3"); }
+    else if (trg.cfg.quiet) { try cc.add("--hints:off");   }
+    // Add the cache folder args
+    const cacheOpt = try std.fmt.allocPrint(A, "--nimcache:{s}", .{try nim.getCacheDir(trg)});
+    defer A.free(cacheOpt);
+    try cc.add(cacheOpt);
+
+    // Output a Library when relevant
+    switch (trg.kind) {
+     .lib    => try cc.add("--app:lib"),
+     .static => try cc.add("--app:staticlib"),
+     .program,.unittest => {},
+    }
+    // Add the cross-compilation target when needed
+    if (S.cross() or in.explicitSystem) {
+      // FIX: These strings will leak. How to defer dealloc from inside an if?
+      try cc.add(try std.fmt.allocPrint(A, "--os:{s}", .{try S.nimOS(A)}));
+      try cc.add(try std.fmt.allocPrint(A, "--cpu:{s}", .{try S.nimCPU(A)}));
+      try cc.add(try std.fmt.allocPrint(A, "--passC:\"-target {s}\"", .{try S.zigTriple(A)}));
+      try cc.add(try std.fmt.allocPrint(A, "--passL:\"-target {s}\"", .{try S.zigTriple(A)}));
+    }
+    // Add the binary output
+    const outDir = try std.fs.path.join(A, &.{trg.cfg.dir.bin, trg.sub});
+    defer A.free(outDir);
+    try cc.add(try std.fmt.allocPrint(A, "--out:{s}", .{trg.trg}));
+    try cc.add(try std.fmt.allocPrint(A, "--outdir:{s}", .{outDir}));
+    // Add the flags
+    if (trg.cfg.nim.unsafeFunctionPointers) try cc.add("--passC:-Wno-incompatible-function-pointer-types");
+    // Add the extra/custom commands requested by the user
+    for (trg.args) |arg| try cc.add(arg);
+
+    // Add the Dependencies/Submodules
+    for (trg.deps.items) |dep| try cc.add(try dep.toNim(trg.cfg.dir.lib, A));
+    // Add the code
+    try cc.add(trg.src.files.items[0]);
+
+    // Report to CLI and run the command
+    prnt("{s} Building Nim target binary: {s} ...\n", .{trg.cfg.prefix, trg.trg});
+    if (!trg.cfg.verbose) prnt("  {s}\n", .{try std.mem.join(trg.builder.A.allocator(), " ", cc.parts.items)});
+    try cc.run();
+    prnt("{s} Done Building.\n", .{trg.cfg.prefix});
+  } //:: BuildTrg.nim.buildFor
+}; //:: BuildTrg.nim
+
 
 //_____________________________________
 /// @descr Orders confy to build the resulting binary of {@arg trg} for the given {@arg system}
@@ -293,14 +378,14 @@ pub fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void 
   switch (trg.lang) {
     .Zig      => try zig.buildFor(trg, system, opts),
     .C, .Cpp, => try C.buildFor(trg, system, opts),
-    .Nim      => std.debug.panic("Support for compiling Nim has not been reimplemented yet.\n", .{}),
+    .Nim      => try nim.buildFor(trg, system, opts),
     else => std.debug.panic("Found a language that has no implemented build command:  {s}\n", .{@tagName(trg.lang)}),
   }
 }
 //_____________________________________
 /// @descr Orders confy to build the resulting binary of {@arg trg} for all of the {@arg systems}
 pub fn buildForAll (trg :*const BuildTrg, systems :[]const System, opts:BuildOptions) !void {
-  for (systems) | system | { try trg.buildFor(system, opts); }
+  for (systems) |system| { try trg.buildFor(system, opts); }
 }
 //_____________________________________
 /// @descr Orders confy to build the resulting binary of {@arg trg} for the host system, using the default {@link BuildOptions}.
