@@ -22,14 +22,18 @@ pub const default = struct {
   const src_subDir = "src";
 };
 
-pub fn new (in :struct{
-    name : cstr,
-    url  : cstr,
-    src  : ?cstr = Submodule.default.src_subDir,
-  }) Submodule {
+pub const Options = struct{
+  src : ?cstr = Submodule.default.src_subDir,
+}; //:: Submodule.Options
+
+pub fn new (
+    name  : cstr,
+    url   : cstr,
+    in    : Submodule.Options,
+  ) Submodule {
   return Submodule{
-    .name = in.name,
-    .url  = in.url,
+    .name = name,
+    .url  = url,
     .src  = in.src,
   };
 }
