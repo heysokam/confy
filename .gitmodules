@@ -1,0 +1,3 @@
+[submodule "src/lib/zstd"]
+	path = src/lib/zstd
+	url = git@github.com:heysokam/zstd.git
