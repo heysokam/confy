@@ -19,16 +19,16 @@ const prnt    = zstd.prnt;
 const Lang    = zstd.Lang;
 const System  = zstd.System;
 // @deps confy
-const zig        = @import("./target/zig.zig");
-const C          = @import("./target/C.zig");
-const nim        = @import("./target/nim.zig");
-const language   = @import("./target/language.zig");
-const Cfg        = @import("./cfg.zig");
-const Submodule  = @import("./submodule.zig");
-const Submodules = Submodule.List;
-const Confy      = @import("./core.zig");
-const CodeList   = @import("./code.zig");
-const FlagList   = @import("./flags.zig");
+const zig          = @import("./target/zig.zig");
+const C            = @import("./target/C.zig");
+const nim          = @import("./target/nim.zig");
+const language     = @import("./target/language.zig");
+const Cfg          = @import("./cfg.zig");
+const Dependency   = @import("./dependency.zig");
+const Dependencies = Dependency.List;
+const Confy        = @import("./core.zig");
+const CodeList     = @import("./code.zig");
+const FlagList     = @import("./flags.zig");
 
 pub const Kind = enum { program, static, lib, unittest };
 
@@ -40,7 +40,7 @@ trg      :cstr,
 src      :CodeList,
 flags    :?FlagList= null,
 sub      :cstr,
-deps     :Submodules,
+deps     :Dependencies,
 version  :Version= zstd.version(0,0,0),
 // system   :std.Build.ResolvedTarget= undefined,
 // optim    :std.builtin.OptimizeMode= undefined,
@@ -68,7 +68,7 @@ const BuildTrg_args = struct {
   cfg     : ?Cfg        = null,
   sub     : cstr        = "",
   args    : ?cstr_List  = null,
-  deps    : ?[]const Submodule= null,
+  deps    : ?[]const Dependency= null,
   version : cstr        = "0.0.0",
   lang    : ?Lang       = null,
 };
@@ -92,7 +92,7 @@ pub fn new (
     .args    = args.args orelse &.{},
   };
   result.src   = CodeList.create(result.builder.A.allocator());
-  result.deps  = Submodules.init(result.builder.A.allocator());
+  result.deps  = Dependencies.init(result.builder.A.allocator());
   result.flags = FlagList.create.empty(result.builder.A.allocator());
   if (args.entry != null) { try result.src.addFile(args.entry.?); }
   if (args.src   != null) { try result.src.addList(args.src.?); }
