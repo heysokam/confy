@@ -1,8 +1,8 @@
 //:______________________________________________________________________
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU LGPLv3 or later  :
 //:______________________________________________________________________
-const version     = "0.6.19";
-const name        = "confy";
-const description = "ᛝ confy | Comfortable and Configurable Buildsystem";
-const author      = "heysokam";
-const license     = "LGPLv3-or-later";
+pub const version     = "0.6.19";
+pub const name        = "confy";
+pub const description = "ᛝ confy | Comfortable and Configurable Buildsystem";
+pub const author      = "heysokam";
+pub const license     = "LGPLv3-or-later";

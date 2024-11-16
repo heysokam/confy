@@ -48,7 +48,7 @@ const version = struct {
   fn pattern (file :cstr) cstr {
     return switch (zstd.Lang.fromFile(file)) {
       .Nim => "version",
-      .Zig => "const version",
+      .Zig => "pub const version",
       else => fail("Unknown pattern for file:  {s}\n", .{file}),
     };
   }
