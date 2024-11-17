@@ -91,9 +91,6 @@ pub fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void 
   }
 
   // Add the cache folder args
-  const cache = try zig.getCacheDir(trg);
-  try cc.addList(&.{"--cache-dir", cache, "--global-cache-dir", cache});
-  // Add the cross-compilation target when needed
   if (system.cross() or opts.explicitSystem) {
     const target = try system.zigTriple(trg.builder.A.allocator());
     try cc.addList(&.{"-target", target});
