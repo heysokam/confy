@@ -17,6 +17,7 @@ pub const cstr      = zstd.cstr;
 pub const cstr_List = zstd.cstr_List;
 pub const Lang      = zstd.Lang;
 pub const System    = zstd.System;
+pub const shell     = zstd.shell;
 
 
 //______________________________________
