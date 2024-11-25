@@ -90,6 +90,8 @@ pub fn buildFor (trg :*const BuildTrg, system :System, opts:BuildOptions) !void 
   if (hasM) try cc.addList(trg.src.files.items[1..])
   else try cc.addList(trg.src.files.items);
 
+  try cc.add("-freference-trace");
+
   // Report to CLI and build
   const bin = try trg.getBin(system, opts);
   defer trg.builder.A.allocator().free(bin);
