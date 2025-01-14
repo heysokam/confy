@@ -38,19 +38,9 @@ pub const Options = struct{
   ///  Must be relative to the current working directory _(`std.path.cwd()`)_ from where the builder is run.
   /// @note _Provided for completion. This option should almost never be needed._
   libDir     :?cstr=  null,
+  /// @descr Subdependencies of this dependency. Only for construction, ignored everywhere else.
+  deps       :?[]const Dependency= null,
 }; //:: Dependency.Options
-
-pub fn new (
-    name  : cstr,
-    url   : cstr,
-    in    : Dependency.Options,
-  ) Dependency {
-  return Dependency{
-    .name = name,
-    .url  = url,
-    .src  = in.src,
-  };
-}
 
 pub fn toNim (
     S : *const Dependency,
@@ -63,11 +53,11 @@ pub fn toNim (
 
 const zig = struct {
   fn depOrModule (
-    S : *const Dependency,
-    D : cstr,
-    M : bool,
-    R : *zstd.str,
-  ) !void {
+      S : *const Dependency,
+      D : cstr,
+      M : bool,
+      R : *zstd.str,
+    ) !void {
     try R.appendSlice(if (M) " -M" else " --dep ");
     try R.appendSlice(S.name);
     if (!M) return;
@@ -82,19 +72,33 @@ const zig = struct {
     try R.appendSlice(".zig");
   }
 
+  /// @descs Adds the given {@arg L} list of dependencies as `--dep name` at the end of the {@arg R} resulting string
+  fn getDependencies (
+      L : Dependency.List,
+      R : *zstd.str,
+    ) !void {
+    if (L.items.len == 0) return;
+    for (L.items) |dep| {
+      try R.appendSlice(" --dep ");
+      try R.appendSlice(dep.name);
+    }
+  }
+
   fn args (
-    S    : *const Dependency,
-    D    : cstr,
-    root : bool,
-    R    : *zstd.str,
-  ) !void {
+      S    : *const Dependency,
+      D    : cstr,
+      root : bool,
+      R    : *zstd.str,
+    ) !void {
+    for (S.deps orelse &.{}) |dep| std.debug.print("{s} ", .{dep.name});
     // Add the dependencies as --dep
     if (S.deps != null) for (S.deps.?) |dep| try zig.depOrModule(&dep, D, false, R);
     // Add the root at the end
     try zig.depOrModule(S, D, root, R);
   }
 };
-pub const toZig = zig.args;
+pub const toZig      = zig.args;
+pub const getZigDeps = zig.getDependencies;
 
 
 // TODO:

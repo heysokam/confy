@@ -27,9 +27,9 @@ fn getModules (trg :*const BuildTrg) !zstd.seq(zstd.str) {
   // Build a oneliner with all dependencies, starting from root
   var root = zstd.str.init(trg.builder.A.allocator());
   defer root.deinit();
+  // Add all root dependencies as --dep to the resulting command
+  try Dependency.getZigDeps(trg.deps, &root);
   // The first module is the root module  (according to the CLI -h message.)
-  const last :Dependency= trg.deps.getLast();
-  try last.toZig(trg.cfg.dir.lib, false, &root);
   try root.appendSlice(" -M");
   try root.appendSlice(trg.trg);
   try root.append('=');
