@@ -90,7 +90,6 @@ const zig = struct {
       root : bool,
       R    : *zstd.str,
     ) !void {
-    for (S.deps orelse &.{}) |dep| std.debug.print("{s} ", .{dep.name});
     // Add the dependencies as --dep
     if (S.deps != null) for (S.deps.?) |dep| try zig.depOrModule(&dep, D, false, R);
     // Add the root at the end
