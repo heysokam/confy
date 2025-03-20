@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "confy",
+  "version": "0.0.0",
+  "description": "ᛝ confy | Comfortable and Configurable Buildsystem",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Ivan Mar (sOkam!)",
+    "url": "https://github.com/heysokam"
+  },
+  "homepage": "https://github.com/heysokam/confy",
+  "bugs": {
+    "url": "https://github.com/heysokam/confy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heysokam/confy.git"
+  },
+  "keywords": [
+    "buildsystem",
+    "configurable",
+    "ergonomic",
+    "zigcc",
+    "c",
+    "cpp",
+    "nim",
+    "zig"
+  ],
+  "files": [
+    "public"
+  ],
+  "main": "public/index.js",
+  "types": "public/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bunx tsc",
+    "build:debug": "bun clean && bunx tsc --build --verbose --listEmittedFiles",
+    "compile:debug": "bun clean && bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
+    "cr": "bun run test && bun compile:debug && bun exec ./bin/confy",
+    "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy",
+    "check": "bun check:errors && bun build:debug && bun check:syntax && bun check:exports && bun clean",
+    "check:ci": "bun check:errors && bun run build && bun check:syntax && bun check:exports",
+    "check:errors": "bunx tsc --noEmit",
+    "check:syntax": "bunx eslint . --max-warnings 0 --report-unused-disable-directives",
+    "check:exports": "bunx attw --pack . || bun check:exports:onFail",
+    "check:exports:onFail": "bunx attw -f json --pack .",
+    "test": "bun run build:debug && bun test",
+    "wip": "bun check && bun ./src/wip.ts"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.30",
+    "@types/bun": "latest"
+  }
+}
+
