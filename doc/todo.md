@@ -1,3 +1,8 @@
+## get.Lang
+- [ ] Bun
+- [ ] Zig
+- [ ] Nim
+- [ ] Minim
 ## All
 - [ ] Autocreate subdirs to compile into
 - [ ] Multi-file build
@@ -8,7 +13,7 @@
 - [ ] strip final binary on release vers
       (user sends the flags: `-Wl,-s`, `-strip-debug`, `-s`, etc, since its compiler-dependent)
 - [ ] Per-file formatted progress bar for binaries on quiet
-- [x] BuildInfo report when not quiet
+- [ ] BuildInfo report when not quiet
 - [ ] cfg: configuration option:  `cfg.zigSystemBin`  (default:on)
            ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
            A local-only version is downloaded and used for the project when off.
@@ -32,7 +37,7 @@
 ## Zig
 - [ ] SharedLibrary build
 - [ ] StaticLibrary build
-- [x] Modules
+- [ ] Modules
 - [ ] `.def` files conversion support  _(eg: arocc requirements)_
 - [ ] Defines feature
   > Builtin:
@@ -43,8 +48,8 @@
     defines.os  : builtin.os
 - [ ] Give context/info about the target when building/running.
 ## C and C++
-- [x] Basic C support
-- [x] Basic C++ support
+- [ ] Basic C support
+- [ ] Basic C++ support
 - [ ] Correctly select `C` or `C++` compiler inside a seq (found for each file, instead of globally for the whole list)
 - [ ] Remote folders _(same concept as Repositories in SCons)_
 - [ ] SharedLibrary build
@@ -71,7 +76,7 @@
   - [ ] Advanced usage
 
 ## Make to Confy
-- [ ] Rewrite/Port to the Zig codebase
+- [ ] Rewrite/Port to the Bun codebase
 - [ ] Generation of confy globs, diffs and reference code lists for each target
 - [ ] Converter
 
