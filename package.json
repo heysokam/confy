@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "confy",
-  "version": "0.0.0",
+  "version": "0.6.50",
   "description": "ᛝ confy | Comfortable and Configurable Buildsystem",
   "license": "GPL-3.0-or-later",
   "author": {
@@ -55,8 +55,14 @@
     "typescript-eslint": "^8.26.1"
   },
   "dependencies": {
+    "@octokit/types": "^4.1.2",
     "@sinclair/typebox": "^0.34.30",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/download": "^8.0.5",
+    "@types/extract-zip": "^2.0.3",
+    "download": "^8.0.0",
+    "electron": "^35.0.3",
+    "extract-zip": "^2.0.1",
+    "octokit": "^4.1.2"
   }
 }
-
