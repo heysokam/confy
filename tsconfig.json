@@ -35,13 +35,16 @@
     "outDir": "public",
     "rootDir": "src",
     "paths": {
+      "@confy": [
+        "./src/confy/index.ts"
+      ],
       "@confy/*": [
-        "./src/*"
+        "./src/confy/*"
       ]
     }
   },
   "include": [
-    "types/**/*.ts",
+    "confy/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
     "../eslint.config.mjs"
@@ -49,6 +52,8 @@
   "exclude": [
     "node_modules",
     "butcher",
+    "examples",
+    "**/confy.ts",
     "**/*.wip.*",
     "**/wip.*",
     "**/*.test.ts",
