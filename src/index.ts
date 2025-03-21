@@ -15,6 +15,7 @@ export { info } from '@confy/log'
 // @section Forward Export: Confy tools
 //____________________________
 export { Program } from '@confy/program'
+export * from '@confy/tools'
 
 /*
 pub const Name      = zstd.Name;
@@ -25,7 +26,6 @@ pub const shell     = zstd.shell;
 
 pub const Confy      = @import("./confy/core.zig").Confy;
 pub const init       = @import("./confy/core.zig").init;
-pub const Git        = @import("./confy/git.zig");
 pub const Package    = @import("./confy/package.zig");
 pub const BuildTrg   = @import("./confy/target.zig");
 pub const Program    = BuildTrg.Program;

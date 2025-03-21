@@ -1,0 +1,8 @@
+//:______________________________________________________________________
+//  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
+//:______________________________________________________________________
+//! @fileoverview Connector cable to all of the Tools modules
+//____________________________________________________________|
+export { CLI } from '@confy/tools/cli'
+export { Path, File, Dir } from '@confy/tools/files'
+export { gh } from '@confy/tools/git'
