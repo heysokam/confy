@@ -1,6 +1,36 @@
 //:______________________________________________________________________
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 //:______________________________________________________________________
+export default Cli; export namespace Cli {
+
+
+/**
+ * @description
+ * Returns the raw Cli.Arguments completely un-processed.
+ * Alias to `Bun.argv` for naming consistency.
+ * @see https://bun.sh/guides/process/argv for a guide on how to process the result.
+ * @returns The contents of `Bun.argv`.
+ * */
+export function raw () :string[] { return Bun.argv }
+
+
+/**
+ * @todo
+ * **Not Yet Implement**. Use {@link Cli.internal} and {@link Cli.raw} in the meantime
+ *
+ * @description
+ * Returns the Cli.Arguments after processing by confy
+ * Use {@link Cli.raw} if you need access to the non-processed arguments.
+ * */
+export function args (argv = Cli.raw()) :Arguments { return new Arguments(argv) }
+
+
+/**
+ * @private Use {@link Cli.args} instead.
+ * @description Returns the Cli.Arguments processed for internal use by confy
+ * */
+export function internal () :Internal { return new Internal() }
+
 
 export type Short     = Set<string>
 export type LongValue = string | boolean
@@ -11,7 +41,11 @@ export type Opts      = {
   long   :Long
 }
 
-export class CLI {
+class Arguments { // TODO:
+  constructor(argv = Cli.raw()) { argv }
+}
+
+class Internal {
   readonly runner :string
   readonly arg0   :string
   opts  :Opts
@@ -50,8 +84,7 @@ export class CLI {
     for (const ch of arg.slice(1)) this.#addShort(ch)
   }
 
-  constructor(argv ?:string[]) {
-    if (!argv) argv = Bun.argv
+  constructor(argv = Cli.raw()) {
     this.runner = argv[0]!
     this.arg0   = argv[1]!
     this.opts   = { short: new Set(), long: {}}
@@ -63,4 +96,6 @@ export class CLI {
     }
   }
 }
+
+};
 

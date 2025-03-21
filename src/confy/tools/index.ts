@@ -3,6 +3,6 @@
 //:______________________________________________________________________
 //! @fileoverview Connector cable to all of the Tools modules
 //____________________________________________________________|
-export { CLI } from '@confy/tools/cli'
+export { Cli } from '@confy/tools/cli'
 export { Path, File, Dir } from '@confy/tools/files'
 export { gh } from '@confy/tools/git'
