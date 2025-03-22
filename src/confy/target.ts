@@ -4,15 +4,15 @@
 // @deps std
 import * as fs from 'fs'
 // @deps confy
-import { Config, cfg_default } from '@confy/cfg'
+import cfg from '@confy/cfg'
 
 export class BuildTarget {
   src  :fs.PathLike[]
-  cfg  :Config
+  cfg  :cfg.Config
 
   constructor(path :fs.PathLike) {
     this.src = [path]
-    this.cfg = cfg_default
+    this.cfg = structuredClone(cfg.defaults)
   }
 }
 
