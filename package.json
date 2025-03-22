@@ -38,7 +38,7 @@
     "build:minisign": "rm -f ./src/confy/tools/minisign.js && bun run ./src/build/minisign.ts",
     "compile:debug": "bun clean && bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
     "cr": "bun run test && bun compile:debug && bun exec ./bin/confy",
-    "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy",
+    "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy && rm -rf ./bin/.cache",
     "check": "bun check:errors && bun build:debug && bun check:syntax && bun check:exports && bun clean",
     "check:ci": "bun check:errors && bun run build && bun check:syntax && bun check:exports",
     "check:errors": "bunx tsc --noEmit",
