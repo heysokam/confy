@@ -12,7 +12,7 @@ export class BuildTarget {
 
   constructor(path :fs.PathLike) {
     this.src = [path]
-    this.cfg = structuredClone(cfg.defaults)
+    this.cfg = cfg.defaults.clone()
   }
 }
 
