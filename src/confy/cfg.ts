@@ -17,7 +17,7 @@ export default cfg; export namespace cfg {
  * */
 export namespace tool {
   export const name      = "confy"
-  export const version   = "0.0.0"
+  export const version   = "0.6.50"
   export const icon      = "ᛝ"
   export const descr     = "Comfortable and Configurable Buildsystem"
   export const separator = { name: ":", descr: "|" }
@@ -29,20 +29,24 @@ export namespace tool {
  * Configuration options for the Zig compiler and its management.
  * */
 export type Bun = {
-  index      :fs.PathLike
-  current    :fs.PathLike
+  name       :string
   cache      :fs.PathLike
   systemBin  :boolean
 }
 
+export enum NamedVersion { "master", "latest" }
 /**
  * @description
  * Configuration options for the Zig compiler and its management.
  * */
 export type Zig = {
+  name       :string
   index      :fs.PathLike
   current    :fs.PathLike
   cache      :fs.PathLike
+  dir        :fs.PathLike
+  bin        :fs.PathLike
+  version    :NamedVersion | string
   systemBin  :boolean
 }
 
@@ -51,6 +55,7 @@ export type Zig = {
  * Configuration options for the Nim compiler and its management.
  * */
 export type Nim = {
+  name       :string
   bootstrap  :boolean
   systemBin  :boolean
 }
@@ -62,28 +67,55 @@ export type Dirs = {
   cache  :fs.PathLike
 }
 export namespace defaults {
-  function prefix () :string { return `${cfg.tool.icon} ${cfg.tool.name}${cfg.tool.separator.name}` }
-  function bin    () :string { return path.join(".", "bin") }
-  function lib    () :string { return path.join(bin(), ".lib") }
+  export const sub = {
+    src : "src",
+    bin : "bin",
+    lib : ".lib",
+    zig : ".zig",
+    nim : ".nim",
+    bun : ".bun",
+  }
+  export function prefix () :string { return `${cfg.tool.icon} ${cfg.tool.name}${cfg.tool.separator.name}` }
+  export namespace dir {
+    export function src    () :string { return path.join(  ".", cfg.defaults.sub.src) }
+    export function bin    () :string { return path.join(  ".", cfg.defaults.sub.bin) }
+    export function lib    () :string { return path.join(bin(), cfg.defaults.sub.lib) }
+    export function cache  () :string { return path.join(bin(), cfg.tool.cache      ) }
+  }
+  export namespace zig {
+    export const name    = "zig"
+    export const version = NamedVersion.latest
+    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
+    export function index   () :string { return path.join(cfg.defaults.dir.cache(), name+".index.json"  ) }
+    export function current () :string { return path.join(cfg.defaults.dir.cache(), name+".version.json") }
+    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.zig) }
+    export function bin     () :string { return path.join(               zig.dir(), name                ) }
+  }
 
-  export function clone () :Config { return structuredClone({
-    prefix      : prefix(),
-    verbose     : false,
+  export function clone () :Config { return {
+    prefix      : cfg.defaults.prefix(),
+    verbose     : true,
     quiet       : false,
     force       : false,
     dir         : {
-      src       : "src",
-      lib       : lib(),
-      bin       : bin(),
-      cache     : cfg.tool.cache,
+      src       : cfg.defaults.dir.src(),
+      lib       : cfg.defaults.dir.lib(),
+      bin       : cfg.defaults.dir.bin(),
+      cache     : cfg.defaults.dir.cache(),
     },
     zig         : {
-      index     : "zig.index.json",
-      current   : "zig.version.json",
-      cache     : "zig",
+      name      : zig.name,
+      version   : zig.version,
+      index     : zig.index(),
+      current   : zig.current(),
+      cache     : zig.cache(),
+      dir       : zig.dir(),
+      bin       : zig.bin(),
       systemBin : false,
-    }
-  })}
+    },
+    nim         : {/* TODO: */} as cfg.Nim,
+    bun         : {/* TODO: */} as cfg.Bun,
+  }}
 }
 
 
@@ -94,9 +126,11 @@ export type Config = {
   force    :boolean
   dir      :cfg.Dirs
   zig      :cfg.Zig
+  nim      :cfg.Nim
+  bun      :cfg.Bun
 }
 
 } //:: cfg
 
-export const defaults = cfg.defaults.clone()
+export const defaults = cfg.defaults.clone
 
