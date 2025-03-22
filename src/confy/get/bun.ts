@@ -25,8 +25,8 @@ export const getBun = {
    * @description
    * Downloads Bun to {@param trg}.
    * Will not do anything if the target already exists.
-   * Will unzip when the bun release file already exists in the cache.
-   * Will download and unzip when the bun file does not exist in the cache.
+   * Will unzip when the release file already exists in the cache.
+   * Will download and unzip when the file does not exist in the cache.
    *
    * @todo Auto-download new release when available.
    * @param force Download/unzip the file even if it already exists.
