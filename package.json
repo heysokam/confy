@@ -35,7 +35,8 @@
   "type": "module",
   "scripts": {
     "build": "bun build:minisign && bunx tsc",
-    "build:debug": "bun clean && bun build:minisign && bunx tsc --build --verbose --listEmittedFiles",
+    "build:debug": "bun clean && bun build:package && bun build:minisign && bunx tsc --build --verbose --listEmittedFiles",
+    "build:package": "bun run ./src/build/package.ts",
     "build:minisign": "rm -f ./src/confy/tools/minisign.js && bun run ./src/build/minisign.ts",
     "compile:debug": "bun clean && bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
     "cr": "bun run test && bun compile:debug && bun exec ./bin/confy",
