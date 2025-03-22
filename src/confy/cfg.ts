@@ -2,30 +2,46 @@
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 //:______________________________________________________________________
 import * as fs from 'fs'
+export default cfg; export namespace cfg {
 
 
-export const cfg_default :Config= {
+export type Zig = {
+  index  :fs.PathLike
+}
+export type Nim = {}
+export type Dirs = {
+  bin    :fs.PathLike
+  src    :fs.PathLike
+  lib    :fs.PathLike
+  cache  :fs.PathLike
+}
+export const defaults :Config= {
   prefix  : "ᛝ confy:",
   verbose : false,
   quiet   : false,
   force   : false,
   dir     : {
-    src   : "src",
-    lib   : "lib",
-    bin   : "bin",
+    src   : "src/",
+    lib   : ".lib/",
+    bin   : "bin/",
+    cache : ".cache/",
+  },
+  zig     : {
+    index : "zig.index.json"
   }
 }
 
-export type ConfigDirs = {
-  bin  :fs.PathLike
-  src  :fs.PathLike
-  lib  :fs.PathLike
-}
 
 export type Config = {
   prefix   :string
   verbose  :boolean
   quiet    :boolean
   force    :boolean
-  dir      :ConfigDirs
+  dir      :cfg.Dirs
+  zig      :cfg.Zig
 }
+
+} //:: cfg
+
+export const defaults = cfg.defaults
+
