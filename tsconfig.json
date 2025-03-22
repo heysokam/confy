@@ -53,6 +53,7 @@
     "node_modules",
     "butcher",
     "examples",
+    "src/build",
     "**/confy.ts",
     "**/*.wip.*",
     "**/wip.*",

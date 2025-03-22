@@ -33,8 +33,9 @@
   "types": "public/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "bunx tsc",
-    "build:debug": "bun clean && bunx tsc --build --verbose --listEmittedFiles",
+    "build": "bun build:minisign && bunx tsc",
+    "build:debug": "bun clean && bun build:minisign && bunx tsc --build --verbose --listEmittedFiles",
+    "build:minisign": "rm -f ./src/confy/tools/minisign.js && bun run ./src/build/minisign.ts",
     "compile:debug": "bun clean && bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
     "cr": "bun run test && bun compile:debug && bun exec ./bin/confy",
     "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy",
@@ -50,19 +51,20 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
     "@eslint/js": "^9.22.0",
+    "dts-gen": "^0.10.4",
     "eslint": "^9.22.0",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
   },
   "dependencies": {
     "@octokit/types": "^4.1.2",
-    "@sinclair/typebox": "^0.34.30",
     "@types/bun": "latest",
     "@types/download": "^8.0.5",
     "@types/extract-zip": "^2.0.3",
     "download": "^8.0.0",
     "electron": "^35.0.3",
     "extract-zip": "^2.0.1",
-    "octokit": "^4.1.2"
+    "octokit": "^4.1.2",
+    "sodium-native": "^4.3.3"
   }
 }
