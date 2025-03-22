@@ -20,11 +20,12 @@
     "buildsystem",
     "configurable",
     "ergonomic",
-    "zigcc",
     "c",
     "cpp",
+    "zig",
     "nim",
-    "zig"
+    "bun",
+    "zigcc"
   ],
   "files": [
     "public"
