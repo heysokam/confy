@@ -1,3 +1,6 @@
+# Package Specific
+src/confy/tools/minisign.js
+
 # dependencies
 /node_modules
 **/node_modules
