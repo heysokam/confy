@@ -18,24 +18,44 @@ export const Path = {
 }
 
 export const Dir = {
-  cwd: () :fs.PathLike => { return process.cwd() },
-  move: (src :fs.PathLike, trg :fs.PathLike) => {
-    fs.cpSync(src as string, trg as string)
-  }
+  cwd    : () :fs.PathLike => { return process.cwd() },
+  move   : (src :fs.PathLike, trg :fs.PathLike) => fs.cpSync(src as string, trg as string),
+  create : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
 }
 
 export const File = {
   exists   : Path.exists,
   read     : fs.readFileSync,
   rmv      : Path.rm,
-  write    : fs.writeFileSync,
   unzip    : extract,
 
-  /** @description Moves {@param src} to {@param trg} by copying src to trg and removing trg on completion. */
-  move: (src :fs.PathLike, trg :fs.PathLike, mode ?:number) => {
+  /**
+   * @description
+   * Writes all bytes of {@param data} into {@param trg}.
+   * Creates the container folders recursively when they do not exist.
+   * */
+  write: function(
+      trg    :fs.PathLike,
+      data   :string|NodeJS.ArrayBufferView,
+      opts  ?:fs.WriteFileOptions
+    ) :void {
+    const dir = Path.dirname(trg.toString())
+    if (!Path.exists(dir)) Dir.create(dir)
+    fs.writeFileSync(trg, data, opts)
+  }, //:: File.write
+
+  /**
+   * @description
+   * Moves {@param src} to {@param trg} by copying src to trg and removing trg on completion.
+   * */
+  move: function(
+      src   :fs.PathLike,
+      trg   :fs.PathLike,
+      mode ?:number
+    ) :void {
     fs.copyFileSync(src as string, trg as string, mode)
     Path.rm(src)
-  },
+  }, //:: File.move
 
   //________________________________________________________
   // FIX: Remove this dependency. Abandonware.
