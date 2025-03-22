@@ -6,14 +6,15 @@ import * as fs from 'fs'
 // @deps confy
 import extract from 'extract-zip'
 import download from 'download'
-import { basename, dirname } from 'path'
+import path, { basename, dirname } from 'path'
 
 export const Path = {
   basename: basename,
   dirname: dirname,
 
-  exists: (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
-  rm: (path :fs.PathLike) => { fs.rm(path, () => {}) },
+  exists : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
+  rm     : (path :fs.PathLike) => { fs.rm(path, () => {}) },
+  join   : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString()))
 }
 
 export const Dir = {
@@ -28,7 +29,6 @@ export const File = {
   read     : fs.readFileSync,
   rmv      : Path.rm,
   write    : fs.writeFileSync,
-  download : download,
   unzip    : extract,
 
   /** @description Moves {@param src} to {@param trg} by copying src to trg and removing trg on completion. */
@@ -36,5 +36,13 @@ export const File = {
     fs.copyFileSync(src as string, trg as string, mode)
     Path.rm(src)
   },
+
+  //________________________________________________________
+  // FIX: Remove this dependency. Abandonware.
+  //      Fetch or ky are better. https://github.com/sindresorhus/ky
+  //      It also requires got, which secretly depends on electron but doesn't list it as a dependency.
+  //      Figure out downloads and just remove it.
+  download : download,
+  //________________________________________________________
 }
 
