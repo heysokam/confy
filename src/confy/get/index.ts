@@ -5,8 +5,10 @@
 //__________________________________________________________|
 // @deps confy
 import { getBun } from "./bun";
+import { getZig } from "./zig";
 
 export namespace get {
   export const Bun = getBun
+  export const Zig = getZig
 }
 
