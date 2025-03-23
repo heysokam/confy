@@ -22,3 +22,4 @@ async function run() :Promise<void> {
   info("Build: Downloading @mlugg/setup-zig/minisign.js to "+trgFile)
   await File.download(url, trgFile)
 }
+
