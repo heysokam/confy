@@ -45,8 +45,8 @@
   },
   "include": [
     "confy/**/*.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "../eslint.config.mjs"
   ],
   "exclude": [
