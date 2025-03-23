@@ -30,7 +30,10 @@ export namespace tool {
  * */
 export type Bun = {
   name       :string
+  // version    :NamedVersion | string  // TODO:
   cache      :fs.PathLike
+  dir        :fs.PathLike
+  bin        :fs.PathLike
   systemBin  :boolean
 }
 
@@ -41,12 +44,12 @@ export enum NamedVersion { "master", "latest" }
  * */
 export type Zig = {
   name       :string
+  version    :NamedVersion | string
   index      :fs.PathLike
   current    :fs.PathLike
   cache      :fs.PathLike
   dir        :fs.PathLike
   bin        :fs.PathLike
-  version    :NamedVersion | string
   systemBin  :boolean
 }
 
@@ -56,6 +59,9 @@ export type Zig = {
  * */
 export type Nim = {
   name       :string
+  cache      :fs.PathLike
+  dir        :fs.PathLike
+  bin        :fs.PathLike
   bootstrap  :boolean
   systemBin  :boolean
 }
@@ -75,6 +81,7 @@ export namespace defaults {
     nim : ".nim",
     bun : ".bun",
   }
+
   export function prefix () :string { return `${cfg.tool.icon} ${cfg.tool.name}${cfg.tool.separator.name}` }
   export namespace dir {
     export function src    () :string { return path.join(  ".", cfg.defaults.sub.src) }
@@ -90,6 +97,20 @@ export namespace defaults {
     export function current () :string { return path.join(cfg.defaults.dir.cache(), name+".version.json") }
     export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.zig) }
     export function bin     () :string { return path.join(               zig.dir(), name                ) }
+  }
+
+  export namespace nim {
+    export const name = "nim"
+    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.nim) }
+    export function bin     () :string { return path.join(               nim.dir(), name                ) }
+    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
+  }
+
+  export namespace bun {
+    export const name = "bun"
+    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.bun) }
+    export function bin     () :string { return path.join(               bun.dir(), name                ) }
+    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
   }
 
   export function clone () :Config { return {
@@ -113,8 +134,22 @@ export namespace defaults {
       bin       : zig.bin(),
       systemBin : false,
     },
-    nim         : {/* TODO: */} as cfg.Nim,
-    bun         : {/* TODO: */} as cfg.Bun,
+    nim         : {
+      /* TODO: */
+      name      : nim.name,
+      cache     : nim.cache(),
+      dir       : nim.dir(),
+      bin       : nim.bin(),
+      systemBin : false,
+      bootstrap : true,
+    },
+    bun         : {
+      name      : bun.name,
+      cache     : bun.cache(),
+      dir       : bun.dir(),
+      bin       : bun.bin(),
+      systemBin : false,
+    },
   }}
 }
 
