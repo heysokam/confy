@@ -3,21 +3,33 @@
 //:______________________________________________________________________
 // @deps std
 import * as fs from 'fs'
-// @deps confy
-import extract from 'extract-zip'
-import path, { basename, dirname } from 'path'
+import * as path from 'path'
 import { Readable } from 'stream'
+// @deps lib
+import extract from 'extract-zip'
+// @deps confy
+import { fail } from '@confy/log'
 
 export const Path = {
-  basename: basename,
-  dirname: dirname,
+  basename : path.basename,
+  dirname  : path.dirname,
+  ext      : path.extname,
 
   exists : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
   rm     : (path :fs.PathLike) => { fs.rm(path, () => {}) },
-  join   : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString()))
+  join   : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString())),
+
+  /**
+   * @description
+   * Return the basename of the {@param P} path without its extension.
+   * Removes whatever extension would be returned by {@link path.extname}
+   * */
+  name: (P :fs.PathLike) :fs.PathLike=> path.basename(P.toString(), path.extname(P.toString())),
+
 }
 
 export const Dir = {
+  exists : Path.exists,
   cwd    : () :fs.PathLike => { return process.cwd() },
   move   : (src :fs.PathLike, trg :fs.PathLike) => fs.cpSync(src as string, trg as string),
   create : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
@@ -25,9 +37,21 @@ export const Dir = {
 
 export const File = {
   exists   : Path.exists,
-  read     : fs.readFileSync,
   rmv      : Path.rm,
-  unzip    : extract,
+  read     : fs.readFileSync,
+
+  /**
+   * @description
+   * Creates the file at {@param trg} if it doesn't already exist.
+   * Does nothing if it does.
+   * */
+  create: (trg: fs.PathLike) :void=> { Dir.create(Path.dirname(trg.toString())); fs.closeSync(fs.openSync(trg, 'a')) },
+
+  /**
+   * @description
+   * Type Wrapper for {@link extract-zip}/extract
+   * */
+  unzip: async(trg :fs.PathLike, opts :extract.Options) :Promise<void>=> extract(trg.toString(), opts),
 
   /**
    * @description
@@ -60,14 +84,15 @@ export const File = {
   /**
    * @description
    * Downloads the file hosted at {@param url} into the {@param trg} file.
-   * @note Untested on folders. Likely won't work ?
+   * @note Folders will return their index route.
+   * @throws Error on when the remote request for data fails.
    * */
   download : file_download_fromURL,
   dl: {
     /**
      * @description
      * Downloads the file hosted at the url of the {@param R} Response into the {@param trg} file.
-     * @note Untested on folders. Likely won't work ?
+     * @note Folders will return their index route.
      * */
     fromResponse : async(R :Response, trg :fs.PathLike) :Promise<void>=> await fs.promises.writeFile(trg, Readable.fromWeb(R.body ?? {} as any)),
     fromURL      : file_download_fromURL,
@@ -75,6 +100,8 @@ export const File = {
 }
 
 async function file_download_fromURL (url :URL, trg :fs.PathLike) :Promise<void> {
-  await File.dl.fromResponse(await fetch(url), trg)
+  const R = await fetch(url)
+  if (!R.ok) fail("File.download: Tried to download a file, but failed to request its data.", JSON.stringify({url, trg, R}, null,  2))
+  await File.dl.fromResponse(R, trg)
 }
 
