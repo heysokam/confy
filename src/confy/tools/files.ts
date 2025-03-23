@@ -5,8 +5,8 @@
 import * as fs from 'fs'
 // @deps confy
 import extract from 'extract-zip'
-import download from 'download'
 import path, { basename, dirname } from 'path'
+import { Readable } from 'stream'
 
 export const Path = {
   basename: basename,
@@ -57,12 +57,24 @@ export const File = {
     Path.rm(src)
   }, //:: File.move
 
-  //________________________________________________________
-  // FIX: Remove this dependency. Abandonware.
-  //      Fetch or ky are better. https://github.com/sindresorhus/ky
-  //      It also requires got, which secretly depends on electron but doesn't list it as a dependency.
-  //      Figure out downloads and just remove it.
-  download : download,
-  //________________________________________________________
+  /**
+   * @description
+   * Downloads the file hosted at {@param url} into the {@param trg} file.
+   * @note Untested on folders. Likely won't work ?
+   * */
+  download : file_download_fromURL,
+  dl: {
+    /**
+     * @description
+     * Downloads the file hosted at the url of the {@param R} Response into the {@param trg} file.
+     * @note Untested on folders. Likely won't work ?
+     * */
+    fromResponse : async(R :Response, trg :fs.PathLike) :Promise<void>=> await fs.promises.writeFile(trg, Readable.fromWeb(R.body ?? {} as any)),
+    fromURL      : file_download_fromURL,
+  },
+}
+
+async function file_download_fromURL (url :URL, trg :fs.PathLike) :Promise<void> {
+  await File.dl.fromResponse(await fetch(url), trg)
 }
 
