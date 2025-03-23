@@ -20,5 +20,5 @@ const trgFile = trgDir+"minisign.js"
 if (import.meta.main) try { run() } catch { throw new Error("[FATAL]: Failed to build MiniSign from: "+url)}
 async function run() :Promise<void> {
   info("Build: Downloading @mlugg/setup-zig/minisign.js to "+trgFile)
-  await File.download(url, trgDir)
+  await File.download(url, trgFile)
 }
