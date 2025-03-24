@@ -4,11 +4,11 @@
 //! @fileoverview Connector cable to all of the Get modules
 //__________________________________________________________|
 // @deps confy
-import { getBun } from "./bun";
-import { getZig } from "./zig";
+import { BUN as bun } from "./bun"
+import { Zig as zig } from "./zig"
 
 export namespace get {
-  export const Bun = getBun
-  export const Zig = getZig
+  export const Bun = bun
+  export const Zig = zig
 }
 
