@@ -24,6 +24,16 @@ export namespace tool {
   export const cache     = ".cache/confy"
 }
 
+/** @description Prefixes added to logging messages */
+export namespace pfx {
+  export const info  = (C :Config) :string=> C.prefix+""
+  export const warn  = (C :Config) :string=> C.prefix+" ⚠ Warning ⚠"
+  export const error = (C :Config) :string=> C.prefix+" ❌ Error ❌"
+  export const fatal = (C :Config) :string=> C.prefix+" ⛔ Error ⛔"
+  export const debug = (C :Config) :string=> C.prefix+" 🐜 Debug 🐜"
+}
+
+
 /**
  * @description
  * Configuration options for the Zig compiler and its management.
