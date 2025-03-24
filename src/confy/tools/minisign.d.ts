@@ -6,15 +6,17 @@
  * */
 
 export default minisign; export declare namespace minisign {
-  export type Base64 = string
+  export type Base64     = string
+  export type DataBuffer = Buffer<ArrayBufferLike>
+
   export type Key = {
-    id   :Buffer<ArrayBufferLike>
-    key  :Buffer<ArrayBufferLike>
+    id   :minisign.DataBuffer
+    key  :minisign.DataBuffer
   }
   export type Signature = {
-    algorithm  :Buffer<ArrayBufferLike>
-    key_id     :Buffer<ArrayBufferLike>
-    signature  :Buffer<ArrayBufferLike>
+    algorithm  :minisign.DataBuffer
+    key_id     :minisign.DataBuffer
+    signature  :minisign.DataBuffer
   }
 
   /**
@@ -29,7 +31,7 @@ export default minisign; export declare namespace minisign {
    * Parse a buffer containing the contents of a minisign signature file.
    * @throws Throws exceptions on invalid signature files.
    * */
-  export function parseSignature (sig_buf: Buffer<ArrayBufferLike>): minisign.Signature;
+  export function parseSignature (sig_buf :minisign.DataBuffer) :minisign.Signature;
 
 
   /**
@@ -41,7 +43,7 @@ export default minisign; export declare namespace minisign {
   export function verifySignature (
     pubkey       : minisign.Key,
     signature    : minisign.Signature,
-    file_content : Buffer<ArrayBufferLike>,
+    file_content : minisign.DataBuffer,
   ) :boolean;
 }
 
