@@ -13,7 +13,7 @@
 import { Default as log } from "@confy/log"
 import { File } from "@confy/tools"
 
-const url = new URL("https://raw.githubusercontent.com/mlugg/setup-zig/refs/heads/main/minisign.js")
+const url     = new URL("https://raw.githubusercontent.com/mlugg/setup-zig/refs/heads/main/minisign.js")
 const trgDir  = "./src/confy/tools/"
 const trgFile = trgDir+"minisign.js"
 
