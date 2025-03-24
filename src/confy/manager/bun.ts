@@ -2,14 +2,13 @@
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 //:______________________________________________________________________
 // @deps confy
-import { Dir } from '@confy/tools/files'
 import * as shell from '@confy/tools/shell'
 import { get } from '@confy/get'
+import { cfg as confy } from '@confy/cfg'
 
 export const ManagerBun = {
   exists   : get.Bun.exists,
-  path     : () => Dir.cwd()+"/bin/bun",
-  validate : async () => await get.Bun.download(ManagerBun.path()),
-  run      : async (...args:unknown[]) => await shell.run(ManagerBun.path(), ...args),
+  validate : async (cfg :confy.Config)=> await get.Bun.download(cfg, /*force=*/false),
+  run      : async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.bun.bin, ...args),
 }
 

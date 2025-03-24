@@ -8,7 +8,7 @@ import { cfg as confy } from '@confy/cfg'
 
 export const ManagerZig = {
   exists   : get.Zig.exists,
-  validate : async (cfg :confy.Config) => await get.Zig.download(cfg, /*force=*/false),
+  validate : async (cfg :confy.Config)=> await get.Zig.download(cfg, /*force=*/false),
   run      : async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.zig.bin, ...args),
 }
 
