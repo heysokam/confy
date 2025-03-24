@@ -63,8 +63,11 @@
     "@types/bun": "latest",
     "@types/download": "^8.0.5",
     "@types/extract-zip": "^2.0.3",
+    "@types/tar": "^6.1.13",
     "extract-zip": "^2.0.1",
     "octokit": "^4.1.2",
-    "sodium-native": "^4.3.3"
+    "sodium-native": "^4.3.3",
+    "tar": "^7.4.3",
+    "xz-decompress": "^0.2.2"
   }
 }
