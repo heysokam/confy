@@ -6,9 +6,14 @@ import * as shell from '@confy/tools/shell'
 import { get } from '@confy/get'
 import { cfg as confy } from '@confy/cfg'
 
-export const ManagerZig = {
-  exists   : get.Zig.exists,
-  validate : async (cfg :confy.Config)=> await get.Zig.download(cfg, /*force=*/false),
-  run      : async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.zig.bin, ...args),
+export namespace Zig {
+  export const exists   = get.Zig.exists
+  export const validate = async (cfg :confy.Config)=> await get.Zig.download(cfg, /*force=*/false)
+  export const run      = async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.zig.bin, ...args)
 }
 
+export const ManagerZig = {
+  exists   : Zig.exists,
+  validate : Zig.validate,
+  run      : Zig.validate,
+}

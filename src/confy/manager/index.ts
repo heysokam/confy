@@ -4,11 +4,11 @@
 //! @fileoverview Connector cable to all of the Manager modules
 //_______________________________________________________________|
 // @deps confy
-import { ManagerBun } from "./bun"
-import { ManagerZig } from "./zig"
+import { BUN as bun } from "./bun"
+import { Zig as zig} from "./zig"
 
 export namespace Manager {
-  export const Bun = ManagerBun
-  export const Zig = ManagerZig
+  export const Bun = bun
+  export const Zig = zig
 }
 
