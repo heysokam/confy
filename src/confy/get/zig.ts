@@ -232,7 +232,7 @@ export namespace Download {
     if (!File.exists(cfg.zig.current )) { log.verb(cfg, `Zig: Current version index at ${cfg.zig.current} does not exist. Downloading Zig.`); return false }
     if (!File.exists(cfg.zig.cache   )) { log.verb(cfg, `Zig: Cache folder at ${cfg.zig.cache} does not exist. Downloading Zig.`); return false }
     const version = JSON.parse(File.read(cfg.zig.current).toString()) as Zig.Version
-    const tarName = Zig.Tar.filename(version.version ?? Zig.InvalidVersionName+".txt")
+    const tarName = Zig.Tar.filename(version.version ?? Zig.InvalidVersionName)
     const tarPath = Path.join(cfg.zig.cache, tarName)
     if (!File.exists(tarPath)) { log.verb(cfg, `Zig: Tarball at ${tarPath} does not exist. Downloading Zig.`); return false }
     // All conditions for skipping a download matched. Return true
@@ -420,6 +420,7 @@ export namespace Download {
         break; // mirror.ok
       } catch (e) { // Mirror failed. Try next
         const next = mirrors[id+1]
+        // FIX: Something is very off with these messages. The current/next values are mixed up by the try/catch scopes
         if (next) log.verb(cfg, (e as Error).message, `\n -> Downloading from \`${mirror}\` didn't work. Re-trying from: ${next}`)
         else      log.fail(cfg, "Zig: Something went wrong when downloading. No link worked, even the official one. Links tried (in order):", JSON.stringify({ mirrors }, null, 2))
       }
@@ -485,5 +486,6 @@ export async function download (
 export const getZig = {
   exists   : Zig.exists,
   download : Zig.download,
+  extract  : Zig.extract,
 }
 
