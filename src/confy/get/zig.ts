@@ -441,11 +441,6 @@ export async function extract (
   const trgDir  = Path.toAbsolute(cfg.zig.cache)
   const subDir  = Path.join(cfg.zig.cache, Path.basename(trg, Zig.Tar.ext()))  // Subfolder where the files will exist after extract
   const tarFile = Path.join(cfg.zig.cache, Path.basename(trg, ".xz"))
-  log.dbg(cfg, "trgDir :", trgDir)
-  log.dbg(cfg, "subDir :", subDir)
-  log.dbg(cfg, "tarFile:", tarFile)
-
-  // Zig.clean(outDir, cfg, true)
   try { switch (Zig.Tar.ext()) {
     case ".zip"    : await File.unzip(trg, {dir: trgDir.toString() }); break;
     case ".tar.xz" : await File.untarxz(trg, cfg.zig.cache, tarFile, true, {} as any); break;
