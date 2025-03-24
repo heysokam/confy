@@ -8,16 +8,16 @@ import { Readable } from 'stream'
 // @deps lib
 import extract from 'extract-zip'
 // @deps confy
-import { fail } from '@confy/log'
+import { Default as log } from '@confy/log'
+
 
 export const Path = {
-  basename : path.basename,
-  dirname  : path.dirname,
-  ext      : path.extname,
-
-  exists : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
-  rm     : (path :fs.PathLike) => { fs.rm(path, () => {}) },
-  join   : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString())),
+  ext      : (P :fs.PathLike) :fs.PathLike=> path.extname(P.toString()),
+  basename : (P :fs.PathLike) :fs.PathLike=> path.basename(P.toString()),
+  dirname  : (P :fs.PathLike) :fs.PathLike=> path.dirname(P.toString()),
+  exists   : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
+  rm       : (path :fs.PathLike) => { fs.rm(path, () => {}) },
+  join     : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString())),
 
   /**
    * @description
@@ -26,14 +26,33 @@ export const Path = {
    * */
   name: (P :fs.PathLike) :fs.PathLike=> path.basename(P.toString(), path.extname(P.toString())),
 
-}
+  /**
+   * @description
+   * Converts the varargs {@param paths} to an absolute path based on the current working directory.
+   * All arguments will be used as subpaths in the order that they are given.
+   *
+   * @example
+   * ```ts
+   * const result = Path.toAbsolute("thing", "other", "end")
+   * console.log(process.cwd())  //   /root/path
+   * console.log(result)         //   /root/path/thing/other/end
+   * ```
+   *
+   * @note
+   * There will always be an implicit `process.cwd()` at the start.
+   * Use {@link path.resolve} to solve non-cwd paths.
+   * */
+  toAbsolute: (...paths :fs.PathLike[]) :fs.PathLike=> path.resolve(process.cwd(), ...paths.map((p)=>p.toString())),
+} //:: Path
+
 
 export const Dir = {
   exists : Path.exists,
   cwd    : () :fs.PathLike => { return process.cwd() },
   move   : (src :fs.PathLike, trg :fs.PathLike) => fs.cpSync(src as string, trg as string),
   create : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
-}
+} //:: Dir
+
 
 export const File = {
   exists   : Path.exists,
@@ -96,12 +115,12 @@ export const File = {
      * */
     fromResponse : async(R :Response, trg :fs.PathLike) :Promise<void>=> await fs.promises.writeFile(trg, Readable.fromWeb(R.body ?? {} as any)),
     fromURL      : file_download_fromURL,
-  },
-}
+  }, //:: File.dl
+} //:: File
 
 async function file_download_fromURL (url :URL, trg :fs.PathLike) :Promise<void> {
   const R = await fetch(url)
-  if (!R.ok) fail("File.download: Tried to download a file, but failed to request its data.", JSON.stringify({url, trg, R}, null,  2))
+  if (!R.ok) log.fail("File.download: Tried to download a file, but failed to request its data.", JSON.stringify({url, trg, R}, null,  2))
   await File.dl.fromResponse(R, trg)
 }
 
