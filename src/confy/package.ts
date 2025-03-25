@@ -5,33 +5,49 @@
 //_____________________________________________|
 import { Manager } from '@confy/manager'
 import { File } from '@confy/tools/files'
-import { cfg as confy } from './cfg'
-
-const cfg = confy.defaults.clone()
-
+import { cfg } from '@confy/cfg'
+const confy = cfg.defaults.clone()
 export namespace Package {
-  export type Info = any
 
-  export namespace files {
-    export const info = "package.json"
-  }
 
-  export namespace has {
-    export function info() :boolean { return File.exists(Package.files.info) }
-  }
+export namespace files {
+  export const json = "package.json"
+} //:: confy.Package.files
 
-  export namespace get {
-    export async function info() :Promise<Info> {
-      return await JSON.parse(JSON.stringify(File.read(Package.files.info))) as Package.Info
-    }
-  }
-
-  export async function init() :Promise<void> {
-    if (Package.has.info()) return  // FIX: Should check if Package.info has the dependencies instead
-    const pkg = await Package.get.info()
-    if (pkg.name === "confy") return
-    await Manager.Bun.run(cfg, "add", "confy")
-    await Manager.Bun.run(cfg, "install")
+export namespace create {
+  export function info (){}
+  export async function requirements () :Promise<void>{
+    await Manager.Bun.run(confy, "add", cfg.tool.name)
   }
 }
+
+export namespace has {
+  export const info = ():boolean=> File.exists(Package.files.json)
+
+
+  // FIX: Should check if Package.info has the dependencies
+  export function requirements () :boolean {
+    if (!Package.has.info()) return false
+    const json = Package.get.info()
+    return cfg.tool.pkgName in json.dependencies
+  }
+} //:: confy.Package.has
+
+
+export namespace get {
+  export function info() :cfg.Package.Info {
+    return JSON.parse(File.read(Package.files.json).toString()) as cfg.Package.Info
+  }
+} //:: confy.Package.get
+
+
+export async function init () :Promise<void> {
+  if (!Package.has.requirements()) Package.create.info()
+  const pkg = Package.get.info()
+  if (pkg.name === "confy") return
+  await Package.create.requirements()
+  await Manager.Bun.run(confy, "install")
+} //:: confy.Package.init
+
+} //:: confy.Package
 
