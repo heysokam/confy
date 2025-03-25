@@ -48,6 +48,7 @@ export namespace minisign {
   }
 } //:: Zig.minisign
 
+
 //______________________________________
 // @section Mirror Management Tools
 //____________________________
@@ -385,7 +386,7 @@ export namespace Download {
     ) :Promise<fs.PathLike> {
     // Download the Index
     const index = await Zig.Download.index(url, cfg, true) // Always redownload the index internally
-    const vers :string= (cfg.zig.version === confy.NamedVersion.latest)
+    const vers :string= (cfg.zig.version === confy.Version.Named.latest)
       ? Object.keys(index)[1]!
       : cfg.zig.version.toString()
     Zig.Download.current.write(index, vers, cfg, true) // Always rewrite the current index internally

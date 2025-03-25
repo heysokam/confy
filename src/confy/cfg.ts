@@ -17,6 +17,7 @@ export default cfg; export namespace cfg {
  * */
 export namespace tool {
   export const name      = "confy"
+  export const pkgName   = cfg.tool.name  // FIX: @npm/ confy is taken
   export const version   = "0.6.50"
   export const icon      = "ᛝ"
   export const descr     = "Comfortable and Configurable Buildsystem"
@@ -47,20 +48,51 @@ export type Bun = {
   systemBin  :boolean
 }
 
-export enum NamedVersion { "master", "latest" }
+export namespace Version {
+  export enum Named { "latest" }
+  export type Zig = "master" | "0.14.0" | "0.13.0" | "0.12.1" | "0.12.0" | "0.11.0" | "0.10.1" | "0.10.0"
+  export type Nim = "devel" | "version-2-2" | "version-2-0"
+  export type Any = string
+}
+
 /**
  * @description
  * Configuration options for the Zig compiler and its management.
  * */
 export type Zig = {
   name       :string
-  version    :NamedVersion | string
+  version    :Version.Zig | Version.Named | Version.Any
   index      :fs.PathLike
   current    :fs.PathLike
   cache      :fs.PathLike
   dir        :fs.PathLike
   bin        :fs.PathLike
   systemBin  :boolean
+}
+
+export namespace Git {
+  /**
+   * @description
+   * Represents the configuration data of a git repository
+   *
+   * @example
+   * host       : https://github.com
+   * owner      : user
+   * repo       : project
+   * branch     : branch
+   * githubURL  : https://github.com/user/project/tree/branch
+   *
+   * @warning
+   * Only tested with github.
+   * Support for generic git hosts is desirable, but has not been implemented.
+   * Please open an issue/PR to discuss about it.
+   * */
+  export type Repository = {
+    host    :URL
+    owner   :fs.PathLike
+    repo    :fs.PathLike
+    branch  :fs.PathLike | null
+  }
 }
 
 /**
@@ -72,6 +104,8 @@ export type Nim = {
   cache      :fs.PathLike
   dir        :fs.PathLike
   bin        :fs.PathLike
+  version    :Version.Nim | Version.Named | Version.Any
+  git        :cfg.Git.Repository  // @warning Setting a branch will override the version when bootstrapping
   bootstrap  :boolean
   systemBin  :boolean
 }
@@ -99,22 +133,6 @@ export namespace defaults {
     export function lib    () :string { return path.join(bin(), cfg.defaults.sub.lib) }
     export function cache  () :string { return path.join(bin(), cfg.tool.cache      ) }
   }
-  export namespace zig {
-    export const name    = "zig"
-    export const version = NamedVersion.latest
-    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
-    export function index   () :string { return path.join(cfg.defaults.dir.cache(), name+".index.json"  ) }
-    export function current () :string { return path.join(cfg.defaults.dir.cache(), name+".version.json") }
-    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.zig) }
-    export function bin     () :string { return path.join(               zig.dir(), name                ) }
-  }
-
-  export namespace nim {
-    export const name = "nim"
-    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.nim) }
-    export function bin     () :string { return path.join(               nim.dir(), name                ) }
-    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
-  }
 
   export namespace bun {
     export const name = "bun"
@@ -123,16 +141,67 @@ export namespace defaults {
     export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
   }
 
+  export namespace zig {
+    export const name    = "zig"
+    export const version = Version.Named.latest
+    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
+    export function index   () :string { return path.join(cfg.defaults.dir.cache(), name+".index.json"  ) }
+    export function current () :string { return path.join(cfg.defaults.dir.cache(), name+".version.json") }
+    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.zig) }
+    export function bin     () :string { return path.join(               zig.dir(), name                ) }
+  }
+
+  export namespace nim {
+    export const name    = "nim"
+    export const version = Version.Named.latest
+    export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.nim) }
+    export function bin     () :string { return path.join(               nim.dir(), name                ) }
+    export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
+    export namespace repo {
+      export function official () :cfg.Git.Repository { return {
+        host   : new URL("https://github.com"),
+        owner  : "nim-lang",
+        repo   : "Nim",
+        branch : null
+      }}
+    }
+  }
+
+  export namespace pkg {
+    export function info () :cfg.Package.Info { return {
+      // Required Preset
+      version      : "0.0.0",
+      dependencies : { [cfg.tool.pkgName]: "^"+cfg.tool.version },
+      // Required Unknown
+      // We consider these required. The schema doesn't. Shouldn't be null. We cast for safety
+      name         : null as unknown as string,
+      description  : null as unknown as string,
+      license      : null as unknown as string,
+      homepage     : null as unknown as string,
+      // Optional fields
+      // Non-configurable fields
+      $schema      : "https://json.schemastore.org/package.json",
+    }}
+  }
+
   export function clone () :Config { return {
     prefix      : cfg.defaults.prefix(),
     verbose     : true,
     quiet       : false,
     force       : false,
+    pkg         : cfg.defaults.pkg.info(),
     dir         : {
       src       : cfg.defaults.dir.src(),
       lib       : cfg.defaults.dir.lib(),
       bin       : cfg.defaults.dir.bin(),
       cache     : cfg.defaults.dir.cache(),
+    },
+    bun         : {
+      name      : bun.name,
+      cache     : bun.cache(),
+      dir       : bun.dir(),
+      bin       : bun.bin(),
+      systemBin : false,
     },
     zig         : {
       name      : zig.name,
@@ -145,30 +214,36 @@ export namespace defaults {
       systemBin : false,
     },
     nim         : {
-      /* TODO: */
       name      : nim.name,
       cache     : nim.cache(),
       dir       : nim.dir(),
       bin       : nim.bin(),
+      git       : nim.repo.official(),
+      version   : nim.version,
       systemBin : false,
       bootstrap : true,
     },
-    bun         : {
-      name      : bun.name,
-      cache     : bun.cache(),
-      dir       : bun.dir(),
-      bin       : bun.bin(),
-      systemBin : false,
-    },
   }}
 }
-
+export namespace Package {
+  export type Dependencies = {[key :string] :string} & {[cfg.tool.pkgName]: string}
+  export type Info = {
+    $schema       :"https://json.schemastore.org/package.json",
+    name          :string
+    description   :string
+    version       :string
+    license       :string
+    homepage      :string
+    dependencies  :Package.Dependencies // cfg.tool.name:cfg.tool.version  must exist, or else it will be added
+  } & {[key :string]: any}
+}
 
 export type Config = {
   prefix   :string
   verbose  :boolean
   quiet    :boolean
   force    :boolean
+  pkg      :cfg.Package.Info
   dir      :cfg.Dirs
   zig      :cfg.Zig
   nim      :cfg.Nim

@@ -14,7 +14,7 @@ import { cfg } from '../confy/cfg'
 const icon         = (!cfg.tool.icon ) ? cfg.tool.icon  : `${cfg.tool.icon} `
 const description  = (!cfg.tool.descr) ? cfg.tool.descr : ` ${cfg.tool.separator.descr} ${cfg.tool.descr}`
 const result       = structuredClone(pkg)
-result.name        = cfg.tool.name
+result.name        = cfg.tool.pkgName
 result.version     = cfg.tool.version
 result.description = `${icon}${cfg.tool.name}${description}`
 File.write("./package.json", JSON.stringify(result, null, 2))
