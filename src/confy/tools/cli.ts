@@ -1,6 +1,7 @@
 //:______________________________________________________________________
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 //:______________________________________________________________________
+import * as node from 'process'
 export default Cli; export namespace Cli {
 
 
@@ -11,7 +12,7 @@ export default Cli; export namespace Cli {
  * @see https://bun.sh/guides/process/argv for a guide on how to process the result.
  * @returns The contents of `Bun.argv`.
  * */
-export function raw () :string[] { return Bun.argv }
+export function raw () :string[] { return node.argv }
 
 
 /**
