@@ -1,6 +1,6 @@
 ## get.Lang
-- [ ] Bun
-- [ ] Zig
+- [x] Bun
+- [x] Zig
 - [ ] Nim
 - [ ] Minim
 ## All
@@ -27,6 +27,7 @@
   - [ ] Long option arguments (variables) support   `key=val`
   - [ ] Arguments (non-files always interpreted as keywords)
 - [ ] Command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
+- [ ] Linking with `mold` on linux
 ### Dependencies
 - [ ] Libs management as git.Submodules ()
 - [ ] Automatic cloning to `libDir/name`
