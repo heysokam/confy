@@ -66,6 +66,8 @@ export const File = {
   exists   : Path.exists,
   rmv      : Path.rm,
   read     : fs.readFileSync,
+  cp       : fs.copyFileSync,
+  cpy      : fs.copyFileSync,
 
   /**
    * @description
