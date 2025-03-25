@@ -19,7 +19,7 @@ export const Path = {
   basename : (P :fs.PathLike, ext ?:fs.PathLike) :fs.PathLike=> path.basename(P.toString(), (ext) ? ext.toString() : undefined),
   dirname  : (P :fs.PathLike) :fs.PathLike=> path.dirname(P.toString()),
   exists   : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
-  rm       : (path :fs.PathLike) => fs.rm(path, () => {}),
+  rm       : (path :fs.PathLike) => (Path.exists(path)) ? fs.rm(path, () => {}) : {},
   join     : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString())),
 
   /**
@@ -52,7 +52,7 @@ export const Path = {
 
 export const Dir = {
   exists : Path.exists,
-  rmv    : (path :fs.PathLike) => fs.rmdir(path, () => {}),
+  rmv    : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdir(path, () => {}) : {},
   cwd    : () :fs.PathLike => { return process.cwd() },
   create : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
   move   : (src :fs.PathLike, trg :fs.PathLike, opts ?:fs.CopySyncOptions) => {
