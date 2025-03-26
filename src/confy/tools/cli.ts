@@ -7,10 +7,8 @@ export default Cli; export namespace Cli {
 
 /**
  * @description
- * Returns the raw Cli.Arguments completely un-processed.
- * Alias to `Bun.argv` for naming consistency.
- * @see https://bun.sh/guides/process/argv for a guide on how to process the result.
- * @returns The contents of `Bun.argv`.
+ * Alias to `node.argv` for naming consistency.
+ * @returns The un-processed Cli.Arguments list
  * */
 export function raw () :string[] { return node.argv }
 
