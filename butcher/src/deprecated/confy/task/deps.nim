@@ -18,21 +18,14 @@ import ../tool/logger
 #_________________________________________________
 # @section Nim and Dependency Management
 #_____________________________
-# proc nim (opts :varargs[string,`$`]) :void=
-#   let cmd = nimGetRealBin().string&" "&opts.join(" ")
-#   dbg "Running nim with command:\n  ",cmd
-#   sh cmd, cfg.verbose
-# proc nimc (opts :varargs[string,`$`]) :void=
-#   if not fileExists(cfg.binDir/".gitignore"): writeFile(cfg.binDir/".gitignore", "*\n!.gitignore")
-#   let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
-#   nim &"c --outDir:{cfg.binDir} {paths} "&opts.join(" ")
-proc nimInstall *(vers :string= cfg.nim.vers) :void=
-  if cfg.nimDir.dirExists: return
-  info "Installing nim "&vers
-  git "clone", cfg.nim.url, cfg.nimDir, "-b", vers, "--depth 1"
-  withDir cfg.nimDir: sh "./build_all.sh"
-  info "Done installing nim."
-
+proc nim (opts :varargs[string,`$`]) :void=
+  let cmd = nimGetRealBin().string&" "&opts.join(" ")
+  dbg "Running nim with command:\n  ",cmd
+  sh cmd, cfg.verbose
+proc nimc (opts :varargs[string,`$`]) :void=
+  if not fileExists(cfg.binDir/".gitignore"): writeFile(cfg.binDir/".gitignore", "*\n!.gitignore")
+  let paths :string= if deps.len > 0: "--path:" & deps.toSeq.join(" --path:") else: ""
+  nim &"c --outDir:{cfg.binDir} {paths} "&opts.join(" ")
 
 #_________________________________________________
 # @section Dependency Management
