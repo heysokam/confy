@@ -153,9 +153,10 @@ export namespace defaults {
 
   export namespace nim {
     export const name    = "nim"
+    export const binDir  = "bin" // Subfolder where the nim binaries are compiled into
     export const version = Version.Named.latest
     export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.nim) }
-    export function bin     () :string { return path.join(               nim.dir(), name                ) }
+    export function bin     () :string { return path.join(               nim.dir(), binDir, name        ) }
     export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
     export namespace repo {
       export function official () :cfg.Git.Repository { return {
