@@ -46,7 +46,7 @@ export async function download (
     force : boolean      = false
   ) :Promise<void> {
   // Skip repeating downloads
-  if (getBun.exists(cfg) && !force) { log.verb(cfg, "Bun: Already exists. Omitting download."); return }
+  if (BUN.exists(cfg) && !force) return log.verb(cfg, "Bun: Already exists. Omitting download.")
   if (force) log.verb(cfg, "Bun: Force downloading into folder: ", cfg.bun.dir)
   else       log.verb(cfg, "Bun: Does not exist. Downloading into folder: ", cfg.bun.dir)
 

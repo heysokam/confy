@@ -473,7 +473,7 @@ export async function download (
     cfg   : confy.Config = confy.defaults.clone(),
     force : boolean      = false,
   ) :Promise<void> {
-  if (Zig.exists(cfg)) { log.verb(cfg, "Zig: Already exists. Omitting download."); return }
+  if (Zig.exists(cfg) && !force) return log.verb(cfg, "Zig: Already exists. Omitting download.");
   // Skip repeating downloads
   if (force) log.verb(cfg, "Zig: Force downloading into folder: ", cfg.zig.dir)
   else       log.verb(cfg, "Zig: Does not exist. Downloading into folder: ", cfg.zig.dir)
