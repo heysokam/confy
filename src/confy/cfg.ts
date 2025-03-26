@@ -97,6 +97,16 @@ export namespace Git {
 
 /**
  * @description
+ * Configuration options for the Nimble Package Manager and its management.
+ * */
+export type Nimble = {
+  dir        :fs.PathLike
+  bin        :fs.PathLike
+  systemBin  :boolean
+}
+
+/**
+ * @description
  * Configuration options for the Nim compiler and its management.
  * */
 export type Nim = {
@@ -108,6 +118,7 @@ export type Nim = {
   git        :cfg.Git.Repository  // @warning Setting a branch will override the version when bootstrapping
   bootstrap  :boolean
   systemBin  :boolean
+  nimble     :cfg.Nimble
 }
 
 export type Dirs = {
@@ -118,12 +129,13 @@ export type Dirs = {
 }
 export namespace defaults {
   export const sub = {
-    src : "src",
-    bin : "bin",
-    lib : ".lib",
-    zig : ".zig",
-    nim : ".nim",
-    bun : ".bun",
+    src    : "src",
+    bin    : "bin",
+    lib    : ".lib",
+    bun    : ".bun",
+    zig    : ".zig",
+    nim    : ".nim",
+    nimble : ".nimble",
   }
 
   export function prefix () :string { return `${cfg.tool.icon} ${cfg.tool.name}${cfg.tool.separator.name}` }
@@ -166,6 +178,10 @@ export namespace defaults {
         branch : null
       }}
     }
+    export namespace nimble {
+      export function dir () :string { return path.join(cfg.defaults.dir.bin(), cfg.defaults.sub.nimble       ) }
+      export function bin () :string { return path.join(cfg.defaults.dir.bin(), cfg.defaults.sub.nimble, name ) }
+    }
   }
 
   export namespace pkg {
@@ -186,43 +202,48 @@ export namespace defaults {
   }
 
   export function clone () :Config { return {
-    prefix      : cfg.defaults.prefix(),
-    verbose     : true,
-    quiet       : false,
-    force       : false,
-    pkg         : cfg.defaults.pkg.info(),
-    dir         : {
-      src       : cfg.defaults.dir.src(),
-      lib       : cfg.defaults.dir.lib(),
-      bin       : cfg.defaults.dir.bin(),
-      cache     : cfg.defaults.dir.cache(),
+    prefix        : cfg.defaults.prefix(),
+    verbose       : true,
+    quiet         : false,
+    force         : false,
+    pkg           : cfg.defaults.pkg.info(),
+    dir           : {
+      src         : cfg.defaults.dir.src(),
+      lib         : cfg.defaults.dir.lib(),
+      bin         : cfg.defaults.dir.bin(),
+      cache       : cfg.defaults.dir.cache(),
     },
-    bun         : {
-      name      : bun.name,
-      cache     : bun.cache(),
-      dir       : bun.dir(),
-      bin       : bun.bin(),
-      systemBin : false,
+    bun           : {
+      name        : bun.name,
+      cache       : bun.cache(),
+      dir         : bun.dir(),
+      bin         : bun.bin(),
+      systemBin   : false,
     },
-    zig         : {
-      name      : zig.name,
-      version   : zig.version,
-      index     : zig.index(),
-      current   : zig.current(),
-      cache     : zig.cache(),
-      dir       : zig.dir(),
-      bin       : zig.bin(),
-      systemBin : false,
+    zig           : {
+      name        : zig.name,
+      version     : zig.version,
+      index       : zig.index(),
+      current     : zig.current(),
+      cache       : zig.cache(),
+      dir         : zig.dir(),
+      bin         : zig.bin(),
+      systemBin   : false,
     },
-    nim         : {
-      name      : nim.name,
-      cache     : nim.cache(),
-      dir       : nim.dir(),
-      bin       : nim.bin(),
-      git       : nim.repo.official(),
-      version   : nim.version,
-      systemBin : false,
-      bootstrap : true,
+    nim           : {
+      name        : nim.name,
+      cache       : nim.cache(),
+      dir         : nim.dir(),
+      bin         : nim.bin(),
+      git         : nim.repo.official(),
+      version     : nim.version,
+      systemBin   : false,
+      bootstrap   : true,
+      nimble      : {
+        dir       : nim.nimble.dir(),
+        bin       : nim.nimble.bin(),
+        systemBin : false,
+      }
     },
   }}
 }
