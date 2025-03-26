@@ -1,7 +1,7 @@
 ## get.Lang
 - [x] Bun
 - [x] Zig
-- [ ] Nim
+- [x] Nim
 - [ ] Minim
 ## All
 - [ ] Autocreate subdirs to compile into
