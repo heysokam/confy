@@ -215,6 +215,15 @@ export const exists = (
   cfg: confy.Config = confy.defaults.clone()
 ) :boolean=> /* FIX: */ File.exists((cfg.nim.systemBin) ? cfg.nim.name : cfg.nim.bin)
 
+export namespace Download {
+  export async function nim (
+      cfg   : confy.Config = confy.defaults.clone(),
+      force : boolean      = false,
+    ) :Promise<void> {force;
+    // nimble --nimbleDir:/yourPath install nim
+    log.fail(cfg, "Nim: Downloading Binaries without bootstrapping is not implemented yet.")
+  }
+}
 
 //______________________________________
 // @section get.Nim: Entry Points
@@ -230,6 +239,13 @@ export async function bootstrap (
   await Nim.Bootstrap.build(cfg, force)
 } //:: Nim.bootstrap
 
+export async function release (
+    cfg   : confy.Config = confy.defaults.clone(),
+    force : boolean      = false,
+  ) :Promise<void> {
+  Nim.Download.nim(cfg, force)
+} //:: Nim.release
+
 export async function download (
     cfg   : confy.Config = confy.defaults.clone(),
     force : boolean      = false,
@@ -237,7 +253,7 @@ export async function download (
   if (Nim.exists(cfg) && !force) return log.verb(cfg, "Nim: Already exists. Omitting download.")
   log.verb(cfg, "Nim: Starting download into: ", cfg.nim.dir)
   if (cfg.nim.bootstrap) await Nim.bootstrap(cfg, force)
-  else                   log.fail(cfg, "Nim: Downloading Binaries without bootstrapping is not implemented yet.")
+  else                   await Nim.release(cfg, force)
   log.verb(cfg, "Nim: Copying data from: ", cfg.nim.cache, " into: ", cfg.nim.dir)
   Dir.move(cfg.nim.cache, cfg.nim.dir)
   log.verb(cfg, "Nim: Done downloading.")
@@ -252,5 +268,6 @@ export const getNim = {
   exists    : Nim.exists,
   download  : Nim.download,
   bootstrap : Nim.bootstrap,
+  release   : Nim.release,
 }
 

@@ -1,7 +1,9 @@
 ## get.Lang
 - [x] Bun
 - [x] Zig
-- [x] Nim
+- [ ] Nim
+  - [x] Bootstrap
+  - [ ] Nimble
 - [ ] Minim
 ## All
 - [ ] Autocreate subdirs to compile into
@@ -27,7 +29,7 @@
   - [ ] Long option arguments (variables) support   `key=val`
   - [ ] Arguments (non-files always interpreted as keywords)
 - [ ] Command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
-- [ ] Linking with `mold` on linux
+- [ ] Linking with `mold` on linux : https://github.com/rui314/mold/releases
 ### Dependencies
 - [ ] Libs management as git.Submodules ()
 - [ ] Automatic cloning to `libDir/name`
