@@ -66,6 +66,7 @@
     "@types/tar": "^6.1.13",
     "extract-zip": "^2.0.1",
     "octokit": "^4.1.2",
+    "simple-git": "^3.27.0",
     "sodium-native": "^4.3.3",
     "tar": "^7.4.3",
     "xz-decompress": "^0.2.2"
