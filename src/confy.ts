@@ -7,7 +7,7 @@ import * as fs from 'fs'
 import * as log from '@confy/log'
 import { Manager } from '@confy/manager'
 import { Package } from '@confy/package'
-import { Cli, File } from '@confy/tools'
+import { Cli, File, Dir, Path } from '@confy/tools'
 import { cfg as confy } from '@confy/cfg'
 
 namespace Commands {
@@ -67,10 +67,35 @@ namespace Commands {
       export const force = (cli :Cli) :boolean=> cli.opts.short.has("f")
     }
 
+    namespace remap {
+      export function bun (cfg :confy.Config) :void {
+        cfg.dir.cache = Path.join(Dir.current(), confy.tool.cache)
+        cfg.bun.cache = Path.join(cfg.dir.cache, confy.defaults.sub.bun)
+        cfg.bun.dir   = Path.join(Dir.current(), confy.defaults.sub.bun)
+        cfg.bun.bin   = Path.join(cfg.bun.dir, confy.defaults.bun.name)
+      }
+      export function zig (cfg :confy.Config) :void {
+        cfg.dir.cache   = Path.join(Dir.current(), confy.tool.cache)
+        cfg.zig.cache   = Path.join(cfg.dir.cache, confy.defaults.sub.zig)
+        cfg.zig.dir     = Path.join(Dir.current(), confy.defaults.sub.zig)
+        cfg.zig.bin     = Path.join(cfg.zig.dir, confy.defaults.zig.name)
+        cfg.zig.index   = Path.join(cfg.zig.cache, confy.defaults.zig.file_index)
+        cfg.zig.current = Path.join(cfg.zig.cache, confy.defaults.zig.file_current)
+      }
+      export function nim (cfg :confy.Config) :void {
+        remap.zig(cfg)
+        cfg.dir.cache = Path.join(Dir.current(), confy.tool.cache)
+        cfg.nim.cache = Path.join(cfg.dir.cache, confy.defaults.sub.nim)
+        cfg.nim.dir   = Path.join(Dir.current(), confy.defaults.sub.nim)
+        cfg.nim.bin   = Path.join(cfg.nim.dir, confy.defaults.nim.name)
+      }
+    }
+
     export async function bun (
         cfg : confy.Config,
         cli : Cli
       ) :Promise<void> {
+      if (!Dir.exists(cfg.dir.bin)) remap.bun(cfg)
       const force = Commands.Get.opts.force(cli)
       await Manager.Bun.validate(cfg, force)
     }
@@ -79,6 +104,7 @@ namespace Commands {
         cfg : confy.Config,
         cli : Cli
       ) :Promise<void> {
+      if (!Dir.exists(cfg.dir.bin)) remap.zig(cfg)
       const force = Commands.Get.opts.force(cli)
       await Manager.Zig.validate(cfg, force)
     }
@@ -87,6 +113,7 @@ namespace Commands {
         cfg : confy.Config,
         cli : Cli
       ) :Promise<void> {
+      if (!Dir.exists(cfg.dir.bin)) remap.nim(cfg)
       const force = Commands.Get.opts.force(cli)
       await Manager.Zig.validate(cfg, force)
       await Manager.Nim.validate(cfg, force)
@@ -99,6 +126,7 @@ namespace Commands {
     ) :Promise<void> {
     if (cli.args[0] !== "get") log.fail(cfg, "Command: Tried to call `confy get` incorrectly. The get argument must be first.", JSON.stringify(cli))  // External unsafe usage sanity
     switch (cli.args[1]) {
+      case "bun" : return Commands.Get.bun(cfg, cli)
       case "zig" : return Commands.Get.zig(cfg, cli)
       case "nim" : return Commands.Get.nim(cfg, cli)
       default    : log.fail(cfg, `Command: \`confy get ${cli.args[1]}\` is not a known get command.`, cfg.verbose ? JSON.stringify(cli) : "")  // External unsafe usage sanity
@@ -158,14 +186,15 @@ async function run () :Promise<void> {
   // Command cases
   switch (cli.args[0]) {
     // Default Cases
-    case "build" : await Commands.build(cfg, cli) ; break;
-    case "run"   : await Commands.run(cfg, cli)   ; break;
-    case "get"   : await Commands.get(cfg, cli)   ; break;
+    case undefined : await Commands.build(cfg, cli) ; break;
+    case "build"   : await Commands.build(cfg, cli) ; break;
+    case "run"     : await Commands.run(cfg, cli)   ; break;
+    case "get"     : await Commands.get(cfg, cli)   ; break;
     // Passthrough commands
-    case "bun"   : await Commands.bun(cfg)        ; break;
-    case "zig"   : await Commands.zig(cfg)        ; break;
-    case "nim"   : await Commands.nim(cfg)        ; break;
-    default      : await Commands.anything(cfg)
+    case "bun"     : await Commands.bun(cfg)        ; break;
+    case "zig"     : await Commands.zig(cfg)        ; break;
+    case "nim"     : await Commands.nim(cfg)        ; break;
+    default        : await Commands.anything(cfg)
   }
 }
 
@@ -173,7 +202,5 @@ async function run () :Promise<void> {
 // Special commands
 //  init
 //  init config
-//  get [language]
-//  nim
 //  tag
 

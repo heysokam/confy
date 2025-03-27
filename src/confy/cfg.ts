@@ -22,7 +22,7 @@ export namespace tool {
   export const icon      = "ᛝ"
   export const descr     = "Comfortable and Configurable Buildsystem"
   export const separator = { name: ":", descr: "|" }
-  export const cache     = ".cache/confy"
+  export const cache     = ".cache"
 }
 
 /** @description Prefixes added to logging messages */
@@ -140,10 +140,10 @@ export namespace defaults {
 
   export function prefix () :string { return `${cfg.tool.icon} ${cfg.tool.name}${cfg.tool.separator.name}` }
   export namespace dir {
-    export function src    () :string { return path.join(  ".", cfg.defaults.sub.src) }
-    export function bin    () :string { return path.join(  ".", cfg.defaults.sub.bin) }
-    export function lib    () :string { return path.join(bin(), cfg.defaults.sub.lib) }
-    export function cache  () :string { return path.join(bin(), cfg.tool.cache      ) }
+    export function src    () :string { return path.join(  ".", cfg.defaults.sub.src          ) }
+    export function bin    () :string { return path.join(  ".", cfg.defaults.sub.bin          ) }
+    export function lib    () :string { return path.join(bin(), cfg.defaults.sub.lib          ) }
+    export function cache  () :string { return path.join(bin(), cfg.tool.cache, cfg.tool.name ) }
   }
 
   export namespace bun {
@@ -154,11 +154,13 @@ export namespace defaults {
   }
 
   export namespace zig {
-    export const name    = "zig"
-    export const version = Version.Named.latest
+    export const name         = "zig"
+    export const version      = Version.Named.latest
+    export const file_index   = name+".index.json"
+    export const file_current = name+".version.json"
     export function cache   () :string { return path.join(cfg.defaults.dir.cache(), name                ) }
-    export function index   () :string { return path.join(cfg.defaults.dir.cache(), name+".index.json"  ) }
-    export function current () :string { return path.join(cfg.defaults.dir.cache(), name+".version.json") }
+    export function index   () :string { return path.join(cfg.defaults.dir.cache(), file_index          ) }
+    export function current () :string { return path.join(cfg.defaults.dir.cache(), file_current        ) }
     export function dir     () :string { return path.join(  cfg.defaults.dir.bin(), cfg.defaults.sub.zig) }
     export function bin     () :string { return path.join(               zig.dir(), name                ) }
   }
