@@ -218,7 +218,8 @@ export namespace Download {
 
 
   /**
-   * @description Returns whether or not we should skip downloading Zig, based on the given {@param cfg}
+   * @description
+   * Returns whether or not we should skip downloading Zig, based on the given {@param cfg}
    * Removing index.json, current.json, the cache folder or the .tar file for the current host will all trigger a redownload
    * Will never skip when {@param force} is true
    * */
