@@ -32,8 +32,8 @@ namespace Commands {
       cli : Cli
     ) :Promise<void> {
     if (!File.exists(build_ts)) return Commands.anything(cfg)
-    await Manager.Bun.run(cfg, "run", build_ts, ...Cli.raw().slice(3))
     await Commands.Build.requirements(cfg, cli)
+    await Manager.Bun.run(cfg, "run", build_ts, ...Cli.raw().slice(3))
   }
 
 
