@@ -3,6 +3,7 @@
 //:______________________________________________________________________
 import * as fs from 'fs'
 import path from 'path';
+import * as confy from '@confy/tools'
 export default cfg; export namespace cfg {
 
 /**
@@ -18,9 +19,9 @@ export default cfg; export namespace cfg {
 export namespace tool {
   export const name      = "confy"
   export const pkgName   = cfg.tool.name  // FIX: @npm/ confy is taken
-  export const version   = "0.6.50"
+  export const version   = new confy.Version(0,6,50)
   export const icon      = "ᛝ"
-  export const descr     = "Comfortable and Configurable Buildsystem"
+  export const descr     = "Comfortable and Configurable Buildsystem for C, C++, Zig and Nim"
   export const separator = { name: ":", descr: "|" }
   export const cache     = ".cache"
 }
@@ -37,7 +38,7 @@ export namespace pfx {
 
 /**
  * @description
- * Configuration options for the Zig compiler and its management.
+ * Configuration options for Bun and its management.
  * */
 export type Bun = {
   name       :string
@@ -189,17 +190,18 @@ export namespace defaults {
   export namespace pkg {
     export function info () :cfg.Package.Info { return {
       // Required Preset
-      version      : "0.0.0",
-      dependencies : { [cfg.tool.pkgName]: "^"+cfg.tool.version },
+      version         : "0.0.0",
+      dependencies    : { [cfg.tool.pkgName]: "^"+cfg.tool.version.toString() },
+      devDependencies : { [cfg.tool.pkgName]: "^"+cfg.tool.version.toString() },
       // Required Unknown
       // We consider these required. The schema doesn't. Shouldn't be null. We cast for safety
-      name         : null as unknown as string,
-      description  : null as unknown as string,
-      license      : null as unknown as string,
-      homepage     : null as unknown as string,
+      name            : null as unknown as string,
+      description     : null as unknown as string,
+      license         : null as unknown as string,
+      homepage        : null as unknown as string,
       // Optional fields
       // Non-configurable fields
-      $schema      : "https://json.schemastore.org/package.json",
+      $schema         : "https://json.schemastore.org/package.json",
     }}
   }
 
@@ -252,13 +254,15 @@ export namespace defaults {
 export namespace Package {
   export type Dependencies = {[key :string] :string} & {[cfg.tool.pkgName]: string}
   export type Info = {
-    $schema       :"https://json.schemastore.org/package.json",
-    name          :string
-    description   :string
-    version       :string
-    license       :string
-    homepage      :string
-    dependencies  :Package.Dependencies // cfg.tool.name:cfg.tool.version  must exist, or else it will be added
+    $schema         :"https://json.schemastore.org/package.json",
+    name            :string
+    description     :string
+    version         :string | confy.Version
+    license         :string
+    homepage        :string
+    // cfg.tool.name:cfg.tool.version  must exist, or else it will be added to devDependencies
+    dependencies    :Package.Dependencies
+    devDependencies :Package.Dependencies
   } & {[key :string]: any}
 }
 
