@@ -49,13 +49,15 @@ export const Path = {
   toAbsolute: (...paths :fs.PathLike[]) :fs.PathLike=> path.resolve(process.cwd(), ...paths.map((p)=>p.toString())),
 } //:: Path
 
+const dir_get_current = ():fs.PathLike=> process.cwd()
 
 export const Dir = {
-  exists : Path.exists,
-  rmv    : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdir(path, () => {}) : {},
-  cwd    : () :fs.PathLike => { return process.cwd() },
-  create : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
-  move   : (src :fs.PathLike, trg :fs.PathLike, opts ?:fs.CopySyncOptions) => {
+  exists  : Path.exists,
+  cwd     : dir_get_current,
+  current : dir_get_current,
+  rmv     : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdir(path, () => {}) : {},
+  create  : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
+  move    : (src :fs.PathLike, trg :fs.PathLike, opts ?:fs.CopySyncOptions) => {
     fs.cpSync(src.toString(), trg.toString(), {...opts, recursive: true})
     Dir.rmv(src)
   },
