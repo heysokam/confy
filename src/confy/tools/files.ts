@@ -18,8 +18,7 @@ export const Path = {
   ext      : (P :fs.PathLike) :string=> path.extname(P.toString()),
   basename : (P :fs.PathLike, ext ?:fs.PathLike) :fs.PathLike=> path.basename(P.toString(), (ext) ? ext.toString() : undefined),
   dirname  : (P :fs.PathLike) :fs.PathLike=> path.dirname(P.toString()),
-  exists   : (path :fs.PathLike) :boolean => { return fs.existsSync(path) },
-  rm       : (path :fs.PathLike) => (Path.exists(path)) ? fs.rm(path, () => {}) : {},
+  exists   : (P :fs.PathLike) :boolean => { return fs.existsSync(P) },
   join     : (...paths:fs.PathLike[]) :fs.PathLike=> path.join(...paths.flatMap(a => a.toString())),
 
   /**
@@ -55,7 +54,7 @@ export const Dir = {
   exists  : Path.exists,
   cwd     : dir_get_current,
   current : dir_get_current,
-  rmv     : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdir(path, () => {}) : {},
+  rmv     : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdirSync(path) : {},
   create  : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
   move    : (src :fs.PathLike, trg :fs.PathLike, opts ?:fs.CopySyncOptions) => {
     fs.cpSync(src.toString(), trg.toString(), {...opts, recursive: true})
@@ -66,10 +65,16 @@ export const Dir = {
 
 export const File = {
   exists   : Path.exists,
-  rmv      : Path.rm,
   read     : fs.readFileSync,
   cp       : fs.copyFileSync,
   cpy      : fs.copyFileSync,
+
+  /**
+   * @description
+   * Removes the file at {@param trg} if it exists.
+   * Does nothing error if it doesn't.
+   * */
+  rmv : (P :fs.PathLike, opts ?:fs.RmOptions) => (Path.exists(P)) ? fs.rmSync(P, opts) : {},
 
   /**
    * @description
