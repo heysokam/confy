@@ -31,6 +31,12 @@
   - [ ] Short option arguments
   - [ ] Long option arguments (variables) support   `key=val`
   - [ ] Arguments (non-files always interpreted as keywords)
+- [ ] Figure out: Support for JS & NPM Package
+      ```json
+      "files": [ "public" ],
+      "main": "public/index.js",
+      "types": "public/index.d.ts",
+      ```
 - [ ] Command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] Linking with `mold` on linux : https://github.com/rui314/mold/releases
 ### Dependencies
