@@ -34,14 +34,6 @@
     "plugins": [],
     "outDir": "public",
     "rootDir": "src",
-    "paths": {
-      "@confy": [
-        "./src/confy/index.ts"
-      ],
-      "@confy/*": [
-        "./src/confy/*"
-      ]
-    }
   },
   "include": [
     "confy/**/*.ts",

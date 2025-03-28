@@ -5,11 +5,11 @@
 import * as git from 'simple-git'
 import * as std_os from 'process'
 // @deps confy
-import * as log from '@confy/log'
-import { cfg as confy } from '@confy/cfg'
-import { Dir, File, Path } from '@confy/tools'
-import * as shell from '@confy/tools/shell'
-import { Manager } from '@confy/manager'
+import * as log from '../log'
+import { cfg as confy } from '../cfg'
+import { Dir, File, Path } from '../tools'
+import * as shell from '../tools/shell'
+import { Manager } from '../manager'
 // import { Manager } from '@confy/manager'
 export namespace Nim {
 

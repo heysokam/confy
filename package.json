@@ -30,9 +30,8 @@
   "files": [
     "public"
   ],
-  "main": "public/index.js",
-  "types": "public/index.d.ts",
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "build": "bun build:minisign && bunx tsc",
     "build:debug": "bun clean && bun build:package && bun build:minisign && bunx tsc --build --verbose --listEmittedFiles",

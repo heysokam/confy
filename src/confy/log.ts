@@ -4,7 +4,7 @@
 // @deps std
 import { log as echo } from 'console'
 // @deps confy
-import { cfg as confy, defaults } from '@confy/cfg'
+import { cfg as confy, defaults } from './cfg'
 
 export function info (C :confy.Config, ...args:unknown[]) :void { echo(confy.pfx.info (C), ...args)}
 export function warn (C :confy.Config, ...args:unknown[]) :void { echo(confy.pfx.warn (C), ...args)}

@@ -2,9 +2,9 @@
 //  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 //:______________________________________________________________________
 // @deps confy
-import * as shell from '@confy/tools/shell'
-import { get } from '@confy/get'
-import { cfg as confy } from '@confy/cfg'
+import * as shell from '../tools/shell'
+import { get } from '../get'
+import { cfg as confy } from '../cfg'
 
 export namespace BUN {
   export const exists   = get.Bun.exists

@@ -5,10 +5,10 @@
 import * as fs from 'fs'
 import * as std_os from 'node:os'
 // @deps confy
-import * as log from "@confy/log";
-import { cfg as confy } from '@confy/cfg'
-import { Dir, File, Path, Shuffle } from "@confy/tools"
-import Minisign from '@confy/tools/minisign'
+import * as log from "../log";
+import { cfg as confy } from '../cfg'
+import { Dir, File, Path, Shuffle } from "../tools"
+import Minisign from '../tools/minisign'
 export namespace Zig {
 
 

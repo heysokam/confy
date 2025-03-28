@@ -4,7 +4,7 @@
 // @deps std
 import * as fs from 'fs'
 // @deps confy
-import cfg from '@confy/cfg'
+import cfg from './cfg'
 
 export class BuildTarget {
   src  :fs.PathLike[]

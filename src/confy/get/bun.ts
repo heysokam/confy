@@ -4,10 +4,10 @@
 // @deps std
 import * as os from 'node:os'
 // @deps confy
-import * as log from '@confy/log'
-import { cfg as confy } from '@confy/cfg'
-import { gh } from "@confy/tools/git"
-import { File, Path, Dir } from '@confy/tools/files'
+import * as log from '../log'
+import { cfg as confy } from '../cfg'
+import { gh } from "../tools/git"
+import { File, Path, Dir } from '../tools/files'
 const InvalidURL = "BadURL"
 export namespace BUN {
 

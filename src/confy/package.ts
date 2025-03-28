@@ -3,9 +3,9 @@
 //:______________________________________________________________________
 //! @fileoverview Tools for Package Management
 //_____________________________________________|
-import { Manager } from '@confy/manager'
-import { File } from '@confy/tools/files'
-import { cfg } from '@confy/cfg'
+import { Manager } from './manager'
+import { File } from './tools/files'
+import { cfg } from './cfg'
 const confy = cfg.defaults.clone()
 export namespace Package {
 

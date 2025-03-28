@@ -9,13 +9,13 @@
 //______________________________________
 // @section Forward Export: General tools
 //____________________________
-export { info } from '@confy/log'
+export { info } from './confy/log'
 
 //______________________________________
 // @section Forward Export: Confy tools
 //____________________________
-export { Program } from '@confy/program'
-export * from '@confy/tools'
+export { Program } from './confy/program'
+export * from './confy/tools'
 
 /*
 pub const Name      = zstd.Name;

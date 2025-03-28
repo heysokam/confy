@@ -3,7 +3,7 @@
 //:______________________________________________________________________
 import * as fs from 'fs'
 import path from 'path';
-import * as confy from '@confy/tools'
+import * as confy from './tools'
 export default cfg; export namespace cfg {
 
 /**

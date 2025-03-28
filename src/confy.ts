@@ -4,11 +4,11 @@
 // @deps std
 import * as fs from 'fs'
 // @deps confy
-import * as log from '@confy/log'
-import { Manager } from '@confy/manager'
-import { Package } from '@confy/package'
-import { Cli, File, Dir, Path } from '@confy/tools'
-import { cfg as confy } from '@confy/cfg'
+import * as log from './confy/log'
+import { Manager } from './confy/manager'
+import { Package } from './confy/package'
+import { Cli, File, Dir, Path } from './confy/tools'
+import { cfg as confy } from './confy/cfg'
 
 namespace Commands {
   //______________________________________
