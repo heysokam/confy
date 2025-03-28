@@ -6,7 +6,7 @@
  * Tools for parsing/modifying Semantic Versions
  * Respects the parsing Specification at https://semver.org
  * */
-import { u64 } from './types'
+type u64 = number
 
 export class Version {
   major : version.Major
