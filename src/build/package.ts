@@ -15,7 +15,7 @@ const icon         = (!cfg.tool.icon ) ? cfg.tool.icon  : `${cfg.tool.icon} `
 const description  = (!cfg.tool.descr) ? cfg.tool.descr : ` ${cfg.tool.separator.descr} ${cfg.tool.descr}`
 const result       = structuredClone(pkg)
 result.name        = cfg.tool.pkgName
-result.version     = cfg.tool.version
+result.version     = cfg.tool.version.toString()
 result.description = `${icon}${cfg.tool.name}${description}`
 File.write("./package.json", JSON.stringify(result, null, 2))
 

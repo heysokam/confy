@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@heysokam/confy",
   "version": "0.6.50",
-  "description": "ᛝ confy | Comfortable and Configurable Buildsystem",
+  "description": "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim",
   "license": "GPL-3.0-or-later",
   "author": {
     "name": "Ivan Mar (sOkam!)",
