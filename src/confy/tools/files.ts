@@ -5,13 +5,18 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { Readable } from 'stream'
+import { log as echo } from 'console'
 // @deps lib
 import extract from 'extract-zip'
 import * as tar from 'tar'
 import * as XZ from 'xz-decompress'
 // @deps confy
-import { Default as log } from '@confy/log'
 import { pathToFileURL } from 'url'
+
+
+class FileError extends Error {}
+// class PathError extends Error {}
+// class  DirError extends Error {}
 
 
 export const Path = {
@@ -117,16 +122,15 @@ export const File = {
       src   : fs.PathLike,
       dir   : fs.PathLike,
       tmp   : fs.PathLike,
-      clean : boolean = true,
-      opts  = {} as tar.TarOptionsWithAliasesAsyncFile,
+      opts  = {} as tar.TarOptionsWithAliasesAsyncFile & { verbose:boolean, clean:boolean, },
     ) :Promise<void>=> {
-    log.verb("Decompressing XZ file: ", src, " -> ", tmp)
+    if (opts.verbose) echo("Decompressing XZ file: ", src, " -> ", tmp)
     await File.lzma.decompress(src, tmp)
-    log.verb("Done decompressing: ", src)
-    log.verb("Extracting tar file: ", tmp,  " -> ", dir)
+    if (opts.verbose) echo("Done decompressing: ", src)
+    if (opts.verbose) echo("Extracting tar file: ", tmp,  " -> ", dir)
     await File.untar(tmp, dir, opts)
-    log.verb("Done extracting: ", tmp)
-    if (clean) File.rmv(tmp)
+    if (opts.verbose) echo("Done extracting: ", tmp)
+    if (opts.clean) File.rmv(tmp)
   },
 
 
@@ -196,7 +200,7 @@ export const File = {
 
 async function file_download_fromURL (url :URL, trg :fs.PathLike) :Promise<void> {
   const R = await fetch(url)
-  if (!R.ok) log.fail("File.download: Tried to download a file, but failed to request its data.", JSON.stringify({url, trg, R}, null,  2))
+  if (!R.ok) throw new FileError("File.download: Tried to download a file, but failed to request its data. " + JSON.stringify({url, trg, R}, null,  2))
   await File.dl.fromResponse(R, trg)
 }
 
