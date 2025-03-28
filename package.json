@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "confy",
+  "name": "@heysokam/confy",
   "version": "0.6.50",
   "description": "ᛝ confy | Comfortable and Configurable Buildsystem",
   "license": "GPL-3.0-or-later",
