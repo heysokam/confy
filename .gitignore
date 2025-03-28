@@ -1,5 +1,9 @@
 # Package Specific
 src/confy/tools/minisign.js
+# : Examples
+examples/**/package.json
+examples/**/bun.lock
+examples/**/bun.lockb
 
 # dependencies
 /node_modules
