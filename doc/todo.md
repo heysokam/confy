@@ -24,6 +24,9 @@
   - [ ] Keyword.all
   - [ ] Nim: Keyword.examples
   - [ ] Nim: Keyword.tests
+- [ ] Watch Mode
+      Call a `.watch()` method on `BuildTarget` that triggers a recompile on file changes
+      Configurable: Refresh time, rerun binary, custom callback
 - [ ] Options/arguments auto parser  (to avoid the user needing to implement parsing the info themselves)
   - [ ] Short option arguments
   - [ ] Long option arguments (variables) support   `key=val`
@@ -34,10 +37,9 @@
 - [ ] Libs management as git.Submodules ()
 - [ ] Automatic cloning to `libDir/name`
 - [ ] Optional Opt-out: `--recurse-submodules`
-### Zig compiler
-- [ ] Automatic download into the configured `cfg.binDir` folder.
-- [ ] Automatic updates from the latest stable version.
 ## Zig
+- [x] Compiler: Automatic download into the configured `cfg.binDir` folder.
+- [ ] Compiler: Automatic updates from the latest stable version.
 - [ ] SharedLibrary build
 - [ ] StaticLibrary build
 - [ ] Modules
@@ -70,10 +72,13 @@
 - [ ] StaticLibrary build
 - [ ] zigcc and zigcpp aliases:
   - [ ] : Call for the system's `zig` command when `cfg.zigSystemBin = on`
-  - [ ] : Ordered to rebuild every run (in case the project is moved or the config options change).
+  - [_] : Ordered to rebuild every run (in case the project is moved or the config options change).
           _Tiny file. Consumes less than a second in total._
+          Done: Not needed with the new path resolution solution.
 
 ## Docs
+- [ ] Typedoc to Markdown
+- [ ] Rewrite the configuration guide on `heysokam.github.io`
 - [ ] Examples:
   - [ ] Basic usage
   - [ ] Advanced usage
