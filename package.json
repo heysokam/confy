@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@heysokam/confy",
+  "version": "0.6.50",
+  "description": "ᛝ confy | Comfortable and Configurable Buildsystem",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Ivan Mar (sOkam!)",
+    "url": "https://github.com/heysokam"
+  },
+  "homepage": "https://github.com/heysokam/confy",
+  "bugs": {
+    "url": "https://github.com/heysokam/confy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heysokam/confy.git"
+  },
+  "keywords": [
+    "buildsystem",
+    "configurable",
+    "ergonomic",
+    "c",
+    "cpp",
+    "zig",
+    "nim",
+    "bun",
+    "zigcc"
+  ],
+  "files": [
+    "public"
+  ],
+  "main": "public/index.js",
+  "types": "public/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build:minisign && bunx tsc",
+    "build:debug": "bun clean && bun build:package && bun build:minisign && bunx tsc --build --verbose --listEmittedFiles",
+    "build:package": "bun run ./src/build/package.ts",
+    "build:minisign": "rm -f ./src/confy/tools/minisign.js && bun run ./src/build/minisign.ts",
+    "compile:debug": "bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
+    "cr": "bun run test && bun run clean && bun compile:debug && bun exec ./bin/confy",
+    "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy && rm -rf ./bin/.cache",
+    "check": "bun check:errors && bun build:debug && bun check:syntax && bun check:exports && bun clean",
+    "check:ci": "bun check:errors && bun run build && bun check:syntax && bun check:exports",
+    "check:errors": "bunx tsc --noEmit",
+    "check:syntax": "bunx eslint . --max-warnings 0 --report-unused-disable-directives",
+    "check:exports": "bunx attw --pack . || bun check:exports:onFail",
+    "check:exports:onFail": "bunx attw -f json --pack .",
+    "test": "bun run build:debug && bun test",
+    "wip": "bun check && bun ./src/wip.ts"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
+    "@eslint/js": "^9.22.0",
+    "dts-gen": "^0.10.4",
+    "eslint": "^9.22.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1"
+  },
+  "dependencies": {
+    "@octokit/types": "^4.1.2",
+    "@types/bun": "latest",
+    "@types/download": "^8.0.5",
+    "@types/extract-zip": "^2.0.3",
+    "@types/tar": "^6.1.13",
+    "extract-zip": "^2.0.1",
+    "octokit": "^4.1.2",
+    "simple-git": "^3.27.0",
+    "sodium-native": "^4.3.3",
+    "tar": "^7.4.3",
+    "xz-decompress": "^0.2.2"
+  }
+}
