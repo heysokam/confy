@@ -62,7 +62,7 @@ export namespace mirrors {
    export const base      = () :URL=> new URL("https://ziglang.org")
    export const builds    = () :URL=> new URL("builds",    Zig.mirrors.official.base())
    export const downloads = () :URL=> new URL("download",  Zig.mirrors.official.base())
-   export const index     = () :URL=> new URL(Path.join(Zig.mirrors.official.downloads(), "index.json"))
+   export const index     = () :URL=> new URL(Path.join(Zig.mirrors.official.downloads().toString(), "index.json").toString())
   }
 
   export async function list () :Promise<URL[]> {
@@ -92,7 +92,8 @@ export function clean (
   if (!Path.exists(trg)) return
   if (!force) { log.verb(cfg, `Zig: ${trg} Already exists. Not cleaning.`); return }
   log.verb(cfg, "Zig: Cleaning path:", trg)
-  Path.rm(trg)
+  try   { File.rmv(trg) }
+  catch {  Dir.rmv(trg) }
 }
 
 
