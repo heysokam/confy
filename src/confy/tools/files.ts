@@ -173,7 +173,7 @@ export const File = {
       mode ?:number
     ) :void {
     fs.copyFileSync(src as string, trg as string, mode)
-    Path.rm(src)
+    File.rmv(src)
   }, //:: File.move
 
   /**
