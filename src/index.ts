@@ -14,7 +14,7 @@ export { info } from './confy/log'
 //______________________________________
 // @section Forward Export: Confy tools
 //____________________________
-export { Program } from './confy/program'
+export * from './confy/target'
 export * from './confy/tools'
 
 /*
