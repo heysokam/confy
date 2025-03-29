@@ -198,6 +198,22 @@ export const File = {
      * */
     fromResponse: async(R :Response, trg :fs.PathLike) :Promise<void>=> { ok(R.body); await fs.promises.writeFile(trg, Readable.fromWeb(R.body)) },
   }, //:: File.dl
+
+  /**
+   * @description
+   * Finds the extension of a filepath that is given without it.
+   * Walks the path's dir, and matches all entries found against the full path of the input path.
+   * @throws FileError If the file has an extension already.
+   * */
+  findExtension: (src :fs.PathLike) :string => {
+    if (Path.ext(src)) throw new FileError("File.findExtension: The input file already has an extension.")
+    for (const found of fs.readdirSync(Path.dirname(src), {withFileTypes:true})) {
+      if (!found.isFile()) continue
+      const file = Path.join(found.parentPath, found.name).toString()
+      if (file.includes(src.toString(), 0)) return Path.ext(found.name)
+    }
+    throw new FileError("File.findExtension: Failed to find the extension of input file: "+src.toString())
+  }, //:: File.findExtension
 } //:: File
 
 async function file_download_fromURL (url :URL, trg :fs.PathLike) :Promise<void> {
