@@ -1,0 +1,4 @@
+{
+  "pack": ".",
+  "entrypoints": ["src"]
+}

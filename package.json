@@ -38,16 +38,16 @@
     "build:package": "bun run ./src/build/package.ts",
     "build:minisign": "rm -f ./src/confy/tools/minisign.js && bun run ./src/build/minisign.ts",
     "compile:debug": "bun build --compile --minify --sourcemap --bytecode ./src/confy.ts --outfile ./bin/confy",
-    "cr": "bun run test && bun run clean && bun compile:debug && bun exec ./bin/confy",
+    "cr": "bun run test && bun run clean && bun check && bun compile:debug && bun exec ./bin/confy",
     "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy && rm -rf ./bin/.cache",
-    "check": "bun check:errors && bun build:debug && bun check:syntax && bun check:exports && bun clean",
+    "clean:check": "bun check && bun clean",
+    "check": "bun check:errors && bun check:syntax",
     "check:ci": "bun check:errors && bun run build && bun check:syntax && bun check:exports",
     "check:errors": "bunx tsc --noEmit",
     "check:syntax": "bunx eslint . --max-warnings 0 --report-unused-disable-directives",
-    "check:exports": "bunx attw --pack . || bun check:exports:onFail",
-    "check:exports:onFail": "bunx attw -f json --pack .",
-    "test": "bun run build:debug && bun test",
-    "wip": "bun check && bun ./src/wip.ts"
+    "check:exports": "bunx attw || bun check:exports:onFail",
+    "check:exports:onFail": "bunx attw -f json",
+    "test": "bun run build:debug && bun test"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
