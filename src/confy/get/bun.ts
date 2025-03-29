@@ -62,13 +62,13 @@ export async function download (
 
   // Unzip
   let zipTrg :string= ""
-  await File.unzip(zip, {dir: Path.toAbsolute(cfg.bun.cache).toString(), onEntry: (entry:any)=> { if (Path.name(entry.fileName).toString().endsWith(BUN.name)) {
+  await File.unzip(zip, {dir: Path.toAbsolute(cfg.bun.cache).toString(), onEntry: (entry)=> { if (Path.name(entry.fileName).toString().endsWith(BUN.name)) {
     zipTrg = Path.join(cfg.bun.cache, entry.fileName).toString()
   }}})
 
   // Move to the Destination and Cleanup
   if (!Dir.exists(cfg.bun.dir)) Dir.create(cfg.bun.dir)
-  File.move(zipTrg, cfg.bun.bin+Path.ext(zipTrg))
+  File.move(zipTrg, cfg.bun.bin.toString()+Path.ext(zipTrg))
   Dir.rmv(Path.dirname(zipTrg))
   log.info(cfg, "Done downloading Bun.")
 } //:: BUN.download

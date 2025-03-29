@@ -7,8 +7,10 @@ import * as fs from 'fs'
 import * as log from './confy/log'
 import { Manager } from './confy/manager'
 import { Package } from './confy/package'
-import { Cli, File, Dir, Path } from './confy/tools'
+import { File, Dir, Path } from './confy/tools/files'
 import { cfg as confy } from './confy/cfg'
+import { Cli as ConfyCLI } from './confy/tools/cli'
+type Cli = ConfyCLI.Internal
 
 namespace Commands {
   //______________________________________
@@ -20,7 +22,7 @@ namespace Commands {
         cfg : confy.Config,
         cli : Cli
       ) :Promise<void> {
-      /*discard*/cli;
+      cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
       // Add all bun & confy dependencies to the package
       await Manager.Bun.validate(cfg)
       await Package.init(cfg)
@@ -33,7 +35,7 @@ namespace Commands {
     ) :Promise<void> {
     if (!File.exists(build_ts)) return Commands.anything(cfg)
     await Commands.Build.requirements(cfg, cli)
-    await Manager.Bun.run(cfg, "run", build_ts, ...Cli.raw().slice(3))
+    await Manager.Bun.run(cfg, "run", build_ts, ...ConfyCLI.raw().slice(3))
   }
 
 
@@ -44,19 +46,19 @@ namespace Commands {
       cfg : confy.Config,
       cli : Cli
     ) :Promise<void> {
-    if (!File.exists(build_ts)) await Manager.Bun.run(cfg, "run", ...Cli.raw().slice(3))
-    await Manager.Bun.run(cfg, "run", build_ts, "run", ...Cli.raw().slice(3))
-    /*discard*/cli;
+    if (!File.exists(build_ts)) await Manager.Bun.run(cfg, "run", ...ConfyCLI.raw().slice(3))
+    await Manager.Bun.run(cfg, "run", build_ts, "run", ...ConfyCLI.raw().slice(3))
+    cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
   }
 
 
   //______________________________________
   // @section Helper Commands: init
   //____________________________
-  export async function init (
+  export async function init ( // eslint-disable-line @typescript-eslint/require-await
       cfg : confy.Config,
       cli : Cli
-    ) :Promise<void> { log.fail(cfg, "Command `init` not yet implemented.", JSON.stringify(cli)) }
+    ) :Promise<void> { log.fail(cfg, "Command `init` not yet implemented.", JSON.stringify(cli)); }
 
 
   //______________________________________
@@ -129,7 +131,7 @@ namespace Commands {
       case "bun" : return Commands.Get.bun(cfg, cli)
       case "zig" : return Commands.Get.zig(cfg, cli)
       case "nim" : return Commands.Get.nim(cfg, cli)
-      default    : log.fail(cfg, `Command: \`confy get ${cli.args[1]}\` is not a known get command.`, cfg.verbose ? JSON.stringify(cli) : "")  // External unsafe usage sanity
+      default    : log.fail(cfg, `Command: \`confy get ${cli.args[1] ?? ""}\` is not a known get command.`, cfg.verbose ? JSON.stringify(cli) : "")  // External unsafe usage sanity
     }
   }
 
@@ -147,24 +149,24 @@ namespace Commands {
       validate ?: FnValidate,
     ) :Promise<void> {
     if (validate) await validate(cfg)
-    const cmd = Cli.raw().slice(3)
+    const cmd = ConfyCLI.raw().slice(3)
     log.verb(cfg, `Running ${(name) ? name + " " : ""}command in passthrough mode:\n `, bin, ...cmd)
     await run(cfg, ...cmd)
   }
 
   // export async function sh (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }
-  export async function bun (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }  // We always validate bun at the start
-  export async function zig (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.zig.bin, "Zig", Manager.Zig.run, Manager.Zig.validate) }
+  export async function bun (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }  // We always validate bun at the start
+  export async function zig (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.zig.bin, "Zig", Manager.Zig.run, Manager.Zig.validate) }
 
-  export async function nim (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.bin, "Nim", Manager.Nim.run, Manager.Nim.validate) }
+  export async function nim (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.nim.bin, "Nim", Manager.Nim.run, Manager.Nim.validate) }
   // export async function nimble    (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.nimble.bin, "Nimble", Manager.Nimble.run, Manager.Nimble.validate) }
   // export async function atlas     (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.atlas.bin, "Atlas", Manager.Atlas.run, Manager.Atlas.validate) }
   // export async function nimpretty (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.nimpretty.bin, "NimPretty", Manager.NimPretty.run, Manager.NimPretty.validate) }
   // export async function testament (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.testament.bin, "Testament", Manager.Testament.run, Manager.Testament.validate) }
 
-  export async function anything (cfg :confy.Config) :Promise<void> {
+  export async function anything (cfg :confy.Config) :Promise<void> { // eslint-disable-line @typescript-eslint/require-await
     // FIX: Print help for the default case
-    // await Manager.Bun.run(...Cli.raw().slice(2))
+    // await Manager.Bun.run(...ConfyCLI.raw().slice(2))
     log.warn(cfg, "Help output message not yet implemented.")
     // Find the file with arg0's name
     //   ok . Run the file with arg0's name
@@ -177,11 +179,11 @@ namespace Commands {
 //______________________________________
 // @section Entry Point: confy
 //____________________________
-if (import.meta.main) run()
+if (import.meta.main) void run()
 async function run () :Promise<void> {
   // Get the confy's internal Config and CLI arguments
   const cfg = confy.defaults.clone()
-  const cli = Cli.internal()
+  const cli = ConfyCLI.internal()
 
   // Command cases
   switch (cli.args[0]) {

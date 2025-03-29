@@ -4,6 +4,7 @@
 // @deps std
 import * as fs from 'fs'
 import * as std_os from 'node:os'
+import { ok } from 'assert'
 // @deps confy
 import * as log from "../log";
 import { cfg as confy } from '../cfg'
@@ -55,7 +56,7 @@ export namespace minisign {
 export namespace mirrors {
   export const registry = {
     url : new URL("https://raw.githubusercontent.com/mlugg/setup-zig/refs/heads/main/mirrors.json"),
-    get : async() :Promise<[URL, string]>=> await (await fetch(Zig.mirrors.registry.url)).json() as any,
+    get : async() :Promise<[URL, string]>=> await (await fetch(Zig.mirrors.registry.url)).json() as any,  // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
   }
 
   export namespace official {
@@ -66,9 +67,9 @@ export namespace mirrors {
   }
 
   export async function list () :Promise<URL[]> {
-    const result = Shuffle.FisherYates((await Zig.mirrors.registry.get()).map((a:any) => a[0]))
+    const result = Shuffle.FisherYates((await Zig.mirrors.registry.get()).map((a:any) => a[0]))    // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     result.push(Zig.mirrors.official.downloads())
-    return result
+    return result as URL[]
   }
 }
 
@@ -90,7 +91,7 @@ export function clean (
     force : boolean      = false,
   ) :void {
   if (!Path.exists(trg)) return
-  if (!force) { log.verb(cfg, `Zig: ${trg} Already exists. Not cleaning.`); return }
+  if (!force) return log.verb(cfg, `Zig: ${trg.toString()} Already exists. Not cleaning.`)
   log.verb(cfg, "Zig: Cleaning path:", trg)
   try   { File.rmv(trg) }
   catch {  Dir.rmv(trg) }
@@ -110,9 +111,7 @@ export type File = {
   zigTarball  ?:URL  // Link to the official upstream file. Available only in some mirrors.
 }
 
-type Files = {
-  [key :Zig.FileID] :Zig.File
-}
+type Files = Record<Zig.FileID, Zig.File>
 export type Version = {
   version  ?:string  // Only for master
   date      :string
@@ -140,8 +139,7 @@ export namespace Host {
     mipsel   = 'mipsel',
     mips64   = 'mips64',
     mips64el = 'mips64el',
-    ppc64    = 'powerpc64',  // @warning Endinaness is lost on this platform.
-    ppc64BE  = 'powerpc64',
+    ppc64BE  = 'powerpc64',  // @warning Endinaness is lost on this platform.
     ppc64LE  = 'powerpc64le',
     riscv64  = 'riscv64',
     s390x    = 's390x',
@@ -231,13 +229,13 @@ export namespace Download {
     if (force) return false
     const binExists = Zig.exists(cfg)
     if (binExists) { log.verb(cfg, "Zig: Already exists. Omitting download."); return true }
-    if (!File.exists(cfg.zig.index   )) { log.verb(cfg, `Zig: Index at ${cfg.zig.index} does not exist. Downloading Zig.`); return false }
-    if (!File.exists(cfg.zig.current )) { log.verb(cfg, `Zig: Current version index at ${cfg.zig.current} does not exist. Downloading Zig.`); return false }
-    if (!File.exists(cfg.zig.cache   )) { log.verb(cfg, `Zig: Cache folder at ${cfg.zig.cache} does not exist. Downloading Zig.`); return false }
+    if (!File.exists(cfg.zig.index   )) { log.verb(cfg, `Zig: Index at ${cfg.zig.index.toString()} does not exist. Downloading Zig.`); return false }
+    if (!File.exists(cfg.zig.current )) { log.verb(cfg, `Zig: Current version index at ${cfg.zig.current.toString()} does not exist. Downloading Zig.`); return false }
+    if (!File.exists(cfg.zig.cache   )) { log.verb(cfg, `Zig: Cache folder at ${cfg.zig.cache.toString()} does not exist. Downloading Zig.`); return false }
     const version = JSON.parse(File.read(cfg.zig.current).toString()) as Zig.Version
     const tarName = Zig.Tar.filename(version.version ?? Zig.InvalidVersionName)
     const tarPath = Path.join(cfg.zig.cache, tarName)
-    if (!File.exists(tarPath)) { log.verb(cfg, `Zig: Tarball at ${tarPath} does not exist. Downloading Zig.`); return false }
+    if (!File.exists(tarPath)) { log.verb(cfg, `Zig: Tarball at ${tarPath.toString()} does not exist. Downloading Zig.`); return false }
     // All conditions for skipping a download matched. Return true
     return true
   }
@@ -255,7 +253,7 @@ export namespace Download {
     log.verb(cfg, "Zig: Requesting ", url.toString(), " ...")
     const mirror = await fetch(Zig.Download.tagURL(url))
     const file = Path.basename(url.pathname)
-    if (!mirror.ok) log.fail(cfg, `Zig: Something went wrong when downloading ${file} from: `, mirror.url.toString())
+    if (!mirror.ok) log.fail(cfg, `Zig: Something went wrong when downloading ${file.toString()} from: `, mirror.url.toString())
     // Return the response
     log.verb(cfg, "Zig: Done requesting url: ", mirror.url.toString())
     return mirror
@@ -270,7 +268,8 @@ export namespace Download {
       ) :Zig.Version {
       const result = index[vers]
       if (!result) log.fail(cfg, `Zig: Failed to find version \`${vers}\` inside index. Data: `, JSON.stringify(index, null, 2))
-      return result!
+      ok(result)
+      return result
     }
 
     export function write (
@@ -301,7 +300,7 @@ export namespace Download {
     // Clean when needed
     Zig.clean(cfg.zig.index, cfg, force)
     // Dont download if it still exists, just read
-    if (File.exists(cfg.zig.index)) return JSON.parse(File.read(cfg.zig.index).toString())
+    if (File.exists(cfg.zig.index)) return JSON.parse(File.read(cfg.zig.index).toString()) as Zig.Registry
     // Request & Download
     const trg = new URL(Path.join(url, Zig.indexFile).toString())
     const mirror = await Zig.Download.request(trg, cfg)
@@ -309,7 +308,7 @@ export namespace Download {
     await File.dl.fromResponse(mirror, cfg.zig.index)
     // Return the downloaded index object
     log.verb(cfg, "Zig: Done downloading: ", Path.basename(cfg.zig.index), "from: ", mirror.url)
-    return JSON.parse(File.read(cfg.zig.index).toString())
+    return JSON.parse(File.read(cfg.zig.index).toString()) as Zig.Registry
   }
 
   /**
@@ -324,7 +323,8 @@ export namespace Download {
     const host    = Zig.Host.target()
     const file    = version[host]
     if (!file) log.fail(cfg, `Zig: Failed to find file for host \`${host}\` inside index. Data: `, JSON.stringify(version, null, 2))
-    return new URL(file!.tarball.toString())
+    ok(file)
+    return new URL(file.tarball.toString())
   }
 
   export function tarFilename (
@@ -389,7 +389,7 @@ export namespace Download {
     // Download the Index
     const index = await Zig.Download.index(url, cfg, true) // Always redownload the index internally
     const vers :string= (cfg.zig.version === confy.Version.Named.latest)
-      ? Object.keys(index)[1]!
+      ? Object.keys(index)[1] as string
       : cfg.zig.version.toString()
     Zig.Download.current.write(index, vers, cfg, true) // Always rewrite the current index internally
     // Download the tarball
@@ -417,14 +417,14 @@ export namespace Download {
 
     let result :fs.PathLike= Zig.InvalidVersionFile
     for (let id = 0; id < mirrors.length; ++id) {
-      const mirror = mirrors[id]!
+      const mirror = mirrors[id]; ok(mirror)
       try {
         result = await Zig.Download.from(mirror, cfg, force)
         break; // mirror.ok
       } catch (e) { // Mirror failed. Try next
         const next = mirrors[id+1]
         // FIX: Something is very off with these messages. The current/next values are mixed up by the try/catch scopes
-        if (next) log.verb(cfg, (e as Error).message, `\n -> Downloading from \`${mirror}\` didn't work. Re-trying from: ${next}`)
+        if (next) log.verb(cfg, (e as Error).message, `\n -> Downloading from \`${mirror.toString()}\` didn't work. Re-trying from: ${next.toString()}`)
         else      log.fail(cfg, "Zig: Something went wrong when downloading. No link worked, even the official one. Links tried (in order):", JSON.stringify({ mirrors }, null, 2))
       }
     }
@@ -447,7 +447,7 @@ export async function extract (
   const tarFile = Path.join(cfg.zig.cache, Path.basename(trg, ".xz"))
   try { switch (Zig.Tar.ext()) {
     case ".zip"    : await File.unzip(trg, {dir: trgDir.toString() }); break;
-    case ".tar.xz" : await File.untarxz(trg, cfg.zig.cache, tarFile, true, {} as any); break;
+    case ".tar.xz" : await File.untarxz(trg, cfg.zig.cache, tarFile, {clean: true, verbose: cfg.verbose} as any); break;   // eslint-disable-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
   }} catch (e) {
     log.fail(cfg, (e as Error).message, "\n -> Extracting tarball failed.")
   }

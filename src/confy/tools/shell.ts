@@ -20,9 +20,9 @@ export async function exec_node (opts :os.ExecOptions, ...args:string[]) {
   return out
 } //:: shell.exec
 
-export async function exec (opts :any, ...args:string[]) {
+export async function exec (opts :any, ...args:string[]) { // eslint-disable-line @typescript-eslint/no-explicit-any
   // FIX: Change to node.spawn
-  const proc = Bun.spawn(["sh", ...(args as string[])], {stdout: "inherit", stderr: "inherit", ...opts})
+  const proc = Bun.spawn(["sh", ...args], {stdout: "inherit", stderr: "inherit", ...opts})
   return await proc.exited
 } //:: shell.exec
 

@@ -4,6 +4,7 @@
 // @deps std
 import * as fs from 'fs'
 import * as path from 'path'
+import { ok } from 'assert'
 import { Readable } from 'stream'
 import { log as echo } from 'console'
 // @deps lib
@@ -101,8 +102,8 @@ export const File = {
    * @param dir (ergonomics/clarity) Folder where the contents will be extracted to. Overrides opts.C when passed
    * */
   untar: async(
-      src   : fs.PathLike,
-      dir   : fs.PathLike,
+      src   : fs.PathLike | null,
+      dir   : fs.PathLike | null,
       opts  : tar.TarOptionsWithAliasesAsyncFile,
     ) :Promise<void>=> tar.extract({...opts, f: src ?? opts.f, C: dir ?? opts.C} as tar.TarOptionsWithAliasesAsyncFile),
 
@@ -146,7 +147,8 @@ export const File = {
         trg : fs.PathLike,
       ) :Promise<void>=> {
       const data   = await fetch(pathToFileURL(src.toString()))
-      const stream = new XZ.XzReadableStream(data.body!)
+      ok(data.body)
+      const stream = new XZ.XzReadableStream(data.body)
       const view = new DataView(await new Response(stream).arrayBuffer())
       File.write(trg, view)
     },
@@ -188,13 +190,13 @@ export const File = {
    * */
   download : file_download_fromURL,
   dl: {
+    fromURL: file_download_fromURL,
     /**
      * @description
      * Downloads the file hosted at the url of the {@param R} Response into the {@param trg} file.
      * @note Folders will return their index route.
      * */
-    fromResponse : async(R :Response, trg :fs.PathLike) :Promise<void>=> await fs.promises.writeFile(trg, Readable.fromWeb(R.body ?? {} as any)),
-    fromURL      : file_download_fromURL,
+    fromResponse: async(R :Response, trg :fs.PathLike) :Promise<void>=> { ok(R.body); await fs.promises.writeFile(trg, Readable.fromWeb(R.body)) },
   }, //:: File.dl
 } //:: File
 

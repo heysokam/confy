@@ -40,11 +40,12 @@ export type Opts      = {
   long   :Long
 }
 
-class Arguments { // TODO:
-  constructor(argv = Cli.raw()) { argv }
-}
+export class Arguments { // TODO:
+  raw  :string[]
+  constructor(argv = Cli.raw()) { this.raw = argv }
+} //:: confy.Cli.Arguments
 
-class Internal {
+export class Internal {
   readonly runner :string
   readonly arg0   :string
   opts  :Opts
@@ -56,7 +57,7 @@ class Internal {
   #addArg (arg :string) :void { this.args.push(arg) }
   #addShort (ch :string) :void { this.opts.short.add(ch) }
   #addLong (name :string, value :LongValue) :void {
-    if (this.opts.long[name] == undefined) this.opts.long[name] = []
+    this.opts.long[name] ??= []
     this.opts.long[name].push(value)
   }
 
@@ -84,8 +85,8 @@ class Internal {
   }
 
   constructor(argv = Cli.raw()) {
-    this.runner = argv[0]!
-    this.arg0   = argv[1]!
+    this.runner = argv[0] ?? "UndefinedRunner"
+    this.arg0   = argv[1] ?? "UndefinedArg0"
     this.opts   = { short: new Set(), long: {}}
     this.args   = []
     for (const arg of argv.slice(2)) {
@@ -94,7 +95,7 @@ class Internal {
       else                           this.#parseShort(arg)  // Might catch invalids
     }
   }
-}
+} //:: confy.Cli.Internal
 
-};
+}; //:: confy.Cli
 

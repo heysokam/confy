@@ -6,6 +6,7 @@
  * Tools for parsing/modifying Semantic Versions
  * Respects the parsing Specification at https://semver.org
  * */
+import { ok } from 'assert'
 type u64 = number
 
 export class Version {
@@ -38,7 +39,7 @@ export class Version {
   toString () :string {
     const tag   = this.tag   ? `-${this.tag}`   : ""
     const build = this.build ? `+${this.build}` : ""
-    return `${this.major}.${this.minor}.${this.patch}${tag}${build}`
+    return `${this.major.toString()}.${this.minor.toString()}.${this.patch.toString()}${tag}${build}`
   }
 }
 
@@ -141,9 +142,10 @@ export namespace version {
     const data = iter.next().value ?? []
     if (data.length === 0) throw new ParseError("Invalid version format: "+vers+"\nSpecification references: "+"\n  https://semver.org\n  https://regex101.com/r/vkijKf/1")
     const result = new Version(null)
-    result.major = parseInt(data[1]!)
-    result.minor = parseInt(data[2]!)
-    result.patch = parseInt(data[3]!)
+    ok(data[1]); ok(data[2]); ok(data[3]);
+    result.major = parseInt(data[1])
+    result.minor = parseInt(data[2])
+    result.patch = parseInt(data[3])
     result.tag   = data[4] ?? null
     result.build = data[5] ?? null
     return result

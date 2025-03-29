@@ -24,12 +24,12 @@ const test_version = [
 ]; const testDir = "./bin/.tests/minisign"
 
 namespace setup { export namespace version {
-  function  url_sig (V :Version) :URL { return new URL(V.url+Zig.minisign.extension.toString()) }
+  function  url_sig (V :Version) :URL { return new URL(V.url.toString()+Zig.minisign.extension.toString()) }
   function name_tar (V :Version) :fs.PathLike { return Path.basename(V.url.toString()) }
   export function path_tar (V :Version) :fs.PathLike { return Path.join(testDir, name_tar(V)) }
-  export function path_sig (V :Version) :fs.PathLike { return path_tar(V)+Zig.minisign.extension }
+  export function path_sig (V :Version) :fs.PathLike { return path_tar(V).toString()+Zig.minisign.extension }
 
-  export async function download (V :Version) :Promise<void> {
+  export function download (V :Version) :void {
     // Signature data
     const sig = path_sig(V)
     if (File.exists(sig)) return
@@ -52,7 +52,7 @@ namespace test {
     const result   = minisign.verifySignature(key, sig, data_tar)
     expect(result).toBeTruthy()
   }
-  export const each = it.each;
+  export const each = it.each.bind(it);  // @note https://typescript-eslint.io/rules/unbound-method/
 }
 
 beforeAll(() => {

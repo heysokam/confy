@@ -63,7 +63,7 @@ export namespace Version {
  * */
 export type Zig = {
   name       :string
-  version    :Version.Zig | Version.Named | Version.Any
+  version    :Version.Zig | Version.Named | Version.Any // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
   index      :fs.PathLike
   current    :fs.PathLike
   cache      :fs.PathLike
@@ -116,7 +116,7 @@ export type Nim = {
   cache      :fs.PathLike
   dir        :fs.PathLike
   bin        :fs.PathLike
-  version    :Version.Nim | Version.Named | Version.Any
+  version    :Version.Nim | Version.Named | Version.Any // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
   git        :cfg.Git.Repository  // @warning Setting a branch will override the version when bootstrapping
   bootstrap  :boolean
   systemBin  :boolean
@@ -253,18 +253,18 @@ export namespace defaults {
   }}
 }
 export namespace Package {
-  export type Dependencies = {[key :string] :string} & {[cfg.tool.pkgName]: string}
+  export type Dependencies = Record<string, string> & {[cfg.tool.pkgName]: string}
   export type Info = {
-    $schema         :"https://json.schemastore.org/package.json",
-    name            :string
-    description     :string
-    version         :string | confy.Version
-    license         :string
-    homepage        :string
+    $schema          :"https://json.schemastore.org/package.json",
+    name             :string
+    description      :string
+    version          :string | confy.Version
+    license          :string
+    homepage         :string
     // cfg.tool.name:cfg.tool.version  must exist, or else it will be added to devDependencies
-    dependencies    :Package.Dependencies
-    devDependencies :Package.Dependencies
-  } & {[key :string]: any}
+    dependencies    ?:Package.Dependencies
+    devDependencies ?:Package.Dependencies
+  } & Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export type Config = {

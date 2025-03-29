@@ -105,12 +105,12 @@ pub fn main() !u8 {
         const src = trg+Zig.extension
         log.verb(cfg, `Nim: Building ZigCC from: `, src, " into binary: ", trg)
         File.write(src, Nim.Bootstrap.Zig.code())
-
+        // Define the compilation command for zigcc
         const cmd   = ["build-exe"]
         const cache = cfg.zig.cache.toString()
         cmd.push("--cache-dir", cache, "--global-cache-dir", cache)
         cmd.push(src, `-femit-bin=${trg}`, "-fno-llvm", "-fno-lld")
-
+        // Compile zigcc
         await Manager.Zig.run(cfg, ...cmd)
       } //:: Nim.Bootstrap.Zig.cpp.build
     } //:: Nim.Bootstrap.Zig.cc
@@ -121,13 +121,13 @@ pub fn main() !u8 {
       export async function build (
           cfg   : confy.Config = confy.defaults.clone(),
           force : boolean      = false,
-        ) :Promise<void> {cfg;force;
+        ) :Promise<void> {
         const trg = Nim.Bootstrap.Zig.cpp.path(cfg)
         if (File.exists(trg) && !force) return
         if (force) File.rmv(trg)
         const src = Nim.Bootstrap.Zig.cc.path(cfg)
         log.verb(cfg, `Nim: Duplicating ZigCC from: `, src, " into: ", trg)
-        if (File.exists(src)) Nim.Bootstrap.Zig.cc.build(cfg, force)
+        if (File.exists(src)) await Nim.Bootstrap.Zig.cc.build(cfg, force)
         File.cp(src, trg)
       } //:: Nim.Bootstrap.Zig.cpp.build
     } //:: Nim.Bootstrap.Zig.cpp
@@ -165,7 +165,7 @@ pub fn main() !u8 {
       cfg   : confy.Config = confy.defaults.clone(),
       force : boolean      = false,
     ) :Promise<void> {
-    if (force) Nim.Bootstrap.reset(cfg)
+    if (force) await Nim.Bootstrap.reset(cfg)
     const data = Nim.Bootstrap.get.patch(cfg)
     const name = "./zigcc.patch"
     const file = Path.join(cfg.nim.cache, name)
@@ -186,7 +186,7 @@ pub fn main() !u8 {
   export namespace Build {
     export const binDir  = "bin"
     export const script  =():string=> (std_os.platform === "win32") ? "./build_all.bat" : "./build_all.sh"
-    export const command =(_:confy.Config):string[]=> [Nim.Bootstrap.Build.script()]
+    export const command =(_:confy.Config):string[]=> [Nim.Bootstrap.Build.script()]  // eslint-disable-line @typescript-eslint/no-unused-vars
   } //:: Nim.Bootstrap.Build
 
   export async function build (
@@ -216,10 +216,10 @@ export const exists = (
 ) :boolean=> /* FIX: */ File.exists((cfg.nim.systemBin) ? cfg.nim.name : cfg.nim.bin)
 
 export namespace Download {
-  export async function nim (
+  export async function nim ( // eslint-disable-line @typescript-eslint/require-await
       cfg   : confy.Config = confy.defaults.clone(),
       force : boolean      = false,
-    ) :Promise<void> {force;
+    ) :Promise<void> {force; // eslint-disable-line @typescript-eslint/no-unused-expressions
     // nimble --nimbleDir:/yourPath install nim
     log.fail(cfg, "Nim: Downloading Binaries without bootstrapping is not implemented yet.")
   }
@@ -243,7 +243,7 @@ export async function release (
     cfg   : confy.Config = confy.defaults.clone(),
     force : boolean      = false,
   ) :Promise<void> {
-  Nim.Download.nim(cfg, force)
+  await Nim.Download.nim(cfg, force)
 } //:: Nim.release
 
 export async function download (
