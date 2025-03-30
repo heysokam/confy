@@ -4,9 +4,8 @@
 # @deps std
 from std/paths import Path
 # @deps confy
-import ./types
-
-type Lang *{.pure.}= enum Unknown, Asm, C, Cpp, Zig, Nim, Minim
+import ./types/base
+import ./types/build
 
 func identifyExt *(_:typedesc[Lang]; ext :string) :Lang=
   ## Returns the language of the {@arg ext} file extension.

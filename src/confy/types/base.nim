@@ -1,7 +1,9 @@
 #:______________________________________________________________________
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
-
-type Config * = object
-  todo :uint8
+## @fileoverview Base Types
+#____________________________|
+type PathLike   * = string
+type SourceFile * = base.PathLike
+type SourceList * = seq[base.SourceFile]
 
