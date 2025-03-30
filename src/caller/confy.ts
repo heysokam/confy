@@ -37,6 +37,7 @@ namespace Commands {
       // FIX: Needs to pass --path for local confy
       const trg = Path.join(cfg.dir.cache, Path.name(Builder.entry))
       const out = "-o:"+trg.toString()
+      File.rmv(trg) // Clean every time
       await Manager.Nim.compile(cfg, "-d:release", out, Builder.entry)
       await shell.run(trg, ...args, ...ConfyCLI.raw().slice(3))
     }
