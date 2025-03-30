@@ -6,26 +6,52 @@ import * as fs from 'fs'
 // @deps confy
 import * as log from './confy/log'
 import { Manager } from './confy/manager'
-import { Package } from './confy/package'
+// import { Package } from './confy/package'
 import { File, Dir, Path } from './confy/tools/files'
 import { cfg as confy } from './confy/cfg'
 import { Cli as ConfyCLI } from './confy/tools/cli'
+import { shell } from './confy/tools'
 type Cli = ConfyCLI.Internal
 
 namespace Commands {
   //______________________________________
   // @section Builder Commands: build
   //____________________________
-  const build_ts = "build.ts"
+  export namespace Builder {
+    export const entry = "build.nim"
+    export function exists (
+        cfg : confy.Config,
+        cli : Cli
+      ) :boolean {
+      cfg;cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
+      const default_entry = File.exists(Builder.entry)
+      return default_entry
+    }
+
+    export async function run (
+        cfg     : confy.Config,
+        cli     : Cli,
+        ...args : unknown[]
+      ) :Promise<void> {
+      cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
+      // FIX: Needs to pass --path for local confy
+      const trg = Path.join(cfg.dir.cache, Path.name(Builder.entry))
+      const out = "-o:"+trg.toString()
+      await Manager.Nim.compile(cfg, "-d:release", out, Builder.entry)
+      await shell.run(trg, ...args, ...ConfyCLI.raw().slice(3))
+    }
+  }
+
   export namespace Build {
     export async function requirements (
         cfg : confy.Config,
         cli : Cli
       ) :Promise<void> {
       cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
-      // Add all bun & confy dependencies to the package
-      await Manager.Bun.validate(cfg)
-      await Package.init(cfg)
+      await Manager.Zig.validate(cfg)
+      await Manager.Nim.validate(cfg)
+      // Add confy+libs+config to the package (when needed)
+      // await Package.init(cfg)
     } //:: Commands.Build.requirements
   } //:: Commands.Build
 
@@ -33,9 +59,9 @@ namespace Commands {
       cfg : confy.Config,
       cli : Cli
     ) :Promise<void> {
-    if (!File.exists(build_ts)) return Commands.anything(cfg)
+    if (!Builder.exists(cfg, cli)) return Commands.anything(cfg)
     await Commands.Build.requirements(cfg, cli)
-    await Manager.Bun.run(cfg, "run", build_ts, ...ConfyCLI.raw().slice(3))
+    await Builder.run(cfg, cli)
   }
 
 
@@ -46,9 +72,8 @@ namespace Commands {
       cfg : confy.Config,
       cli : Cli
     ) :Promise<void> {
-    if (!File.exists(build_ts)) await Manager.Bun.run(cfg, "run", ...ConfyCLI.raw().slice(3))
-    await Manager.Bun.run(cfg, "run", build_ts, "run", ...ConfyCLI.raw().slice(3))
-    cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
+    if (!Builder.exists(cfg, cli)) await Manager.Bun.run(cfg, "run", ...ConfyCLI.raw().slice(3))
+    await Builder.run(cfg, cli, "run")
   }
 
 
