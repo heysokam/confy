@@ -8,7 +8,7 @@ import ./types/errors
 import ./types/build as types
 import ./lang
 import ./command
-from   ./log import fail
+from   ./log import fail, verb, warn
 
 export types.Build
 
@@ -24,14 +24,14 @@ func new *(kind :Build;
 
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   let cmd = Command.build(trg)
-  # log.dbg "Building:", trg.repr
-  if cmd.exec() == 0: trg.fail BuildError, "Failed to build the target:\n  ", trg.repr
+  if cmd.exec() != 0: trg.fail CompileError, "Failed to build the target:\n  ", trg.repr
   result = trg
 
 
 func run *(trg :BuildTarget) :BuildTarget {.discardable.}=
-  # log.dbg "Running:", trg.repr
-  let cmd = Command.run(trg)
-  cmd.exec()
+  let cmd  = Command.run(trg)
+  let code = cmd.exec()
+  if code != 0: trg.warn "Run command exited with code:", $code
+  else        : trg.verb "Done running. Command exited with code:", $code
   result = trg
 

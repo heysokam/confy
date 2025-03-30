@@ -3,5 +3,8 @@
 #:______________________________________________________________________
 ## @fileoverview Error Types
 #_____________________________|
-type BuildError    * = object of CatchableError
-type SomeToolError * = BuildError
+type CompileError * = object of IOError
+  ## @descr For exceptions during the compile process
+type GeneratorError * = object of IOError
+  ## @descr For exceptions during code generation.
+type SomeToolError * = CompileError | GeneratorError
