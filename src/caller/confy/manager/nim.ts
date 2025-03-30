@@ -13,7 +13,7 @@ export namespace Nim {
   export const compile  = async (cfg :confy.Config, ...args:unknown[]) => {
     const backend = "c"
     const verbose = (cfg.verbose) ? "--verbosity:2" : (cfg.quiet) ? "--verbosity:0" : "--verbosity:1"
-    const hints   = ["--hint:Conf:off", "--hint:MsgOrigin:off"]  /*"--hint:Exec:on", "--hint:Link:on",*/
+    const hints   = ["--hint:Conf:off", "--hint:SuccessX:off", "--hint:MsgOrigin:off", "--hint:Exec:on", "--hint:Link:on",]
     const warns   = ["--warning:UnusedImport:off"]
     const zigcc   = `${cfg.zig.bin.toString()}cc`
     const zigcpp  = `${cfg.zig.bin.toString()}cpp`
