@@ -13,15 +13,17 @@ export namespace Nim {
   export const compile  = async (cfg :confy.Config, ...args:unknown[]) => {
     const backend = "c"
     const verbose = (cfg.verbose) ? "--verbosity:2" : (cfg.quiet) ? "--verbosity:0" : "--verbosity:1"
+    const hints   = ["--hint:Conf:off", "--hint:MsgOrigin:off"]  /*"--hint:Exec:on", "--hint:Link:on",*/
     const zigcc   = `${cfg.zig.bin.toString()}cc`
     const zigcpp  = `${cfg.zig.bin.toString()}cpp`
+    const nimble  = [`--clearNimblePath`, `--NimblePath:${cfg.nim.nimble.dir.toString()}`]
     const zig     = ["-d:zig",
       "--cc:clang",
       `--clang.exe=${zigcc}`,          `--clang.linkerexe=${zigcc}`,
       `--clang.cppCompiler=${zigcpp}`, `--clang.cppXsupport="-std=c++20"`,
     ]
     const cache = "--nimcache:"+cfg.nim.cache.toString()
-    await shell.run(cfg.nim.bin, backend, verbose, ...zig, cache, ...args)
+    await shell.run(cfg.nim.bin, backend, verbose, ...hints, ...nimble, ...zig, cache, ...args)
   } //:: Manager.Nim
 } //:: Manager.Nim
 
