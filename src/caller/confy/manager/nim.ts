@@ -10,6 +10,19 @@ export namespace Nim {
   export const exists   = get.Nim.exists
   export const validate = async (cfg :confy.Config)=> await get.Nim.download(cfg, /*force=*/false)
   export const run      = async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.nim.bin, ...args)
+  export const compile  = async (cfg :confy.Config, ...args:unknown[]) => {
+    const backend = "c"
+    const verbose = (cfg.verbose) ? "--verbosity:2" : (cfg.quiet) ? "--verbosity:0" : "--verbosity:1"
+    const zigcc   = `${cfg.zig.bin.toString()}cc`
+    const zigcpp  = `${cfg.zig.bin.toString()}cpp`
+    const zig     = ["-d:zig",
+      "--cc:clang",
+      `--clang.exe=${zigcc}`,          `--clang.linkerexe=${zigcc}`,
+      `--clang.cppCompiler=${zigcpp}`, `--clang.cppXsupport="-std=c++20"`,
+    ]
+    const cache = "--nimcache:"+cfg.nim.cache.toString()
+    await shell.run(cfg.nim.bin, backend, verbose, ...zig, cache, ...args)
+  } //:: Manager.Nim
 } //:: Manager.Nim
 
 export const ManagerZig = {
@@ -17,3 +30,4 @@ export const ManagerZig = {
   validate : Nim.validate,
   run      : Nim.run,
 }
+
