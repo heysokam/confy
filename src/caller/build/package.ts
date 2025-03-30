@@ -7,7 +7,7 @@
  * Should be run during confy's build process.
  * */
 // @deps confy
-import pkg from '../../package.json'
+import pkg from '../package.json'
 import { File } from '../confy/tools/files'
 import { cfg } from '../confy/cfg'
 

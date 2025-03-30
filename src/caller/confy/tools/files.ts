@@ -60,7 +60,7 @@ export const Dir = {
   exists  : Path.exists,
   cwd     : dir_get_current,
   current : dir_get_current,
-  rmv     : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdirSync(path) : {},
+  rmv     : (path :fs.PathLike) => (Dir.exists(path)) ? fs.rmdirSync(path, {recursive: true}) : {},
   create  : (trg :fs.PathLike, recursive :boolean= true) => fs.mkdirSync(trg, {recursive: recursive}),
   move    : (src :fs.PathLike, trg :fs.PathLike, opts ?:fs.CopySyncOptions) => {
     fs.cpSync(src.toString(), trg.toString(), {...opts, recursive: true})

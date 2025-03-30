@@ -11,12 +11,12 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService  : { allowDefaultProject: [
-          'src/confy.ts',
-          'src/*wip.{js,jsx,ts,tsx}',
-          'src/build/*.{js,jsx,ts,tsx}',
+          'confy.ts',
+          '*wip.{js,jsx,ts,tsx}',
+          'build/*.{js,jsx,ts,tsx}',
           // Test Folders  (TODO: How to recurse)
-          'src/*.test.{js,jsx,ts,tsx}',
-          'src/confy/tools/*.test.{js,jsx,ts,tsx}',
+          '*.test.{js,jsx,ts,tsx}',
+          'confy/tools/*.test.{js,jsx,ts,tsx}',
           // Examples  (TODO: How to recurse)
           'examples/minimal/*.{js,jsx,ts,tsx}'
         ]},
@@ -37,7 +37,7 @@ export default tseslint.config(
   },
 
   {
-    ignores: ["public/**",  "bin/**",  "ref/**",  "butcher/**", 'src/confy/tools/minisign.js', "eslint.config.mjs", ],
+    ignores: ["public/**",  "bin/**",  "ref/**",  "butcher/**", 'confy/tools/minisign.js', "eslint.config.mjs", ],
   }
 );
 

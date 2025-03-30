@@ -21,6 +21,7 @@ examples/**/bun.lockb
 
 # production
 src/caller/bin
+src/caller/public
 /bin
 /build
 /public

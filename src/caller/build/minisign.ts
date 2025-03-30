@@ -14,7 +14,7 @@ import { Default as log } from "../confy/log"
 import { File } from "../confy/tools"
 
 const url     = new URL("https://raw.githubusercontent.com/mlugg/setup-zig/refs/heads/main/minisign.js")
-const trgDir  = "./src/confy/tools/"
+const trgDir  = "./confy/tools/"
 const trgFile = trgDir+"minisign.js"
 
 if (import.meta.main) try { await run() } catch { throw new Error("[FATAL]: Failed to build MiniSign from: "+url.toString())}

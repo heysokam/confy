@@ -7,7 +7,7 @@ import { Path, File } from '../tools';
 class LangError extends Error {}
 export namespace Lang {
 export enum ID { Unknown, Asm, C, Cpp, Zig, Nim, Minim }
-export const name = (id :Lang.ID) :string=> Object.values(Lang.ID)[id]
+export const name = (id :Lang.ID) :string=> (Object.values(Lang.ID)[id] ?? "").toString()
 
 namespace Identify {
   /**
@@ -35,7 +35,7 @@ namespace Identify {
   export function file (
       src : SourceFile
     ) :Lang.ID {
-    let result = Identify.ext(Path.ext(src)) || Identify.ext(File.findExtension(src))
+    const result = Identify.ext(Path.ext(src)) || Identify.ext(File.findExtension(src))
     if (result === Lang.ID.Unknown) throw new LangError("Couldn't find the language of a file using its extension: "+src.toString())
     return result
   } //:: confy.Lang.Identify.file
@@ -47,7 +47,7 @@ namespace Identify {
   export function list (
       src : SourceList
     ) :Lang.ID {
-    let langs = new Set<Lang.ID>()
+    const langs = new Set<Lang.ID>()
     for (const file of src) langs.add(Identify.file(file))
          if (langs.has(Lang.ID.Nim  )) return Lang.ID.Nim
     else if (langs.has(Lang.ID.Minim)) return Lang.ID.Minim
