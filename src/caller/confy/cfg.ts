@@ -208,7 +208,7 @@ export namespace defaults {
 
   export function clone () :Config { return {
     prefix        : cfg.defaults.prefix(),
-    verbose       : true,
+    verbose       : false,
     quiet         : false,
     force         : false,
     pkg           : cfg.defaults.pkg.info(),
