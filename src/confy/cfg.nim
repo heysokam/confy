@@ -5,6 +5,23 @@
 #_______________________________________
 # @section Tool Config
 #_____________________________
+const tool_name    *{.strdefine .}= "confy"
+const tool_icon    *{.strdefine .}= "ᛝ"
+const tool_sep     *{.strdefine .}= "|"
+const tool_postfix *{.strdefine .}= ":"
+const tool_prefix  *{.strdefine .}= cfg.tool_icon&" "&cfg.tool_name&cfg.tool_postfix
+const tool_verbose *{.booldefine.}= defined(debug) or not (defined(release) or defined(danger))
+
+
+#_______________________________________
+# @section Logging Config
+#_____________________________
+const log_info  *{.strdefine.}= ""
+const log_warn  *{.strdefine.}= " ⚠ Warning ⚠"
+const log_error *{.strdefine.}= " ❌ Error ❌"
+const log_fatal *{.strdefine.}= " ⛔ Error ⛔"
+const log_debug *{.strdefine.}= " 🐜 Debug 🐜"
+
 
 #_______________________________________
 # @section Default Values

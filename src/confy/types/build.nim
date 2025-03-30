@@ -27,7 +27,7 @@ type Build *{.pure.}= enum None, Program, SharedLib, StaticLib, UnitTest, Object
 # @note
 #  Don't use directly. Use Build.* instead
 #  eg: Build.Program
-type BuildTarget = object
+type BuildTarget * = object
   kind   *:Build
   src    *:SourceList
   trg    *:PathLike
