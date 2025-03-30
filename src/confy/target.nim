@@ -1,11 +1,14 @@
 #:______________________________________________________________________
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
+# @deps std
+from std/paths import Path
 # @deps confy
-import ./types/build {.all.} as types
+import ./types/errors
+import ./types/build as types
 import ./lang
 import ./command
-from   ./log import nil
+from   ./log import fail
 
 export types.Build
 
@@ -15,33 +18,20 @@ func new *(kind :Build;
   result      = BuildTarget()
   result.kind = kind
   result.src  = @[src]
+  result.trg  = string(paths.splitFile(src.Path).name)
   result.lang = Lang.identify(result.src)
 
 
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
-  result = trg
   let cmd = Command.build(trg)
-  log.dbg "Building:", trg.repr
-  log.dbg "Command :", cmd.repr
+  # log.dbg "Building:", trg.repr
+  if cmd.exec() == 0: trg.fail BuildError, "Failed to build the target:\n  ", trg.repr
+  result = trg
 
 
 func run *(trg :BuildTarget) :BuildTarget {.discardable.}=
-  log.dbg "Running:", trg.repr
+  # log.dbg "Running:", trg.repr
+  let cmd = Command.run(trg)
+  cmd.exec()
   result = trg
-
-
-
-
-# export namespace Build {
-#
-#
-# export namespace Command {
-#   export function C (
-#     ) :string[] {
-#     return [""]
-#   } //:: confy.Build.Command.C
-# } //:: confy.Build.Command
-#
-#
-# } //:: confy.Build
 
