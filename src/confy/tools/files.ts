@@ -66,6 +66,7 @@ export const Dir = {
     fs.cpSync(src.toString(), trg.toString(), {...opts, recursive: true})
     Dir.rmv(src)
   },
+  // glob: remember https://www.npmjs.com/package/glob
 } //:: Dir
 
 

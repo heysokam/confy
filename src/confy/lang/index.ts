@@ -7,6 +7,7 @@ import { Path, File } from '../tools';
 class LangError extends Error {}
 export namespace Lang {
 export enum ID { Unknown, Asm, C, Cpp, Zig, Nim, Minim }
+export const name = (id :Lang.ID) :string=> Object.values(Lang.ID)[id]
 
 namespace Identify {
   /**
