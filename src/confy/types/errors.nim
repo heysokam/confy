@@ -3,4 +3,5 @@
 #:______________________________________________________________________
 ## @fileoverview Error Types
 #_____________________________|
-type BuildError * = object of CatchableError
+type BuildError    * = object of CatchableError
+type SomeToolError * = BuildError
