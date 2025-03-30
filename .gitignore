@@ -20,6 +20,7 @@ examples/**/bun.lockb
 /out/
 
 # production
+src/caller/bin
 /bin
 /build
 /public
@@ -43,8 +44,9 @@ yarn-error.log*
 *.tsbuildinfo
 
 # Version Locks
-package-lock.json
-bun.lockb
+src/caller/package-lock.json
+src/caller/bun.lockb
+src/caller/bun.lock
 
 # Zig Output
 **/zig-*
