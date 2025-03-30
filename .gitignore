@@ -4,6 +4,7 @@ src/confy/tools/minisign.js
 examples/**/package.json
 examples/**/bun.lock
 examples/**/bun.lockb
+examples/**/build.nim.cfg
 
 # dependencies
 /node_modules
