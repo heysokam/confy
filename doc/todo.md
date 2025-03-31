@@ -16,7 +16,7 @@
       (user sends the flags: `-Wl,-s`, `-strip-debug`, `-s`, etc, since its compiler-dependent)
 - [ ] Per-file formatted progress bar for binaries on quiet
 - [ ] BuildInfo report when not quiet
-- [ ] cfg: configuration option:  `cfg.zigSystemBin`  (default:on)
+- [x] cfg: configuration option:  `cfg.zigSystemBin`  (default:on)
            ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
            A local-only version is downloaded and used for the project when off.
 - [ ] Stop process when a previous step failed
@@ -31,12 +31,7 @@
   - [ ] Short option arguments
   - [ ] Long option arguments (variables) support   `key=val`
   - [ ] Arguments (non-files always interpreted as keywords)
-- [ ] Figure out: Support for JS & NPM Package
-      ```json
-      "files": [ "public" ],
-      "main": "public/index.js",
-      "types": "public/index.d.ts",
-      ```
+- [_] Figure out: Support for JS & NPM Package
 - [ ] Command line command parsing (for pkg-config, etc)   (note: windows with pkg-config-lite maybe?)
 - [ ] Linking with `mold` on linux : https://github.com/rui314/mold/releases
 ### Dependencies
@@ -59,7 +54,7 @@
     defines.os  : builtin.os
 - [ ] Give context/info about the target when building/running.
 ## C and C++
-- [ ] Basic C support
+- [x] Basic C support
 - [ ] Basic C++ support
 - [ ] Correctly select `C` or `C++` compiler inside a seq (found for each file, instead of globally for the whole list)
 - [ ] Remote folders _(same concept as Repositories in SCons)_
@@ -88,6 +83,7 @@
 - [ ] Examples:
   - [ ] Basic usage
   - [ ] Advanced usage
+  - [ ] Complex C cases  (passing confy.Object with different compile flags)
 
 ## Make to Confy
 - [ ] Rewrite/Port to the Bun codebase
