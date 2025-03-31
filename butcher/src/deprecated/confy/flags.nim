@@ -24,12 +24,6 @@ proc toLD *(flags :varargs[string]) :Flags=
 #_______________________________________
 # Compiler Flag sets
 #___________________
-func std *(lang :Lang) :Flags=
-  case lang
-  of C   : "-std=c11".toCC
-  of Cpp : "-std=c++20".toCC
-  else   : Flags()
-#___________________
 const less * = Flags(
   cc: @[
   "-Wall",

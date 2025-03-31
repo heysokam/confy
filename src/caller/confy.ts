@@ -34,7 +34,6 @@ namespace Commands {
         ...args : unknown[]
       ) :Promise<void> {
       cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
-      // FIX: Needs to pass --path for local confy
       const trg = Path.join(cfg.dir.cache, Path.name(Builder.entry))
       const out = "-o:"+trg.toString()
       const libs :string[]= []

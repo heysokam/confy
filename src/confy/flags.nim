@@ -2,9 +2,10 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps confy
+import ./types/build
 
-const C * = @[
-  "-std=c2x",
+
+const Strict * = @[
   "-Weverything",
   "-Werror",
   "-pedantic",
@@ -15,7 +16,19 @@ const C * = @[
   "-Wno-error=pre-c2x-compat",
   "-Wno-error=unsafe-buffer-usage",
   "-Wno-error=#warnings",
-  ] #:: flags.C
+  ]
 
-const Cpp * = flags.C  # FIX: C++ specific
+#___________________
+func std *(lang :build.Lang) :build.Flag=
+  case lang
+  of C   : "-std=c2x"
+  of Cpp : "-std=c++20"
+  else   : ""
+
+
+#_______________________________________
+# @section Default Flags (Strict)
+#_____________________________
+const C   * = @[Lang.C.std()]   & flags.Strict
+const Cpp * = @[Lang.Cpp.std()] & flags.Strict
 
