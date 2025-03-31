@@ -18,11 +18,11 @@ export types.Build
 
 
 func new *(kind :Build;
-    version : Version      = Version();
     entry   : PathLike     = "";
     cfg     : Config       = Config();
     src     : SourceList   = @[];
     trg     : PathLike     = NullPath;
+    version : Version      = Version();
     sub     : PathLike     = "";
     lang    : Lang         = Lang.Unknown;
     deps    : Dependencies = @[];

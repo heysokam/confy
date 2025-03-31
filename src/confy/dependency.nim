@@ -77,6 +77,13 @@ func download *(trg :build.BuildTarget; _:typedesc[Dependencies]) :void=
 #_______________________________________
 # @section Nim: Dependencies to Arguments
 #_____________________________
+# Forward Declare
+func toNim *(
+    deps : build.Dependencies;
+    dir  : PathLike = ".";
+  ) :build.ArgsList;
+#_____________________________
+# Standard Tools
 func nim_path (
     dep  : build.Dependency;
     dir  : PathLike = ".";
@@ -87,13 +94,15 @@ func nim_path (
 func toNim *(
     dep  : build.Dependency;
     dir  : PathLike = ".";
-  ) :build.ArgsList= @[dep.nim_path(dir)]
+  ) :build.ArgsList=
+  result.add dep.nim_path(dir)
+  result &= dep.deps.toNim(dir)
 #___________________
 func toNim *(
     deps : build.Dependencies;
     dir  : PathLike = ".";
   ) :build.ArgsList=
-  for dep in deps: result.add dep.toNim(dir)
+  for dep in deps: result &= dep.toNim(dir)
 
 
 #_______________________________________

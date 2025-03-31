@@ -32,7 +32,7 @@ type NimUnsafe * = object
 
 type NimBackend *{.pure.}= enum c, cpp, objc, js
 type Nim * = object
-  bin  *:PathLike=  cfg.dirs_bin/cfg.nim_dir/cfg.nim_bin ## @descr
+  bin  *:PathLike=  cfg.dirs_bin/cfg.nim_dir/"bin"/cfg.nim_bin ## @descr
     ##  Binary that confy will call when it needs to run `nim [options]`
     ##  Can be a binary in PATH, or an absolute or relative path
     ##  @default "nim" Relies on nim being installed on PATH
@@ -54,7 +54,7 @@ type Nim * = object
 
 
 type Nimble * = object
-  bin       *:PathLike=  cfg.dirs_bin/cfg.nimble_dir/cfg.nimble_bin
+  bin       *:PathLike=  cfg.dirs_bin/cfg.nimble_dir/"bin"/cfg.nimble_bin
   cache     *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.nimble_dir
   systemBin *:bool    =  false
 

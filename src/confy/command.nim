@@ -115,9 +115,14 @@ func nim *(_:typedesc[Command];
   result.args.add &"--NimblePath:{trg.cfg.nimble.cache}"
   # Flags
   result.args &= @[]
+  # Dependencies
+  result.args &= trg.deps.toNim(trg.cfg.dirs.lib)
+  # Output
+  let outDir = trg.cfg.dirs.bin/trg.sub
+  result.args.add &"--out:{trg.trg}"
+  result.args.add &"--outDir:{outDir}"
   # Source code
   for file in trg.src: result.args.add trg.cfg.dirs.src/file
-  # Output
 
 
 #_______________________________________
