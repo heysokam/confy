@@ -4,27 +4,53 @@
 # @deps std
 from std/paths import Path
 # @deps confy
+import ./types/base
 import ./types/errors
+import ./types/config
 import ./types/build as types
+import ./tools/version as V
+from   ./log import fail, verb, warn
 import ./lang
 import ./command
-from   ./log import fail, verb, warn
+import ./dependency
 
 export types.Build
 
+
 func new *(kind :Build;
-    src :string;
+    version : Version      = Version();
+    entry   : PathLike     = "";
+    cfg     : Config       = Config();
+    src     : SourceList   = @[];
+    trg     : PathLike     = NullPath;
+    sub     : PathLike     = "";
+    lang    : Lang         = Lang.Unknown;
+    deps    : Dependencies = @[];
+    flags   : Flags        = Flags();
+    args    : ArgsList     = @[];
   ) :BuildTarget=
-  result      = BuildTarget()
-  result.kind = kind
-  result.src  = @[src]
-  result.trg  = string(paths.splitFile(src.Path).name)
-  result.lang = Lang.identify(result.src)
+  ## @descr
+  ##  Creates a new {@link BuildTarget} object containing all the data needed by confy to build the given binary {@arg kind}
+  ##  Any arguments omitted will be automatically resolved to sane defaults.
+  ## @example
+  ##  ```nim
+  ##  const app = Program.new("hello.c")
+  ##  ```
+  result       = BuildTarget(kind: kind, version: version)
+  result.cfg   = cfg
+  result.src   = if entry != "": @[entry] & src else: src
+  result.trg   = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
+  result.sub   = sub
+  result.lang  = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
+  result.deps  = deps
+  result.flags = flags
+  result.args  = args
 
 
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
+  trg.download(Dependencies)
   let cmd = Command.build(trg)
-  if cmd.exec() != 0: trg.fail CompileError, "Failed to build the target:\n  ", trg.repr
+  if cmd.exec() != 0: trg.fail CompileError, "Failed to build the target:\n  ", $trg
   result = trg
 
 
