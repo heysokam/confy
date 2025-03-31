@@ -1,9 +1,6 @@
 #:______________________________________________________________________
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
-when not defined(nimscript): import system/nimscript except dirExists  # Silence incorrect lsp noise
-
-#_____________________________
 # Package Information
 packageName  = "confy"
 version      = "0.7.0"
