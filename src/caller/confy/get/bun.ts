@@ -70,7 +70,7 @@ export async function download (
   if (!Dir.exists(cfg.bun.dir)) Dir.create(cfg.bun.dir)
   File.move(zipTrg, cfg.bun.bin.toString()+Path.ext(zipTrg))
   Dir.rmv(Path.dirname(zipTrg))
-  log.info(cfg, "Done downloading Bun.")
+  log.info(cfg, "Bun: Done downloading.")
 } //:: BUN.download
 } //:: BUN
 

@@ -228,7 +228,7 @@ export namespace Download {
     ) :boolean {
     if (force) return false
     const binExists = Zig.exists(cfg)
-    if (binExists) { log.verb(cfg, "Zig: Already exists. Omitting download."); return true }
+    if (binExists) { log.info(cfg, "Zig: Already exists. Omitting download."); return true }
     if (!File.exists(cfg.zig.index   )) { log.verb(cfg, `Zig: Index at ${cfg.zig.index.toString()} does not exist. Downloading Zig.`); return false }
     if (!File.exists(cfg.zig.current )) { log.verb(cfg, `Zig: Current version index at ${cfg.zig.current.toString()} does not exist. Downloading Zig.`); return false }
     if (!File.exists(cfg.zig.cache   )) { log.verb(cfg, `Zig: Cache folder at ${cfg.zig.cache.toString()} does not exist. Downloading Zig.`); return false }
@@ -304,10 +304,10 @@ export namespace Download {
     // Request & Download
     const trg = new URL(Path.join(url, Zig.indexFile).toString())
     const mirror = await Zig.Download.request(trg, cfg)
-    log.verb(cfg, "Zig: Starting Download: ", Path.basename(cfg.zig.index), " from: ", mirror.url)
+    log.info(cfg, "Zig: Starting Download: ", Path.basename(cfg.zig.index), " from: ", mirror.url)
     await File.dl.fromResponse(mirror, cfg.zig.index)
     // Return the downloaded index object
-    log.verb(cfg, "Zig: Done downloading: ", Path.basename(cfg.zig.index), "from: ", mirror.url)
+    log.info(cfg, "Zig: Done downloading: ", Path.basename(cfg.zig.index), "from: ", mirror.url)
     return JSON.parse(File.read(cfg.zig.index).toString()) as Zig.Registry
   }
 
@@ -354,10 +354,10 @@ export namespace Download {
     Zig.clean(trgFile, cfg, force)
     // Download the file
     const mirror = await Zig.Download.request(url, cfg)
-    log.verb(cfg, "Zig: Starting Download:", Path.basename(trgFile), " from: ", mirror.url)
+    log.info(cfg, "Zig: Starting Download:", Path.basename(trgFile), " from: ", mirror.url)
     await File.dl.fromResponse(mirror, trgFile)
     // Read and Return the file's data
-    log.verb(cfg, "Zig: Done downloading: ", Path.basename(trgFile), "from: ", mirror.url)
+    log.info(cfg, "Zig: Done downloading: ", Path.basename(trgFile), "from: ", mirror.url)
     return Buffer.from(File.read(trgFile).buffer)
   }
 
@@ -424,7 +424,7 @@ export namespace Download {
       } catch (e) { // Mirror failed. Try next
         const next = mirrors[id+1]
         // FIX: Something is very off with these messages. The current/next values are mixed up by the try/catch scopes
-        if (next) log.verb(cfg, (e as Error).message, `\n -> Downloading from \`${mirror.toString()}\` didn't work. Re-trying from: ${next.toString()}`)
+        if (next) log.info(cfg, (e as Error).message, `\n -> Downloading from \`${mirror.toString()}\` didn't work. Re-trying from: ${next.toString()}`)
         else      log.fail(cfg, "Zig: Something went wrong when downloading. No link worked, even the official one. Links tried (in order):", JSON.stringify({ mirrors }, null, 2))
       }
     }
@@ -441,7 +441,7 @@ export async function extract (
   // Clean the target folder when needed
   Zig.clean(cfg.zig.dir, cfg, force)
   // Extract into the zig cache
-  log.verb(cfg, "Zig: Extracting binaries into folder: ", cfg.zig.cache)
+  log.info(cfg, "Zig: Extracting binaries into folder: ", cfg.zig.cache)
   const trgDir  = Path.toAbsolute(cfg.zig.cache)
   const subDir  = Path.join(cfg.zig.cache, Path.basename(trg, Zig.Tar.ext()))  // Subfolder where the files will exist after extract
   const tarFile = Path.join(cfg.zig.cache, Path.basename(trg, ".xz"))
@@ -453,6 +453,7 @@ export async function extract (
   }
   // Move the cache data into the target folder
   Dir.move(subDir, cfg.zig.dir)
+  log.info(cfg, "Zig: Done extracting: ", cfg.zig.cache)
 } //:: Zig.unzip
 
 
@@ -475,12 +476,14 @@ export async function download (
     cfg   : confy.Config = confy.defaults.clone(),
     force : boolean      = false,
   ) :Promise<void> {
-  if (Zig.exists(cfg) && !force) return log.verb(cfg, "Zig: Already exists. Omitting download.");
   // Skip repeating downloads
+  if (Zig.exists(cfg) && !force) return log.verb(cfg, "Zig: Already exists. Omitting download.");
   if (force) log.verb(cfg, "Zig: Force downloading into folder: ", cfg.zig.dir)
-  else       log.verb(cfg, "Zig: Does not exist. Downloading into folder: ", cfg.zig.dir)
+  else       log.info(cfg, "Zig: Does not exist. Downloading into folder: ", cfg.zig.dir)
+  // Download from any mirrors
   const trg = await Zig.Download.tryAll(cfg, force)
   await Zig.extract(trg, cfg, force)
+  log.info(cfg, "Zig: Done Downloading.")
 } //:: Zig.download
 
 } //:: Zig

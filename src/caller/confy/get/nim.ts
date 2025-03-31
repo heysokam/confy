@@ -232,7 +232,7 @@ export async function bootstrap (
     cfg   : confy.Config = confy.defaults.clone(),
     force : boolean      = false,
   ) :Promise<void> {
-  log.verb(cfg, "Nim: Starting the Bootstrap process using ZigCC from: ", Nim.Bootstrap.Zig.cc.path(cfg))
+  log.info(cfg, "Nim: Starting the Bootstrap process using ZigCC from: ", Nim.Bootstrap.Zig.cc.path(cfg))
   await Nim.Bootstrap.clone(cfg, force)
   await Nim.Bootstrap.patch(cfg, force)
   await Nim.Bootstrap.zigcc(cfg, force)
@@ -251,12 +251,12 @@ export async function download (
     force : boolean      = false,
   ) :Promise<void> {
   if (Nim.exists(cfg) && !force) return log.verb(cfg, "Nim: Already exists. Omitting download.")
-  log.verb(cfg, "Nim: Starting download into: ", cfg.nim.dir)
+  log.info(cfg, "Nim: Starting download into: ", cfg.nim.dir)
   if (cfg.nim.bootstrap) await Nim.bootstrap(cfg, force)
   else                   await Nim.release(cfg, force)
   log.verb(cfg, "Nim: Copying data from: ", cfg.nim.cache, " into: ", cfg.nim.dir)
   Dir.move(cfg.nim.cache, cfg.nim.dir)
-  log.verb(cfg, "Nim: Done downloading.")
+  log.info(cfg, "Nim: Done downloading.")
 } //:: Nim.download
 
 
