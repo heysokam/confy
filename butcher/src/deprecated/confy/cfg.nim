@@ -27,20 +27,6 @@ var prefix  *:string=  "confy: "
   ## @descr Prefix that will be added at the start of every command output.
 var tab     *:string=  "     : "
   ## @descr Tab that will be added at the start of every new line in of the same message.
-var Cstr    *:string=  "CC"
-  ## @descr Prefix used for formatting the quiet output calls to the Compiler.
-var Lstr    *:string=  "LD"
-  ## @descr Prefix used for formatting the quiet output calls to the Linker.
-
-#___________________
-# ZigCC
-var zigcc * = (
-  systemBin : off,  # default:off
-  ) # << cfg.zigcc ( ... )
-  ## @field systemBin
-  ##  Uses the System's ZigCC path, without downloading a new version from the web.
-  ##  @when on : Uses the system's zig like `zig cc file.c
-  ##  @when off: Runs the zig compiler setup logic and executes the zig compiler like `cfg.zigDir/zig cc file.c`
 
 #___________________
 # Nim
@@ -54,29 +40,6 @@ var nim * = (
     functionPointers : off,
     ) # << cfg.nim.unsafe ( ... )
   ) # << cfg.nim ( ... )
-  ## @field cc
-  ##  Selects the binary that confy will call when it needs to run `nim [options]`
-  ##  Can be a binary in PATH, or an absolute or relative path
-  ##  @default "nim" Relies on nim being installed on PATH
-  ## @field systemBin
-  ##  Uses the System's Nim path, without downloading a new version from the web.
-  ##  @when on : Uses the system's nim like `nim c file.nim`
-  ##  @when off: Runs the nim compiler setup logic and executes the nim compiler like `cfg.nimDir/bin/nim c file.nim`
-  ##  @default:on
-  ##   Avoids confusion for nim users.
-  ##   They will expect it `on` because both the nim compiler and nimble work that way.
-  ## @field backend
-  ##   Selects the backend that the nim compiler will use to build the project.
-  ##   @note Only applies to the project files. The builder app always compiles with the `nim c` backend.
-  ## @field url
-  ##  Link to the Nim repository that will be used for initializing a local-installation of the compiler.
-  ## @field vers
-  ##  Name of the branch (aka version) that will be used when cloning the Nim repository for local-installation of the compiler.
-  ## @field unsafe.functionPointers
-  ##  When active, the flag `-Wno-incompatible-function-pointer-types` will be passed to ZigCC for compiling nim code.
-  ##  The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.
-  ##  This config option exists just for ergonomics, and the same behavior can be achieved by:
-  ##  `someBuildTarget.args = "-Wno-incompatible-function-pointer-types"`
 
 #___________________
 # MinC

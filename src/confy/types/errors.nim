@@ -5,6 +5,8 @@
 #_____________________________|
 type CompileError * = object of IOError
   ## @descr For exceptions during the compile process
+type GitError * = object of IOError
+  ## @descr For exceptions that happened when invoking git commands
 type GeneratorError * = object of IOError
   ## @descr For exceptions during code generation.
-type SomeToolError * = CompileError | GeneratorError
+type SomeToolError * = CompileError | GeneratorError | GitError

@@ -76,34 +76,6 @@ proc extAR *(os :OS) :string=
   else: cerr &"Getting Archive extension of OS.{$os} is not implemented."
 func toAR *(file :Fil; os :OS) :Fil= file.changeFileExt(os.extAR())
 #_____________________________
-proc getCC *(lang :Lang; compiler :Compiler) :string=
-  ## @descr Returns the correct command string to build with the given compiler for the given lang.
-  case lang
-  of Lang.C, Lang.Asm:
-    case compiler
-    of Zig   : result = zcfg.getRealCC()
-    of GCC   : cerr "GCC support has been deprecated. Use ZigCC instead."   # result = ccfg.gcc
-    of Clang : cerr "Clang support has been deprecated. Use ZigCC instead." # result = ccfg.clang
-    # else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
-  of Lang.Cpp:
-    case compiler
-    of Zig   : result = zcfg.getRealCCP()
-    of GCC   : cerr "GCC support has been deprecated. Use ZigCC instead"    # result = ccfg.gpp
-    of Clang : cerr "Clang support has been deprecated. Use ZigCC instead"  # result = ccfg.clangpp
-    # else: raise newException(CompileError, &"Support for getCC with {lang} and compiler {compiler} is currently not implemented.")
-  of Lang.Unknown: raise newException(CompileError, &"Tried to getCC with Lang.{lang}. The input lang is either uninitialized, or support for it is not implemented in confy.")
-  else: raise newException(CompileError, &"Support for getCC for Lang.{lang} and compiler {compiler} is currently not implemented.")
-#_____________________________
-proc getCC *(file :DirFile; compiler :Compiler) :string=  file.getLang.getCC(compiler)
-  ## @descr Returns the correct command string to build the input file with the given compiler.
-  ## @note Its language will be decided by its file extension.
-#_____________________________
-proc getCC *(list :seq[DirFile]; compiler :Compiler) :string=  list.getLang.getCC(compiler)
-  ## @descr Returns the correct command string to build the input list of files with the given compiler.
-  ## @notes
-  ##  Its language will be decided by its file extension.
-  ##  Lang will be cpp first if one of the files has .cpp or .cc extension.
-#_____________________________
 func toNim *(syst :System) :SystemStr=  (os: $syst.os, cpu: $syst.cpu)
   ## @descr Converts a system object into an (os,cpu) string pair, usable with nimc as --os:OS --cpu:CPU
 func toZig *(syst :System) :SystemStr=

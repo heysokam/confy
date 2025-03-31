@@ -21,7 +21,6 @@ proc sh *(cmd :string; dbg :bool= false) :void=
   if dbg: echo cmd
   if cfg.fakeRun: return
   if os.execShellCmd(cmd) != 0: raise newException(OSError, &"Failed to run shell command:  {cmd}")
-proc git *(args :varargs[string,`$`]) :void= sh cfg.gitBin&" "&args.join(" ")
 #___________________
 # Access time
 when not nims:

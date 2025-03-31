@@ -17,14 +17,6 @@ else:
 from nstd/types as nstd import nil
 
 
-#_________________________________________________
-# @section Error Management
-#___________________
-type CompileError * = object of IOError
-  ## @descr For exceptions during the compile process
-type GeneratorError * = object of IOError
-  ## @descr For exceptions during code generation.
-
 
 #_______________________________________
 # @section Paths
@@ -45,43 +37,7 @@ type DirFile * = object
   file  *:Fil
 
 
-#_________________________________________________
-# @section Package information
-#___________________
-type Package * = object
-  name        *:string
-  version     *:string
-  author      *:string
-  description *:string
-  license     *:string
-
-
-#_________________________________________________
-# @section Dependencies/Submodules Management
-#___________________
-type Dependency * = object
-  name  *:string
-  url   *:string
-  src   *:Dir
-  dir   *:Dir
 type Dependencies * = HashSet[Dependency]
-
-
-#_______________________________________
-# @section Compiler
-#___________________
-type Lang *{.pure.}= enum Unknown, C, Cpp, Nim, MinC, Asm
-  ## @descr Language of a code file, based on its extension
-type BinKind * = enum Program, SharedLibrary, StaticLibrary, Object, Module
-  ## @descr Type of binary that will be output. `.exe`, `.lib`, `.a`, `.o`, etc
-#___________________
-type Flags * = object
-  ## @descr Set of flags to send to the compiler stages.
-  cc *:seq[string]
-  ld *:seq[string]
-#___________________
-type Compiler * = enum Zig, GCC, Clang
-  ## @descr Known compiler names.
 
 
 #_______________________________________
@@ -139,26 +95,9 @@ type BuildMode * = enum Release, Debug
 # @section Build Target
 #___________________
 type BuildTrg * = object
-  kind     *:BinKind       ## @field kind Type of build target
-  src      *:seq[DirFile]  ## @field src Sequence of source files to build with. Object files (aka `.o`, etc) will be linked at the end and their path won't be adjusted.
-  trg      *:Fil           ## @field trg Output binary to build
-  cc       *:Compiler      ## @field cc Compiler that will be used to build the app.
   # Optional fields
-  flags    *:Flags         ## @field flags Set of flags to send to each compiler stage
   syst     *:System        ## @field syst Target system of the build object  (eg: linux.x86_64). Will be host when omitted.
   root     *:Dir           ## @field root Root folder of the output. Will be: `binDir` when omitted, `root` when absolute, and `binDir/root` when relative.
   sub      *:Dir           ## @field sub Subfolder where the source code files will be remapped to, relative to cfg.srcDir. For when the root of src is in srcDir/sub instead
   remotes  *:seq[Dir]      ## @field remotes Remote folders to search for files (in order), when they are not found in the main folder.
-  deps     *:Dependencies  ## @field deps Submodules/Dependencies required to build this target
-  args     *:string        ## @field args Extra arguments to send to the compiler command. Will be added right at the end.
-  version  *:string        ## @field version Version string. Currently used for info reports in CLI with `BuildTrg.print()`.
-  # Internals
-  lang     *:Lang          ## @internal @field lang Main language of the app. Having any cpp files will make the app be Cpp
-
-
-#_______________________________________
-# @section Extra tools
-#___________________
-type VersT     = uint
-type Version * = nstd.Version[VersT]
 

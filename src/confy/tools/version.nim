@@ -9,6 +9,8 @@ type Minor = uint64
 type Patch = uint64
 type Tag   = string
 type Build = string
+# type VersT     = uint
+# type Version * = nstd.Version[VersT]
 
 type Version * = object
   major  *:version.Major= 0

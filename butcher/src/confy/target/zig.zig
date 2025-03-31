@@ -15,40 +15,10 @@ const BuildTrg     = @import("../target.zig");
 const BuildOptions = BuildTrg.BuildOptions;
 const Dependency   = @import("../dependency.zig");
 
-//_____________________________________
-pub fn getCC       (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.zig, "zig"});  }
-pub fn getCacheDir (trg :*const BuildTrg) !cstr { return try std.fs.path.join(trg.builder.A.allocator(), &.{trg.cfg.dir.bin, trg.cfg.dir.cache, "zig"});  }
-fn getEmitBin      (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
+fn getEmitBin (trg :*const BuildTrg, system :System, opts:BuildOptions) !cstr {
   return try std.fmt.allocPrint(trg.builder.A.allocator(), "-femit-bin={s}", .{try trg.getBin(system, opts)});
 } //:: BuildTrg.zig.getEmitBin
 
-fn getModules (trg :*const BuildTrg) !zstd.seq(zstd.str) {
-  if (trg.deps.items.len == 0) return zstd.seq(zstd.str).init(trg.builder.A.allocator());
-  // Build a oneliner with all dependencies, starting from root
-  var root = zstd.str.init(trg.builder.A.allocator());
-  defer root.deinit();
-  // Add all root dependencies as --dep to the resulting command
-  try Dependency.getZigDeps(trg.deps, &root);
-  // The first module is the root module  (according to the CLI -h message.)
-  try root.appendSlice(" -M");
-  try root.appendSlice(trg.trg);
-  try root.append('=');
-  try root.appendSlice(trg.src.files.getLast());
-  // Add the dependencies
-  var iter = std.mem.reverseIterator(trg.deps.items);
-  while (iter.next()) |dep| try dep.toZig(trg.cfg.dir.lib, true, &root);
-  // Split the oneliner
-  //  We would confuse the shell runner if we sent them all in one string
-  var result = zstd.seq(zstd.str).init(trg.builder.A.allocator());
-  var iter2 = std.mem.splitScalar(u8, root.items, ' ');
-  while (iter2.next()) |arg| {
-    if (arg.len == 0) continue; // Skip empty splitting results
-    var argument = zstd.str.init(trg.builder.A.allocator());
-    try argument.appendSlice(arg);
-    try result.append(argument);
-  }
-  return result;
-}
 
 //_____________________________________
 /// @descr Orders confy to build the resulting binary for this Zig BuildTrg.

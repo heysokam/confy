@@ -18,14 +18,6 @@ import ./zigcc/zcfg
 
 
 #_____________________________________________________
-# @section MinC: General Config
-#_____________________________
-const KnownExts = [".cm",".nim"]
-template getRealBin *() :string=
-  if cfg.minc.systemBin: cfg.minc.cc else: string cfg.mincDir/"bin"/cfg.minc.cc
-
-
-#_____________________________________________________
 # @section MinC: Builder
 #_____________________________
 proc compile *(src :seq[DirFile]; obj :BuildTrg; force :bool= false) :void=
