@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@heysokam/confy",
-  "version": "0.6.50",
+  "version": "0.7.0",
   "description": "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim",
   "license": "GPL-3.0-or-later",
   "author": {
