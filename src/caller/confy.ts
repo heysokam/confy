@@ -6,7 +6,7 @@ import * as fs from 'fs'
 // @deps confy
 import * as log from './confy/log'
 import { Manager } from './confy/manager'
-// import { Package } from './confy/package'
+import { Package } from './confy/package'
 import { File, Dir, Path } from './confy/tools/files'
 import { cfg as confy } from './confy/cfg'
 import { Cli as ConfyCLI } from './confy/tools/cli'
@@ -37,8 +37,10 @@ namespace Commands {
       // FIX: Needs to pass --path for local confy
       const trg = Path.join(cfg.dir.cache, Path.name(Builder.entry))
       const out = "-o:"+trg.toString()
+      const libs :string[]= []
+      for (const dep of Package.dependencies) libs.push("--path:"+Path.join(Package.paths.libs, dep.name, dep.subdir).toString())
       File.rmv(trg) // Clean every time
-      await Manager.Nim.compile(cfg, "-d:release", out, Builder.entry)
+      await Manager.Nim.compile(cfg, "-d:release", ...libs, out, Builder.entry)
       await shell.run(trg, ...args, ...ConfyCLI.raw().slice(3))
     }
   }
@@ -52,7 +54,7 @@ namespace Commands {
       await Manager.Zig.validate(cfg)
       await Manager.Nim.validate(cfg)
       // Add confy+libs+config to the package (when needed)
-      // await Package.init(cfg)
+      await Package.init()
     } //:: Commands.Build.requirements
   } //:: Commands.Build
 
