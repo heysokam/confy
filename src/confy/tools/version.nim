@@ -28,7 +28,7 @@ func version *(
     b : version.Build= "";
   ) :Version {.inline.}= Version(major:M, minor:m, patch:p, tag:t, build:b)
 
-func parse *(_:typedesc[Version]; vers :string) :Version= Version()
+func parse   *(_:typedesc[Version]; vers :string) :Version= Version()
 func version *(vers :string) :Version {.inline.}= Version.parse(vers)
 
 

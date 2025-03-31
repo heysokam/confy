@@ -23,12 +23,13 @@ func err  *(msg :varargs[string, `$`]) :void= log.base(pfx= cfg.tool_prefix&cfg.
 func dbg  *(msg :varargs[string, `$`]) :void= log.base(pfx= cfg.tool_prefix&cfg.log_debug, msg)
 func verb *(msg :varargs[string, `$`]) :void=
   if cfg.tool_verbose: log.base(pfx= cfg.tool_prefix&cfg.log_info,  msg)
+
 template fail *(Err :CatchableError; msg :varargs[string, `$`])=
   ## Marks a block of code as an unrecoverable fatal error. Raises an exception when entering the block.
   ## For debugging unexpected errors on the buildsystem.
   const inst = instantiationInfo()
   const info = "$#($#,$#): " % [inst.fileName, $inst.line, $inst.column]
-  raise newException(Err, cfg.tool_prefix&cfg.log_fatal & " " & info & " " & msg.join(" "))
+  {.cast(noSideEffect).}: raise newException(Err, info & "\n" & cfg.tool_prefix&cfg.log_fatal & " " & msg.join(" "))
 
 
 
@@ -47,5 +48,5 @@ template fail *(trg :BuildTarget; Err :typedesc[SomeToolError]; msg :varargs[str
   ## For debugging unexpected errors on the buildsystem.
   const inst = instantiationInfo()
   const info = "$#($#,$#): " % [inst.fileName, $inst.line, $inst.column]
-  raise newException(Err, trg.cfg.prefix&cfg.log_fatal & " " & info & " " & msg.join(" "))
+  {.cast(noSideEffect).}: raise newException(Err, info & "\n" & trg.cfg.prefix&cfg.log_fatal & " " & msg.join(" "))
 
