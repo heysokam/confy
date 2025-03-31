@@ -37,6 +37,8 @@ func c *(_:typedesc[Command];
   if trg.cfg.verbose: result.args.add "-v"
   # Flags
   result.args &= flags.C
+  # User Args
+  result.args &= trg.args
   # Source code
   for file in trg.src: result.args.add trg.cfg.dirs.src/file
   # Output
@@ -57,6 +59,8 @@ func cpp *(_:typedesc[Command];
   if trg.cfg.verbose: result.args.add "-v"
   # Flags
   result.args &= flags.Cpp
+  # User Args
+  result.args &= trg.args
   # Source code
   for file in trg.src: result.args.add trg.cfg.dirs.src/file
   # Output
@@ -97,6 +101,8 @@ func zig *(_:typedesc[Command];
   if trg.kind == Program: result.args.add "-freference-trace"
   # Dependencies
   result.args &= trg.zig_getModules()
+  # User Args
+  result.args &= trg.args
   # Output
   result.args.add "-femit-bin=" & trg.getBinary()
 
@@ -121,6 +127,8 @@ func nim *(_:typedesc[Command];
   let outDir = trg.cfg.dirs.bin/trg.sub
   result.args.add &"--out:{trg.trg}"
   result.args.add &"--outDir:{outDir}"
+  # User Args
+  result.args &= trg.args
   # Source code
   for file in trg.src: result.args.add trg.cfg.dirs.src/file
 
