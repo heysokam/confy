@@ -1,6 +1,8 @@
 #:______________________________________________________________________
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
+# TODO: Port Complete list of flags from butcher
+#________________________________________________|
 # @deps confy
 import ./types/build
 
