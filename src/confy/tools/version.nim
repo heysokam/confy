@@ -20,7 +20,7 @@ type Version * = object
   build  *:version.Build= ""
 
 func toString *(V :Version) :string {.inline.}= &"{$V.major}.{$V.major}.{$V.major}{V.tag}{V.build}"
-template `$`  *(V :Version)= V.toString()
+template `$`  *(V :Version) :string= V.toString()
 
 func version *(
     M : version.Major= 0;
