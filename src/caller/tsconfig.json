@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "target": "ESNext",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "plugins": [],
+    "outDir": "public",
+    "rootDir": ".",
+    "noEmit": true,
+  },
+  "include": [
+    "confy/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "../eslint.config.mjs"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "**/confy.ts",
+    "**/*.wip.*",
+    "**/wip.*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "public"
+  ]
+}

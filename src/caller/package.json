@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@heysokam/confy",
+  "version": "0.7.0",
+  "description": "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Ivan Mar (sOkam!)",
+    "url": "https://github.com/heysokam"
+  },
+  "homepage": "https://github.com/heysokam/confy",
+  "bugs": {
+    "url": "https://github.com/heysokam/confy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heysokam/confy.git"
+  },
+  "keywords": [
+    "buildsystem",
+    "configurable",
+    "ergonomic",
+    "c",
+    "cpp",
+    "zig",
+    "nim",
+    "bun",
+    "zigcc"
+  ],
+  "files": [
+    "public"
+  ],
+  "type": "module",
+  "main": "confy.ts",
+  "scripts": {
+    "build": "./bin/.bun/bun --bun build:minisign && ./bin/.bun/bun --bun x tsc",
+    "build:debug": "./bin/.bun/bun --bun clean && ./bin/.bun/bun --bun build:package && ./bin/.bun/bun --bun build:minisign && ./bin/.bun/bun --bun x tsc --build --verbose --listEmittedFiles",
+    "build:package": "./bin.bun/bun --bun run ./build/package.ts",
+    "build:minisign": "rm -f ./confy/tools/minisign.js && ./bin/.bun/bun --bun run ./build/minisign.ts",
+    "compile:debug": "./bin/.bun/bun --bun build --compile --minify --sourcemap --bytecode ./confy.ts --outfile ./bin/confy",
+    "cr": "./bin/.bun/bun --bun run test && ./bin/.bun/bun --bun run clean && ./bin/.bun/bun --bun check && ./bin/.bun/bun --bun compile:debug && ./bin/.bun/bun --bun exec ./bin/confy",
+    "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy && rm -rf ./bin/.cache",
+    "clean:check": "./bin/.bun/bun --bun check && ./bin/.bun/bun --bun clean",
+    "check": "./bin/.bun/bun --bun check:errors && ./bin/.bun/bun --bun check:syntax",
+    "check:ci": "./bin.bun/bun check:errors && ./bin/.bun/bun --bun run build && ./bin/.bun/bun --bun check:syntax && ./bin/.bun/bun --bun check:exports",
+    "check:errors": "./bin/.bun/bun --bun x tsc --noEmit",
+    "check:syntax": "./bin/.bun/bun --bun x eslint . --max-warnings 0 --report-unused-disable-directives",
+    "check:package": "npx publint",
+    "check:exports": "/bin/.bun/bun --bun x attw || /bin/.bun/bun --bun check:exports:onFail",
+    "check:exports:onFail": "/bin/.bun/bun --bun x attw -f json",
+    "test": "/bin/.bun/bun --bun run build:debug && /bin/.bun/bun --bun test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
+    "@eslint/js": "^9.22.0",
+    "dts-gen": "^0.10.4",
+    "eslint": "^9.22.0",
+    "publint": "^0.3.9",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1"
+  },
+  "dependencies": {
+    "@octokit/types": "^4.1.2",
+    "@types/bun": "latest",
+    "@types/download": "^8.0.5",
+    "@types/extract-zip": "^2.0.3",
+    "@types/tar": "^6.1.13",
+    "extract-zip": "^2.0.1",
+    "octokit": "^4.1.2",
+    "simple-git": "^3.27.0",
+    "sodium-native": "^4.3.3",
+    "tar": "^7.4.3",
+    "xz-decompress": "^0.2.2"
+  }
+}
