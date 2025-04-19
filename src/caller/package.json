@@ -35,20 +35,20 @@
   "scripts": {
     "build": "./bin/.bun/bun --bun build:minisign && ./bin/.bun/bun --bun x tsc",
     "build:debug": "./bin/.bun/bun --bun clean && ./bin/.bun/bun --bun build:package && ./bin/.bun/bun --bun build:minisign && ./bin/.bun/bun --bun x tsc --build --verbose --listEmittedFiles",
-    "build:package": "./bin.bun/bun --bun run ./build/package.ts",
+    "build:package": "./bin/.bun/bun --bun run ./build/package.ts",
     "build:minisign": "rm -f ./confy/tools/minisign.js && ./bin/.bun/bun --bun run ./build/minisign.ts",
     "compile:debug": "./bin/.bun/bun --bun build --compile --minify --sourcemap --bytecode ./confy.ts --outfile ./bin/confy",
     "cr": "./bin/.bun/bun --bun run test && ./bin/.bun/bun --bun run clean && ./bin/.bun/bun --bun check && ./bin/.bun/bun --bun compile:debug && ./bin/.bun/bun --bun exec ./bin/confy",
     "clean": "rm -rf ./public && rm -f ./*.tsbuildinfo && rm -f ./bin/confy && rm -rf ./bin/.cache",
     "clean:check": "./bin/.bun/bun --bun check && ./bin/.bun/bun --bun clean",
     "check": "./bin/.bun/bun --bun check:errors && ./bin/.bun/bun --bun check:syntax",
-    "check:ci": "./bin.bun/bun check:errors && ./bin/.bun/bun --bun run build && ./bin/.bun/bun --bun check:syntax && ./bin/.bun/bun --bun check:exports",
+    "check:ci": "./bin/.bun/bun check:errors && ./bin/.bun/bun --bun run build && ./bin/.bun/bun --bun check:syntax && ./bin/.bun/bun --bun check:exports",
     "check:errors": "./bin/.bun/bun --bun x tsc --noEmit",
     "check:syntax": "./bin/.bun/bun --bun x eslint . --max-warnings 0 --report-unused-disable-directives",
     "check:package": "npx publint",
-    "check:exports": "/bin/.bun/bun --bun x attw || /bin/.bun/bun --bun check:exports:onFail",
-    "check:exports:onFail": "/bin/.bun/bun --bun x attw -f json",
-    "test": "/bin/.bun/bun --bun run build:debug && /bin/.bun/bun --bun test"
+    "check:exports": "./bin/.bun/bun --bun x attw || ./bin/.bun/bun --bun check:exports:onFail",
+    "check:exports:onFail": "./bin/.bun/bun --bun x attw -f json",
+    "test": "./bin/.bun/bun --bun run build:debug && ./bin/.bun/bun --bun test"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",

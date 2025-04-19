@@ -20,7 +20,7 @@ export namespace tool {
   export const name      = "confy"
   export const scope     = "@heysokam"
   export const pkgName   = `${cfg.tool.scope}/${cfg.tool.name}`  // FIX: @npm/ confy is taken
-  export const version   = new confy.Version(0,6,50)
+  export const version   = new confy.Version(0,7,0)
   export const icon      = "ᛝ"
   export const descr     = "Comfortable and Configurable Buildsystem for C, C++, Zig and Nim"
   export const separator = { name: ":", descr: "|" }
