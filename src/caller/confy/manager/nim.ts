@@ -17,14 +17,16 @@ export namespace Nim {
     const warns   = ["--warning:UnusedImport:off"]
     const zigcc   = `${cfg.zig.bin.toString()}cc`
     const zigcpp  = `${cfg.zig.bin.toString()}cpp`
-    const nimble  = [`--clearNimblePath`, `--NimblePath:${cfg.nim.nimble.dir.toString()}`]
+    const nimble  = [`--clearNimblePath`, `--NimblePath:${cfg.nim.nimble.dir.toString()}/pkgs2`]
     const zig     = ["-d:zig",
       "--cc:clang",
       `--clang.exe=${zigcc}`,          `--clang.linkerexe=${zigcc}`,
       `--clang.cppCompiler=${zigcpp}`, `--clang.cppXsupport="-std=c++20"`,
     ]
     const cache = "--nimcache:"+cfg.nim.cache.toString()
-    await shell.run(cfg.nim.bin, backend, verbose, ...hints, ...warns, ...nimble, ...zig, cache, ...args)
+    const cmd = [cfg.nim.bin, backend, verbose, ...hints, ...warns, ...nimble, ...zig, cache, ...args]
+    if (!cfg.quiet) console.log(...cmd)
+    await shell.run(...cmd)
   } //:: Manager.Nim
 } //:: Manager.Nim
 
