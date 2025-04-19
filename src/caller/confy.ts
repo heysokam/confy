@@ -19,13 +19,19 @@ namespace Commands {
   //____________________________
   export namespace Builder {
     export const entry = "build.nim"
+    export function path (
+        cfg : confy.Config,
+        cli : Cli,
+      ) :fs.PathLike {
+      cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
+      const insideSrc = Path.join(cfg.dir.src, Path.name(Builder.entry))
+      return File.exists(insideSrc) ? insideSrc : Builder.entry
+    }
     export function exists (
         cfg : confy.Config,
-        cli : Cli
+        cli : Cli,
       ) :boolean {
-      cfg;cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
-      const default_entry = File.exists(Builder.entry)
-      return default_entry
+      return File.exists(Commands.Builder.path(cfg, cli))
     }
 
     export async function run (
@@ -33,13 +39,13 @@ namespace Commands {
         cli     : Cli,
         ...args : unknown[]
       ) :Promise<void> {
-      cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
-      const trg = Path.join(cfg.dir.cache, Path.name(Builder.entry))
+      const bld = Builder.path(cfg, cli)
+      const trg = Path.join(cfg.dir.cache, Path.name(bld))
       const out = "-o:"+trg.toString()
       const libs :string[]= []
       for (const dep of Package.dependencies) libs.push("--path:"+Path.join(Package.paths.libs, dep.name, dep.subdir).toString())
       File.rmv(trg) // Clean every time
-      await Manager.Nim.compile(cfg, "-d:release", ...libs, out, Builder.entry)
+      await Manager.Nim.compile(cfg, "-d:release", ...libs, out, bld)
       await shell.run(trg, ...args, ...ConfyCLI.raw().slice(3))
     }
   }
