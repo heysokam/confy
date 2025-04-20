@@ -16,6 +16,7 @@ import ./dependency
 
 export types.Build
 
+func `entry=` *(trg :var BuildTarget; file :PathLike) :void= trg.src[0] = file
 
 func new *(kind :Build;
     entry   : PathLike     = "";

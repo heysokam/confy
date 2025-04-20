@@ -16,6 +16,24 @@ import ./log
 export build.Dependency
 export build.Dependencies
 
+#_______________________________________
+# @section Dependency Declaration
+#_____________________________
+func new *(_:typedesc[Dependencies]; list :varargs[Dependency]) :Dependencies=
+  for dep in list: result.add dep
+#___________________
+func new *(_:typedesc[Dependency];
+    name  : string;
+    url   : URL;
+    src   : string = "src";
+    deps  : Dependencies = @[];
+  ) :Dependency=
+  result = Dependency(name:name, url:url, src:src)
+
+
+#_______________________________________
+# @section Dependency: Git Management
+#_____________________________
 # # Bash
 # proc sh *(cmd :string; dbg :bool= false) :void=
 #   if dbg: echo cmd
