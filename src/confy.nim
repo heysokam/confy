@@ -33,4 +33,5 @@ export os.fileExists
 export os.dirExists
 export os.getEnv
 export os.parentDir
+export os.removeDir
 
