@@ -106,7 +106,9 @@ func zig *(_:typedesc[Command];
   # Output
   result.args.add "-femit-bin=" & trg.getBinary()
   # Source Code
-  for file in trg.src: result.args.add trg.cfg.dirs.src/file
+  if trg.src.len > 1:
+    let start = if trg.src.len > 1: 1 else: 0
+    for file in trg.src[start..^1]: result.args.add trg.cfg.dirs.src/file
 
 
 #_______________________________________
