@@ -6,7 +6,16 @@
 # @deps confy
 import ./types/build
 
+#_______________________________________
+# @section Forward Export Flags Types
+#_____________________________
+export build.Flag
+export build.Flags
 
+
+#_______________________________________
+# @section Default Flags Lists
+#_____________________________
 const Strict * = @[
   "-Weverything",
   "-Werror",
@@ -19,7 +28,6 @@ const Strict * = @[
   "-Wno-error=unsafe-buffer-usage",
   "-Wno-error=#warnings",
   ]
-
 #___________________
 func std *(lang :build.Lang) :build.Flag=
   case lang
