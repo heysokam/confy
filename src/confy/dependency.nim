@@ -28,7 +28,7 @@ func new *(_:typedesc[Dependency];
     src   : string = "src";
     deps  : Dependencies = @[];
   ) :Dependency=
-  result = Dependency(name:name, url:url, src:src)
+  result = Dependency(name:name, url:url, src:src, deps:deps)
 
 
 #_______________________________________
@@ -61,7 +61,7 @@ func download *(
   var cmd :ArgsList= @[]
   if dep.submodule.active:
     var dir = dep.submodule.dir
-    if dir == "" : dir = trg.cfg.dirs.src/"lib"/dep.name
+    if dir == "" : dir = trg.cfg.dirs.lib/dep.name
     {.cast(noSideEffect).}:
       if os.dirExists(dir): return
     # Run   git submodule add
