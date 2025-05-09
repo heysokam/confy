@@ -54,8 +54,8 @@ type Nim * = object
 
 
 type Nimble * = object
-  bin       *:PathLike=  cfg.dirs_bin/cfg.nimble_dir/"bin"/cfg.nimble_bin
-  cache     *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.nimble_dir
+  bin       *:PathLike=  cfg.dirs_bin/cfg.nim_dir/"bin"/cfg.nimble_bin
+  cache     *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.nimble_dir/"pkgs2"
   systemBin *:bool    =  false
 
 type Git * = object
