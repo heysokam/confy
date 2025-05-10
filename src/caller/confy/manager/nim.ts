@@ -8,7 +8,7 @@ import { cfg as confy } from '../cfg'
 
 export namespace Nim {
   export const exists   = get.Nim.exists
-  export const validate = async (cfg :confy.Config)=> await get.Nim.download(cfg, /*force=*/false)
+  export const validate = async (cfg :confy.Config, force :boolean= false)=> await get.Nim.download(cfg, force)
   export const run      = async (cfg :confy.Config, ...args:unknown[]) => await shell.run(cfg.nim.bin, ...args)
   export const compile  = async (cfg :confy.Config, ...args:unknown[]) => {
     const backend = "c"
