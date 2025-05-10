@@ -5,7 +5,7 @@
 packageName  = "confy"
 version      = "0.7.0"
 author       = "heysokam"
-description  = "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim",
+description  = "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim"
 license      = "GPLv3-or-later"
 srcDir       = "src"
 skipDirs     = @["caller", "src/caller"]
