@@ -13,6 +13,7 @@ from   ./log import fail, verb, warn
 import ./lang
 import ./command
 import ./dependency
+import ./flags as confy_flags
 
 export types.Build
 
@@ -37,16 +38,22 @@ func new *(kind :Build;
   ##  ```nim
   ##  const app = Program.new("hello.c")
   ##  ```
-  result       = BuildTarget(kind: kind, version: version)
-  result.cfg   = cfg
-  result.src   = if entry != "": @[entry] & src else: src
-  result.trg   = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
-  result.sub   = sub
-  result.lang  = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
-  result.deps  = deps
-  result.flags = flags
-  result.args  = args
-
+  result      = BuildTarget(kind: kind, version: version)
+  result.cfg  = cfg
+  result.src  = if entry != "": @[entry] & src else: src
+  result.trg  = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
+  result.sub  = sub
+  result.lang = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
+  result.deps = deps
+  result.args = args
+  # Add the flags
+  let flags_default = case result.lang
+    of C   : confy_flags.C
+    of Cpp : confy_flags.Cpp
+    else   : @[]
+  result.flags = Flags(cc: flags_default, ld: flags.ld)
+  for flag in flags.cc:
+    if flag notin result.flags.cc: result.flags.cc.add flag
 
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   trg.download(Dependencies)

@@ -42,7 +42,8 @@ func c *(_:typedesc[Command];
   # Options
   if trg.cfg.verbose: result.add "-v"
   # Flags
-  result.add flags.C
+  result.add trg.flags.cc
+  result.add trg.flags.ld
   # User Args
   result.add trg.args
   # Source code
@@ -63,7 +64,8 @@ func cpp *(_:typedesc[Command];
   # Options
   if trg.cfg.verbose: result.add "-v"
   # Flags
-  result.add flags.Cpp
+  result.add trg.flags.cc
+  result.add trg.flags.ld
   # User Args
   result.add trg.args
   # Source code
