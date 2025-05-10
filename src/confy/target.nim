@@ -14,15 +14,22 @@ import ./lang
 import ./command
 import ./dependency
 import ./flags as confy_flags
-import ./state as G
+from ./state as G import nil
 
 export types.Build
 
-func `entry=` *(trg :var BuildTarget; file :PathLike) :void= trg.src[0] = file
 
 #_______________________________________
 # @section BuildTarget: Create
 #_____________________________
+func entry *(trg :var BuildTarget; file :PathLike) :PathLike=
+  if trg.src.len == 0 : ""
+  else                : trg.src[0]
+#___________________
+func `entry=` *(trg :var BuildTarget; file :PathLike) :void=
+  if trg.src.len == 0 : trg.src.add file
+  else                : trg.src[0] = file
+#___________________
 func new *(kind :Build;
     entry   : PathLike     = "";
     cfg     : Config       = G.cfg;
