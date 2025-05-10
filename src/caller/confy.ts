@@ -24,7 +24,7 @@ namespace Commands {
         cli : Cli,
       ) :fs.PathLike {
       cli;/*discard*/ // eslint-disable-line @typescript-eslint/no-unused-expressions
-      const insideSrc = Path.join(cfg.dir.src, Path.name(Builder.entry))
+      const insideSrc = Path.join(cfg.dir.src, Path.basename(Builder.entry))
       return File.exists(insideSrc) ? insideSrc : Builder.entry
     }
     export function exists (
