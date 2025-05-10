@@ -27,6 +27,7 @@ const Strict * = @[
   "-Wno-error=pre-c2x-compat",
   "-Wno-error=unsafe-buffer-usage",
   "-Wno-error=#warnings",
+  "-Wno-error=documentation-unknown-command",
   ]
 #___________________
 func std *(lang :build.Lang) :build.Flag=
