@@ -13,6 +13,11 @@ import ./log
 from ./flags import nil
 from ./dependency import nil
 
+#_______________________________________
+# @section Command Type Exports
+#_____________________________
+export build.Command
+
 
 #_______________________________________
 # @section Command Helpers
@@ -22,6 +27,8 @@ func getBinary *(trg :BuildTarget) :PathLike= trg.cfg.dirs.bin/trg.sub/trg.trg
 func exec *(cmd :Command) :int {.discardable.}=
   log.info "Executing command:\n  ", cmd.args.join(" ")
   return os.execShellCmd cmd.args.join(" ")
+#___________________
+func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discardable.}=  cmd.args &= args; return cmd
 
 
 #_______________________________________
@@ -31,19 +38,18 @@ func c *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   # Binary & Subcommand
-  result.args.add trg.cfg.zig.bin
-  result.args.add "cc"
+  result.add trg.cfg.zig.bin, "cc"
   # Options
-  if trg.cfg.verbose: result.args.add "-v"
+  if trg.cfg.verbose: result.add "-v"
   # Flags
-  result.args &= flags.C
+  result.add flags.C
   # User Args
-  result.args &= trg.args
+  result.add trg.args
   # Source code
-  for file in trg.src: result.args.add trg.cfg.dirs.src/file
+  for file in trg.src: result.add trg.cfg.dirs.src/file
   # Output
-  result.args.add "-o"
-  result.args.add trg.getBinary()
+  result.add "-o"
+  result.add trg.getBinary()
 
 
 #_______________________________________
@@ -53,19 +59,18 @@ func cpp *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   # Binary & Subcommand
-  result.args.add trg.cfg.zig.bin
-  result.args.add "c++"
+  result.add trg.cfg.zig.bin, "c++"
   # Options
-  if trg.cfg.verbose: result.args.add "-v"
+  if trg.cfg.verbose: result.add "-v"
   # Flags
-  result.args &= flags.Cpp
+  result.add flags.Cpp
   # User Args
-  result.args &= trg.args
+  result.add trg.args
   # Source code
-  for file in trg.src: result.args.add trg.cfg.dirs.src/file
+  for file in trg.src: result.add trg.cfg.dirs.src/file
   # Output
-  result.args.add "-o"
-  result.args.add trg.getBinary()
+  result.add "-o"
+  result.add trg.getBinary()
 
 
 #_______________________________________
@@ -87,32 +92,32 @@ func zig *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   # Binary & Subcommand
-  result.args.add trg.cfg.zig.bin
+  result.add trg.cfg.zig.bin
   case trg.kind
   of SharedLib,
-     StaticLib : result.args.add "build-lib"
-  of Program   : result.args.add "build-exe"
-  of UnitTest  : result.args.add "test"
+     StaticLib : result.add "build-lib"
+  of Program   : result.add "build-exe"
+  of UnitTest  : result.add "test"
   else:discard
   # Cache
-  result.args &= [       "--cache-dir", trg.cfg.zig.cache]
-  result.args &= ["--global-cache-dir", trg.cfg.zig.cache]
+  result.add [       "--cache-dir", trg.cfg.zig.cache]
+  result.add ["--global-cache-dir", trg.cfg.zig.cache]
   # Flags
-  if trg.kind == Program: result.args.add "-freference-trace"
+  if trg.kind == Program: result.add "-freference-trace"
   # Dependencies
   result.args &= trg.zig_getModules()
   # User Args
   result.args &= trg.args
   # Output
-  result.args.add "-femit-bin=" & trg.getBinary()
+  result.add "-femit-bin=" & trg.getBinary()
   # Source Code
   case trg.kind
   of UnitTest:
-    for file in trg.src: result.args.add trg.cfg.dirs.src/file
+    for file in trg.src: result.add trg.cfg.dirs.src/file
   else:
-    if trg.src.len > 1:
+    if trg.src.len > 1:  # Always skip the entry file. It is treated as a module root
       let start = if trg.src.len > 1: 1 else: 0
-      for file in trg.src[start..^1]: result.args.add trg.cfg.dirs.src/file
+      for file in trg.src[start..^1]: result.add trg.cfg.dirs.src/file
 
 
 #_______________________________________
@@ -122,23 +127,22 @@ func nim *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   # Binary & Subcommand
-  result.args.add trg.cfg.nim.bin
-  result.args.add $trg.cfg.nim.backend
+  result.add trg.cfg.nim.bin, $trg.cfg.nim.backend
   # Cache & Nimble path
-  result.args.add &"--nimCache:{trg.cfg.nim.cache}"
-  result.args.add &"--NimblePath:{trg.cfg.nimble.cache}"
+  result.add &"--nimCache:{trg.cfg.nim.cache}"
+  result.add &"--NimblePath:{trg.cfg.nimble.cache}"
   # Flags
-  result.args &= @[]
+  result.add []
   # Dependencies
-  result.args &= trg.deps.toNim(trg.cfg.dirs.lib)
+  result.add trg.deps.toNim(trg.cfg.dirs.lib)
   # Output
   let outDir = trg.cfg.dirs.bin/trg.sub
-  result.args.add &"--out:{trg.trg}"
-  result.args.add &"--outDir:{outDir}"
+  result.add &"--out:{trg.trg}"
+  result.add &"--outDir:{outDir}"
   # User Args
-  result.args &= trg.args
+  result.add trg.args
   # Source code
-  for file in trg.src: result.args.add trg.cfg.dirs.src/file
+  for file in trg.src: result.add trg.cfg.dirs.src/file
 
 
 #_______________________________________
@@ -162,7 +166,10 @@ func run *(_:typedesc[Command];
     trg   :BuildTarget;
     args  :ArgsList= @[];
   ) :Command=
+  ## @descr Create a run command for the {@arg trg} that will pass {@arg args} to the binary
   result = Command()
-  result.args.add trg.getBinary()
-  result.args &= args
+  result.add trg.getBinary()
+  result.add args
+#___________________
+proc run *(cmd :Command) :int {.discardable.}= return cmd.exec()
 
