@@ -7,8 +7,11 @@ version      = "0.7.0"
 author       = "heysokam"
 description  = "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim",
 license      = "GPLv3-or-later"
+srcDir       = "src"
+skipDirs     = @["caller", "src/caller"]
 
 #_____________________________
 # Build Requirements
 requires "nim >= 2.0.0"
+requires "https://github.com/heysokam/nstd#head"
 
