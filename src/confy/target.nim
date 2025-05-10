@@ -6,7 +6,7 @@ from std/paths import Path
 # @deps confy
 import ./types/base
 import ./types/errors
-import ./types/config
+import ./types/config as types_config
 import ./types/build as types
 import ./tools/version as V
 from   ./log import fail, verb, warn
@@ -15,8 +15,18 @@ import ./command
 import ./dependency
 import ./flags as confy_flags
 from ./state as G import nil
+from ./cfg as config import nil
 
 export types.Build
+
+#_______________________________________
+# @section Config: Update
+#_____________________________
+func updateSystemBin *(cfg :Config) :Config=
+  result = cfg
+  if result.nim.systemBin    : result.nim.bin    = config.nim_bin
+  if result.nimble.systemBin : result.nimble.bin = config.nimble_bin
+  if result.zig.systemBin    : result.zig.bin    = config.zig_bin
 
 
 #_______________________________________
@@ -50,7 +60,7 @@ func new *(kind :Build;
   ##  const app = Program.new("hello.c")
   ##  ```
   result      = BuildTarget(kind: kind, version: version)
-  result.cfg  = cfg
+  result.cfg  = cfg.updateSystemBin()
   result.src  = if entry != "": @[entry] & src else: src
   result.trg  = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
   result.sub  = sub
