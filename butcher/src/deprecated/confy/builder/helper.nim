@@ -75,16 +75,3 @@ proc extAR *(os :OS) :string=
   of OS.Mac    : ext.mac.ar
   else: cerr &"Getting Archive extension of OS.{$os} is not implemented."
 func toAR *(file :Fil; os :OS) :Fil= file.changeFileExt(os.extAR())
-#_____________________________
-func toNim *(syst :System) :SystemStr=  (os: $syst.os, cpu: $syst.cpu)
-  ## @descr Converts a system object into an (os,cpu) string pair, usable with nimc as --os:OS --cpu:CPU
-func toZig *(syst :System) :SystemStr=
-  ## @descr Converts a sytem object into an (os,cpu) string pair, usable with `zig cc` as `-target CPU-OS`
-  result.os = case syst.os
-    of Mac: "macos" # Remove the x from default
-    else:   $syst.os
-  result.cpu = case syst.cpu
-    of x86, x86_64: syst.cpu.symbolName
-    of arm64:       "aarch64"
-    else:           $syst.cpu
-

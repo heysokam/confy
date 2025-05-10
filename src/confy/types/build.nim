@@ -66,9 +66,75 @@ type Lang *{.pure.}= enum Unknown, Asm, C, Cpp, Zig, Nim, Minim
 
 
 #_______________________________________
-# @section Targets
+# @section Target Kind
 #_____________________________
 type Build *{.pure.}= enum None, Program, SharedLib, StaticLib, UnitTest, Object
+
+
+#_______________________________________
+# @section Target System
+#_____________________________
+type OS *{.pure.}= enum
+  UndefinedOS = "UndefinedOS",
+  Windows = "windows", Mac     = "macosx",  Linux   = "linux"
+  NetBSD  = "netbsd",  FreeBSD = "freebsd", OpenBSD = "openbsd"
+  Solaris = "solaris", Aix     = "aix",     Haiku   = "haiku",  Other   = "standalone"
+type CPU *{.pure.}= enum
+  UndefinedCPU = "UndefinedCPU",
+  x86     = "i386",    x86_64    = "amd64",     arm         = "arm",         arm64    = "arm64",
+  mips    = "mips",    mipsel    = "mipsel",    mips64      = "mips64",      mips64el = "mips64el", 
+  powerpc = "powerpc", powerpc64 = "powerpc64", powerpc64el = "powerpc64el", sparc    = "sparc",
+  riscv32 = "riscv32", riscv64   = "riscv64",   alpha       = "alpha",       unknown  = "unknown",
+type ABI *{.pure.}= enum gnu, musl
+#___________________
+type System * = object
+  ## Properties of a specific target system
+  os   *:OS
+  cpu  *:CPU
+  abi  *:ABI= ABI.gnu
+type SystemStr * = tuple[os:string,cpu:string,abi:string]
+  ## Tuple of (os,cpu,abi) strings, converted to be valid for use as arguments for specific commands.
+#___________________
+type Extension * = object
+  ## File extensions for a system.
+  os    *:OS
+  bin   *:PathLike
+  lib   *:PathLike
+  obj   *:PathLike
+  ar    *:PathLike
+#___________________
+type Extensions * = object
+  unix  *:Extension
+  win   *:Extension
+  mac   *:Extension
+#___________________
+func `[]` *(E :Extension; kind :Build) :PathLike=
+  case kind
+  of Program,
+     UnitTest  : E.bin
+  of SharedLib : E.lib
+  of StaticLib : E.ar
+  of Object    : E.obj
+  of None      : ""
+#___________________
+func `[]` *(E :Extensions; os :OS) :Extension=
+  case os
+  of Windows : E.win
+  of Mac     : E.mac
+  else       : E.unix
+#___________________
+const extensions * = Extensions(
+  # @note Remember:
+  # https://github.com/nim-lang/Nim/blob/devel/compiler/platform.nim#L46
+  unix: Extension(os: OS.Linux,   bin: "",     lib: ".so",    obj: ".o",   ar: ".a"  ),
+  win:  Extension(os: OS.Windows, bin: ".exe", lib: ".dll",   obj: ".obj", ar: ".lib"),
+  mac:  Extension(os: OS.Mac,     bin: ".app", lib: ".dylib", obj: ".o",   ar: ".a"  ),
+  ) #:: ext
+
+
+#_______________________________________
+# @section Targets
+#_____________________________
 type BuildTarget * = object
   ## @descr
   ##  Defines the data necessary to compile/run a specific target binary
@@ -81,11 +147,12 @@ type BuildTarget * = object
   trg      *:PathLike           ## Target Binary that the compiler will output on compilation
   sub      *:PathLike=  ""      ## Subfolder inside cfg.dirs.bin where the target binaries will be output
   cfg      *:Config             ## Project configuration options used by this target
-  lang     *:Lang               ## @descr Forces the target to be built with the given {@link Lang} when specified. Will search by file extensions on creation.
+  lang     *:Lang               ## Forces the target to be built with the given {@link Lang} when specified. Will search by file extensions on creation.
   deps     *:Dependencies= @[]  ## List of dependencies required to compile this target
   flags    *:Flags              ## List of Flags used to compile this target
   args     *:ArgsList           ## List of arguments that will be passed to the compiler as they are
+  system   *:System             ## OS/CPU/ABI that the compiler will build for. Will be host when omitted. (eg: linux.x86_64.gnu)
   # TODO:
-  # system   :std.Build.ResolvedTarget= undefined,
   # optim    :std.builtin.OptimizeMode= undefined,
+  # remotes  *:seq[Dir]      ## @field remotes Remote folders to search for files (in order), when they are not found in the main folder.
 

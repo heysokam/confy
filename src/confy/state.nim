@@ -4,4 +4,6 @@
 import ./types
 
 var cfg  *:types.Config=  types.Config()
+  # @note Auto-passing this global config object to BuildTarget generation
+  #       removes the option for them to be comptime defined :(
 

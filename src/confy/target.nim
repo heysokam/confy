@@ -14,8 +14,9 @@ import ./lang
 import ./command
 import ./dependency
 import ./flags as confy_flags
-from ./state as G import nil
+from ./system as sys import nil
 from ./cfg as config import nil
+from ./state as G import nil
 
 export types.Build
 
@@ -51,6 +52,7 @@ func new *(kind :Build;
     deps    : Dependencies = @[];
     flags   : Flags        = Flags();
     args    : ArgsList     = @[];
+    system  : System       = sys.host();
   ) :BuildTarget=
   ## @descr
   ##  Creates a new {@link BuildTarget} object containing all the data needed by confy to build the given binary {@arg kind}
@@ -83,7 +85,7 @@ func new *(kind :Build;
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   trg.download(Dependencies)
   let cmd = Command.build(trg)
-  if cmd.exec() != 0: trg.fail CompileError, "Failed to build the target:\n  ", $trg
+  if sys.exec(cmd) != 0: trg.fail CompileError, "Failed to build the target:\n  ", $trg
   result = trg
 
 
@@ -92,7 +94,7 @@ func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
 #_____________________________
 func run *(trg :BuildTarget) :BuildTarget {.discardable.}=
   let cmd  = Command.run(trg)
-  let code = cmd.exec()
+  let code = sys.exec(cmd)
   if code != 0: trg.warn "Run command exited with code:", $code
   else        : trg.verb "Done running. Command exited with code:", $code
   result = trg

@@ -3,7 +3,6 @@
 #:______________________________________________________________________
 # @deps std
 from std/os import `/`, execShellCmd
-from std/strutils  import join
 from std/strformat import `&`
 from std/algorithm import reversed
 # @deps confy
@@ -12,6 +11,7 @@ import ./types/build
 import ./log
 from ./flags import nil
 from ./dependency import nil
+from ./system as sys import nil
 
 #_______________________________________
 # @section Command Type Exports
@@ -20,14 +20,8 @@ export build.Command
 
 
 #_______________________________________
-# @section Command Helpers
+# @section Command: Data Helpers
 #_____________________________
-func getBinary *(trg :BuildTarget) :PathLike= trg.cfg.dirs.bin/trg.sub/trg.trg
-#___________________
-func exec *(cmd :Command) :int {.discardable.}=
-  log.info "Executing command:\n  ", cmd.args.join(" ")
-  return os.execShellCmd cmd.args.join(" ")
-#___________________
 func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discardable.}=  cmd.args &= args; return cmd
 
 
@@ -50,7 +44,7 @@ func c *(_:typedesc[Command];
   for file in trg.src: result.add trg.cfg.dirs.src/file
   # Output
   result.add "-o"
-  result.add trg.getBinary()
+  result.add sys.binary(trg)
 
 
 #_______________________________________
@@ -72,7 +66,7 @@ func cpp *(_:typedesc[Command];
   for file in trg.src: result.add trg.cfg.dirs.src/file
   # Output
   result.add "-o"
-  result.add trg.getBinary()
+  result.add sys.binary(trg)
 
 
 #_______________________________________
@@ -111,7 +105,7 @@ func zig *(_:typedesc[Command];
   # User Args
   result.args &= trg.args
   # Output
-  result.add "-femit-bin=" & trg.getBinary()
+  result.add "-femit-bin=" & sys.binary(trg)
   # Source Code
   case trg.kind
   of UnitTest:
@@ -144,9 +138,8 @@ func nim *(_:typedesc[Command];
   # Dependencies
   result.add trg.deps.toNim(trg.cfg.dirs.lib)
   # Output
-  let outDir = trg.cfg.dirs.bin/trg.sub
-  result.add &"--out:{trg.trg}"
-  result.add &"--outDir:{outDir}"
+  result.add &"--out:{sys.outBin(trg)}"
+  result.add &"--outDir:{sys.outDir(trg)}"
   # User Args
   result.add trg.args
   # Source code
@@ -176,8 +169,8 @@ func run *(_:typedesc[Command];
   ) :Command=
   ## @descr Create a run command for the {@arg trg} that will pass {@arg args} to the binary
   result = Command()
-  result.add trg.getBinary()
+  result.add sys.binary(trg)
   result.add args
 #___________________
-proc run *(cmd :Command) :int {.discardable.}= return cmd.exec()
+proc run *(cmd :Command) :int {.discardable.}= return sys.exec(cmd)
 

@@ -13,8 +13,11 @@ from ./confy/flags         import nil ; export flags
 from ./confy/tools/version import nil ; export version
 from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
+from ./confy/system as sys import nil ; export sys
 from ./confy/types import nil
 export types.Config
+export types.System
+export types.OS ; export types.CPU ; export types.ABI
 from ./confy/state as G import nil ; export G.cfg
 
 #_______________________________________
