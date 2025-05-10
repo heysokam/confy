@@ -139,7 +139,8 @@ func nim *(_:typedesc[Command];
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
   # Flags
-  result.add []
+  for flag in trg.flags.cc: result.add &"--passC:\"{flag}\""
+  for flag in trg.flags.ld: result.add &"--passL:\"{flag}\""
   # Dependencies
   result.add trg.deps.toNim(trg.cfg.dirs.lib)
   # Output
