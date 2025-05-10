@@ -130,6 +130,11 @@ func nim *(_:typedesc[Command];
   ) :Command=
   # Binary & Subcommand
   result.add trg.cfg.nim.bin, $trg.cfg.nim.backend
+  # Add application type
+  case trg.kind
+  of SharedLib: result.add "--app:lib"
+  of StaticLib: result.add "--app:staticlib"
+  else:discard  # FIX: Add gui/console cases
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"

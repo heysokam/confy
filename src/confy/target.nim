@@ -20,6 +20,9 @@ export types.Build
 
 func `entry=` *(trg :var BuildTarget; file :PathLike) :void= trg.src[0] = file
 
+#_______________________________________
+# @section BuildTarget: Create
+#_____________________________
 func new *(kind :Build;
     entry   : PathLike     = "";
     cfg     : Config       = G.cfg;
@@ -56,6 +59,10 @@ func new *(kind :Build;
   for flag in flags.cc:
     if flag notin result.flags.cc: result.flags.cc.add flag
 
+
+#_______________________________________
+# @section BuildTarget: Order to Build
+#_____________________________
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   trg.download(Dependencies)
   let cmd = Command.build(trg)
@@ -63,6 +70,9 @@ func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   result = trg
 
 
+#_______________________________________
+# @section BuildTarget: Order to Run
+#_____________________________
 func run *(trg :BuildTarget) :BuildTarget {.discardable.}=
   let cmd  = Command.run(trg)
   let code = cmd.exec()
