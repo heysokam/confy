@@ -14,6 +14,7 @@ import ./lang
 import ./command
 import ./dependency
 import ./flags as confy_flags
+import ./state as G
 
 export types.Build
 
@@ -21,7 +22,7 @@ func `entry=` *(trg :var BuildTarget; file :PathLike) :void= trg.src[0] = file
 
 func new *(kind :Build;
     entry   : PathLike     = "";
-    cfg     : Config       = Config();
+    cfg     : Config       = G.cfg;
     src     : SourceList   = @[];
     trg     : PathLike     = NullPath;
     version : Version      = Version();

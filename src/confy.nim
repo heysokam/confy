@@ -15,7 +15,7 @@ from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
 from ./confy/types import nil
 export types.Config
-var cfg *:types.Config= types.Config()
+from ./confy/state as G import nil ; export G.cfg
 
 #_______________________________________
 # @section Forward Export useful nstd tools
