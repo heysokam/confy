@@ -30,3 +30,27 @@ const Templ_GitInfo * = "{info.baseURL}/{info.owner}/{info.repo}"
 func `$` *(info :git.Info; templ :static string= Templ_GitInfo) :string= fmt( templ )
   ## @descr Converts the given git {@arg info} object into its corresponding URL
 
+
+
+#_______________________________________
+# @section Git: Ignore
+#_____________________________
+const ignoreAll * ="""
+*
+"""  ## Completely hides a folder from git
+#___________________
+const ignore * = """
+*
+!.gitignore
+"""  ## Hides all files in a folder, but not the folder
+#___________________
+proc hide *(dir :string) :void=
+  let file = dir/".gitignore"
+  if file.fileExists: return
+  file.writeFile(git.ignoreAll)
+#___________________
+proc ignore *(dir :string) :void=
+  let file = dir/".gitignore"
+  if file.fileExists: return
+  file.writeFile(git.ignore)
+
