@@ -8,6 +8,7 @@ from std/algorithm import reversed
 # @deps confy
 import ./types/base
 import ./types/build
+import ./types/config
 import ./log
 from ./flags import nil
 from ./dependency import nil
@@ -127,8 +128,7 @@ func zig *(_:typedesc[Command];
 # @section Command: Nim
 #_____________________________
 func nim_zigcc *(_:typedesc[Command];
-    trg   : BuildTarget;
-    templ : static string= Templ_nim_zigcc;
+    trg : BuildTarget;
   ) :seq[string]=
   ## @descr
   ##  Creates the template command for compiling Nim with ZigCC
@@ -140,7 +140,7 @@ func nim_zigcc *(_:typedesc[Command];
   ##  clang.cppCompiler = "zigcpp"
   ##  clang.cppXsupport = "-std=C++20"
   ##  nim c --cc:clang --clang.exe="zigcc" --clang.linkerexe="zigcc" --opt:speed hello.nim
-  if trg.cfg.nim.backend notin {c,cpp}: return
+  if trg.cfg.nim.backend notin {NimBackend.c, NimBackend.cpp}: return
   result.add "-d:zig"
   result.add "-cc:clang"
   result.add &"--clang.exe=\"{trg.cfg.zig.cc}\""
@@ -153,7 +153,7 @@ func nim *(_:typedesc[Command];
   ) :Command=
   # Binary & Subcommand
   result.add trg.cfg.nim.bin, $trg.cfg.nim.backend
-  result.add trg.nim_zigcc()
+  result.add Command.nim_zigcc(trg)
   # Add application type
   case trg.kind
   of SharedLib: result.add "--app:lib"
