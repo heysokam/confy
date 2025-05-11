@@ -2,13 +2,11 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps std
-import std/os
-from std/strformat import `&`, fmt
+from std/strformat import fmt
 # @deps confy
 import ./types/base
-import ./types/build
 import ./tools/version
-from ./systm as sys import nil
+import ./tools/git
 
 
 #_______________________________________
@@ -21,7 +19,8 @@ const Templ_PackageInfo = """
   ::  Description  :  {info.description}
   ::  Author       :  {info.author}
   ::  License      :  {info.license}
-  ::  Repository   :  {info.url}
+  ::  Website      :  {info.url}
+  ::  Repository   :  {info.repo}
   ::...............:
   """
 #___________________
@@ -33,8 +32,8 @@ type Info * = object
   license     *:string
   description *:string
   url         *:URL
+  repo        *:git.Repository
 #___________________
-
 func report *(
     info  : package.Info;
     quiet : bool= false;

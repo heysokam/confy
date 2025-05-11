@@ -8,7 +8,13 @@ from std/os import `/`
 # @deps confy
 import ./base
 from ../cfg import nil
+from ../tools/git import nil
+from ../package import nil
 
+
+#_______________________________________
+# @section Folders
+#_____________________________
 type Dirs * = object
   root   *:PathLike=  "."
   bin    *:PathLike=  cfg.dirs_bin
@@ -17,6 +23,10 @@ type Dirs * = object
   lib    *:PathLike=  cfg.dirs_bin/cfg.dirs_lib
   cache  *:PathLike=  cfg.dirs_bin/cfg.dirs_cache
 
+
+#_______________________________________
+# @section Zig
+#_____________________________
 const zig_dir = cfg.dirs_bin/cfg.zig_dir  # Internal alias to not repeat the default assignments code
 type Zig * = object
   bin        *:PathLike=  zig_dir/cfg.zig_bin
@@ -26,6 +36,10 @@ type Zig * = object
   cache      *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.zig_name
   systemBin  *:bool    =  false
 
+
+#_______________________________________
+# @section Nim
+#_____________________________
 type NimUnsafe * = object
   ## @descr Unsafe (optional) flags that can be added to a Nim BuildTarget to ignore safety flags.
   functionPointers  *:bool= false ## @descr
@@ -59,21 +73,39 @@ type Nim * = object
     ##  Unsafe (optional) flags that can be added to a Nim BuildTarget to ignore ZigCC safety flags.
 
 
+#_______________________________________
+# @section Nimble
+#_____________________________
 type Nimble * = object
   bin       *:PathLike=  cfg.dirs_bin/cfg.nim_dir/"bin"/cfg.nimble_bin
   cache     *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.nimble_dir/"pkgs2"
   systemBin *:bool    =  false
 
-type Git * = object
-  bin       *:PathLike=  cfg.git_bin
-  systemBin *:bool    =  true
 
+#_______________________________________
+# @section Git
+#_____________________________
+type Git * = object
+  bin  *:PathLike= cfg.git_bin ## @descr
+    ##  Binary to call for running `git` tasks.
+  repo *:git.Repository ## @descr
+    ##  Git Repository where the Project is stored
+  systemBin  *:bool= true
+
+
+#_______________________________________
+# @section Configuration Options
+#_____________________________
 type Config * = object
   # Builder Options
-  prefix  *:string = cfg.tool_prefix
-  verbose *:bool   = cfg.tool_verbose
-  quiet   *:bool   = cfg.tool_quiet
-  force   *:bool   = cfg.tool_force
+  prefix  *:string= cfg.tool_prefix ## @descr
+    ##  Prefix that will be added at the start of every command output.
+  verbose *:bool= cfg.tool_verbose ## @descr
+    ##  Output will be fully verbose when active.
+  quiet   *:bool= cfg.tool_quiet ## @descr
+    ##  Output will be formatted in a minimal clean style when active.
+  force   *:bool= cfg.tool_force ## @descr
+    ##  Force-compile ignoring the cache on every run of the builder when true.
   # Project Options
   dirs    *:Dirs
   # Compiler/Tools Options
@@ -81,4 +113,8 @@ type Config * = object
   zig     *:Zig
   nim     *:Nim
   nimble  *:Nimble
+  pkg     *:package.Info
+  # TODO:
+  # fakeRun  *:bool= false  ## @descr
+  #   ##  Everything will happen normally, except that no commands will be executed.
 
