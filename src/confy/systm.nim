@@ -36,7 +36,7 @@ proc with *(os :OS; cpu :CPU; abi :ABI= ABI.gnu) :System=
   result.os  = os
   result.cpu = cpu
   result.abi = abi
-#_____________________________
+#___________________
 proc host *() :System=
   ## @descr Returns the properties of the host, as a System object
   case hostOS
@@ -68,8 +68,10 @@ proc host *() :System=
   of   "riscv64":     result.cpu = CPU.riscv64
   of   "alpha":       result.cpu = CPU.alpha
   result.abi = ABI.gnu
-#_____________________________
+#___________________
 proc host *(_:typedesc[System]) :System= systm.host()
+#___________________
+proc cross *(syst :System) :bool= syst != systm.host()
 
 
 

@@ -92,6 +92,7 @@ type System * = object
   os   *:OS
   cpu  *:CPU
   abi  *:ABI= ABI.gnu
+  explicit  *:bool= false  ## Will always add the `-target` tag to the compilation command when true
 type SystemStr * = tuple[os:string,cpu:string,abi:string]
   ## Tuple of (os,cpu,abi) strings, converted to be valid for use as arguments for specific commands.
 #___________________

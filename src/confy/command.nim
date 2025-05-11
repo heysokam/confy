@@ -11,7 +11,7 @@ import ./types/build
 import ./log
 from ./flags import nil
 from ./dependency import nil
-from ./systm as sys import nil
+from ./systm as sys import cross
 
 #_______________________________________
 # @section Command: Type Exports
@@ -26,51 +26,39 @@ func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discarda
 
 
 #_______________________________________
-# @section Command: C
+# @section Command: C & C++
 #_____________________________
+# Command: C.generic
+func zigcc (_:typedesc[Command];
+    trg : BuildTarget;
+    tag : string;
+  ) :Command=
+  # Binary & Subcommand
+  result.add trg.cfg.zig.bin, tag
+  # Options
+  if trg.cfg.verbose: result.add "-v"
+  if trg.kind == SharedLib: result.add "-shared"
+  # Cross Compilation Flags
+  if trg.system.cross or trg.system.explicit:
+    result.add sys.toZigTag(trg.system)
+  # Flags
+  result.add trg.flags.cc
+  result.add trg.flags.ld
+  # User Args
+  result.add trg.args
+  # Source code
+  for file in trg.src: result.add trg.cfg.dirs.src/file
+  # Output
+  result.add "-o"
+  result.add sys.binary(trg)
+#___________________
 func c *(_:typedesc[Command];
     trg :BuildTarget;
-  ) :Command=
-  # Binary & Subcommand
-  result.add trg.cfg.zig.bin, "cc"
-  # Options
-  if trg.cfg.verbose: result.add "-v"
-  # Cross Compilation Flags
-  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
-  # Flags
-  result.add trg.flags.cc
-  result.add trg.flags.ld
-  # User Args
-  result.add trg.args
-  # Source code
-  for file in trg.src: result.add trg.cfg.dirs.src/file
-  # Output
-  result.add "-o"
-  result.add sys.binary(trg)
-
-
-#_______________________________________
-# @section Command: C++
-#_____________________________
+  ) :Command= Command.zigcc(trg, "cc")
+#___________________
 func cpp *(_:typedesc[Command];
     trg :BuildTarget;
-  ) :Command=
-  # Binary & Subcommand
-  result.add trg.cfg.zig.bin, "c++"
-  # Options
-  if trg.cfg.verbose: result.add "-v"
-  # Cross Compilation Flags
-  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
-  # Flags
-  result.add trg.flags.cc
-  result.add trg.flags.ld
-  # User Args
-  result.add trg.args
-  # Source code
-  for file in trg.src: result.add trg.cfg.dirs.src/file
-  # Output
-  result.add "-o"
-  result.add sys.binary(trg)
+  ) :Command= Command.zigcc(trg, "c++")
 
 
 #_______________________________________
@@ -103,7 +91,8 @@ func zig *(_:typedesc[Command];
   result.add [       "--cache-dir", trg.cfg.zig.cache]
   result.add ["--global-cache-dir", trg.cfg.zig.cache]
   # Cross Compilation Flags
-  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
+  if trg.system.cross or trg.system.explicit:
+    result.add sys.toZigTag(trg.system)
   # Flags
   if trg.kind == Program: result.add "-freference-trace"
   # Dependencies
@@ -139,7 +128,7 @@ func nim *(_:typedesc[Command];
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
   # Cross Compilation Flags
-  if trg.system != sys.host():
+  if trg.system.cross or trg.system.explicit:
     let system_nim = sys.toNim(trg.system)
     result.add &"--os:{system_nim.os}"
     result.add &"--cpu:{system_nim.cpu}"
