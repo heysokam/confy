@@ -73,7 +73,7 @@ type ModeKind  *{.pure.}= enum Debug, Release, Danger
 type ModeOptim *{.pure.}= enum None, Speed, Size
 type Mode * = object
   kind  *:ModeKind=   Debug
-  opt   *:ModeOptim=  Speed
+  opt   *:ModeOptim=  None
 
 
 #_______________________________________
