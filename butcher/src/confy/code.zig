@@ -5,27 +5,9 @@
 //!  Describes the metadata and tools to manage a list of source code files.
 //___________________________________________________________________________|
 pub const CodeList = @This();
-// @deps std
-const std = @import("std");
-// @deps zstd
-const zstd = @import("../lib/zstd.zig");
-const seq  = zstd.seq;
-const cstr = zstd.cstr;
-const cstr_List = zstd.cstr_List;
 
 files :Data,
 const Data = seq(cstr);
-
-/// @descr Creates a new empty CodeList object, and initializes its memory
-pub fn create (A :std.mem.Allocator) CodeList { return CodeList{.files= Data.init(A)}; }
-/// @descr Frees all resources owned by the object.
-pub fn destroy (L :*CodeList) void { L.files.deinit(); }
-/// @descr Adds all files of {@arg B} to the list of files of {@arg A}. Allocates more memory as necessary.
-pub fn add (A :*CodeList, B :CodeList) !void { try A.files.appendSlice(B.files.items); }
-/// @descr Adds the {@arg file} to the list of files of {@arg L}. Allocates more memory as necessary.
-pub fn addFile (L :*CodeList, file :cstr) !void { try L.files.append(file); }
-/// @descr Adds the entire {@arg list} to the list of files of {@arg L}. Allocates more memory as necessary.
-pub fn addList (L :*CodeList, files :cstr_List) !void { try L.files.appendSlice(files); }
 
 
 const AddFolderOptions = struct {

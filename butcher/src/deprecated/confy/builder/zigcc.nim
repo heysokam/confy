@@ -1,30 +1,3 @@
-#:_____________________________________________________
-#  confy  |  Copyright (C) Ivan Mar (sOkam!)  |  MIT  :
-#:_____________________________________________________
-# @deps ndk
-import nstd/strings
-import nstd/paths
-# @deps confy
-import ../types
-import ../cfg
-import ../dirs
-import ../tool/helper as t
-# @deps confy.builder
-import ./base
-import ./helper
-# @deps confy.builder.zigcc
-import ./zigcc/zcfg
-
-
-#_______________________________________
-# Configuration
-#_____________________________
-proc getTarget *(syst :System) :string=
-  ## @descr Returns a `-target cpu-os` flag for sending it to zigcc for cross-compilation.
-  if syst == getHost(): return ""
-  let zigSyst = helper.toZig(syst)
-  result = &"-target {zigSyst.cpu}-{zigSyst.os}"
-  if syst.os == Linux: result.add "-gnu"
 
 #_____________________________
 # ZigCC: Compiler

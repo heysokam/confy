@@ -24,18 +24,11 @@ import ./minc as minc
 import ./assembler
 
 #_____________________________
-proc compile (src :seq[DirFile]; obj :BuildTrg; force :bool) :void=
-  if not dirExists(cfg.binDir/obj.sub): md cfg.binDir/obj.sub
-  case obj.src.getLang()
-  of C       : c.compile(src, obj, force)
-  of Cpp     : cpp.compile(src, obj, force)
-  of Nim     : nim.compile(src, obj, force)
-  of MinC    : minc.compile(src, obj, force)
-  of Asm     : assembler.compile(src, obj, force)
-  of Unknown : cerr "Tried to compile and Unknown language."
-
-#_____________________________
-proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
+proc build (
+    obj   : var BuildTrg;
+    run   : bool = false;
+    force : bool = false
+  ) :void=
   if not obj.cc.exists: cerr &"Trying to compile {obj.trg} with {$obj.cc}, but the compiler binary couldn't be found."
   if not quiet: info.report(obj)  # Report build information to console when not quiet
   if force and dirExists(cfg.cacheDir.string):
@@ -53,7 +46,12 @@ proc build (obj :var BuildTrg; run :bool= false; force :bool= false) :void=
 #_____________________________
 const ReservedKeywords = ["all", "examples", "tests", "tasks"]
 #_____________________________
-proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
+proc build *(
+    obj      : var BuildTrg;
+    keywords : seq[string] = @["all"];
+    run      : bool        = false;
+    force    : bool        = false
+  ) :void=
   if cfg.verbose: cfg.quiet = off  # Disable quiet when verbose is active.
   if obj.trg.string in ReservedKeywords: cerr &"Found a target that uses a reserved keyword as its .trg= field:\n  {obj.trg}\nThe list of reserved keywords is:\n  {ReservedKeywords}"
   block checkKeywords:
@@ -83,6 +81,12 @@ proc build *(obj :var BuildTrg; keywords :seq[string]= @["all"]; run :bool= fals
   # Key was found. Continue building
   obj.build(run,force)
 #_____________________________
-proc build *(obj :BuildTrg; keywords :seq[string]= @["all"]; run :bool= false; force :bool= false) :void=
+proc build *(
+    obj      : BuildTrg;
+    keywords : seq[string] = @["all"];
+    run      : bool        = false;
+    force    : bool        = false
+  ) :void=
   var tmp :BuildTrg= obj
   tmp.build(keywords, run, force)
+

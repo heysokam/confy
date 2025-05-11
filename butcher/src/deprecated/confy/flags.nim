@@ -69,3 +69,4 @@ func all *(lang :Lang= Lang.Unknown) :Flags=
   of Cpp     : join( Cpp.std(), defaults, Cpp.extras() )
   of Unknown : defaults
   else       : Flags()
+

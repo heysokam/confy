@@ -75,3 +75,4 @@ proc extAR *(os :OS) :string=
   of OS.Mac    : ext.mac.ar
   else: cerr &"Getting Archive extension of OS.{$os} is not implemented."
 func toAR *(file :Fil; os :OS) :Fil= file.changeFileExt(os.extAR())
+

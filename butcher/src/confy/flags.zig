@@ -21,28 +21,6 @@ ld  :Data,
 const Data = seq(cstr);
 
 pub const create = struct {
-  /// @descr Creates a new empty FlagList object, and initializes its memory
-  pub fn empty (A :std.mem.Allocator) FlagList { return FlagList{.cc= Data.init(A), .ld= Data.init(A)}; }
-  /// @descr Creates a new FlagList object, and initializes its CC list with the given {@arg L} list
-  pub fn fromCC (L :cstr_List, A :std.mem.Allocator) !FlagList {
-    var result = FlagList{.cc= Data.initCapacity(A, L.len), .ld= Data.init(A)};
-    try result.addCCList(L);
-    return result;
-  }
-  /// @descr Creates a new FlagList object, and initializes its CC list with the given {@arg L} list
-  pub fn fromLD (L :cstr_List, A :std.mem.Allocator) !FlagList {
-    var result = FlagList{.cc= Data.init(A), .ld= Data.initCapacity(A, L.len)};
-    try result.addLDList(L);
-    return result;
-  }
-  /// @descr Creates a new FlagList object, and initializes its CC list with the given {@arg cc} and  {@arg ld} lists
-  pub fn fromFlags (cc :cstr_List, ld :cstr_List, A :std.mem.Allocator) !FlagList {
-    var result = FlagList{.cc= Data.initCapacity(A, cc.len), .ld= Data.initCapacity(A, ld.len)};
-    try result.addCCList(cc);
-    try result.addLDList(ld);
-    return result;
-  }
-
   pub const default = struct {
     pub const C = struct {
       pub fn all (A :std.mem.Allocator) !FlagList {
@@ -84,18 +62,6 @@ pub const create = struct {
 
 };
 
-/// @descr Frees all resources owned by the object.
-pub fn destroy (L :*FlagList) void { L.cc.deinit(); L.ld.deinit(); }
-/// @descr Adds all flags of {@arg B} to the list of files of {@arg A}. Allocates more memory as necessary.
-pub fn add (A :*FlagList, B :FlagList) !void { try A.addCCList(B.cc.items); try A.addLDList(B.ld.items); }
-/// @descr Adds the {@arg flag} to the list of CC flags of {@arg L}. Allocates more memory as necessary.
-pub fn addCC (L :*FlagList, flag :cstr) !void { try L.cc.append(flag); }
-/// @descr Adds the entire {@arg flags} list to the list of CC flags of {@arg L}. Allocates more memory as necessary.
-pub fn addCCList (L :*FlagList, flags :cstr_List) !void { try L.cc.appendSlice(flags); }
-/// @descr Adds the {@arg flag} to the list of LD flags of {@arg L}. Allocates more memory as necessary.
-pub fn addLD (L :*FlagList, flag :cstr) !void { try L.cc.append(flag); }
-/// @descr Adds the entire {@arg flags} list to the list of LD flags of {@arg L}. Allocates more memory as necessary.
-pub fn addLDList (L :*FlagList, flags :cstr_List) !void { try L.cc.appendSlice(flags); }
 
 
 pub const default = struct {
