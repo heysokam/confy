@@ -104,15 +104,19 @@ func zig *(_:typedesc[Command];
   # Cache
   result.add [       "--cache-dir", trg.cfg.zig.cache]
   result.add ["--global-cache-dir", trg.cfg.zig.cache]
-  # Cross Compilation Flags
+  # Dependencies
+  result.add trg.zig_getModules()
+  # Compilation Flags
+  # └─ 1. Cross Compilation Flags
   if trg.system.cross or trg.system.explicit:
     result.add sys.toZigTag(trg.system)
-  # Flags
+  # └─ 2. Internally managed flags
   if trg.kind == Program: result.add "-freference-trace"
-  # Dependencies
-  result.args &= trg.zig_getModules()
+  # └─ 3. User-defined Flags
+  for flag in trg.flags.cc: result.add flag
+  for flag in trg.flags.ld: result.add flag
   # User Args
-  result.args &= trg.args
+  result.add trg.args
   # Output
   result.add "-femit-bin=" & sys.binary(trg)
   # Source Code

@@ -2,7 +2,7 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps std
-from std/os import `/`
+from std/os import `/`, splitFile
 from std/strutils import join
 from std/strformat import fmt
 import std/enumutils
@@ -27,6 +27,19 @@ func ext    *(trg :BuildTarget) :PathLike= build.extensions[trg.system.os][trg.k
 func outDir *(trg :BuildTarget) :PathLike= trg.cfg.dirs.bin/trg.sub
 func binary *(trg :BuildTarget) :PathLike= trg.outDir()/trg.trg&trg.ext()
 func outBin *(trg :BuildTarget) :PathLike= trg.trg & trg.ext()
+# TODO:
+# proc findExt *(file :PathLike) :string=
+#   ## @descr
+#   ##  Finds the extension of a file that is sent without it.
+#   ##  Walks the file's dir, and matches all entries found against the full path of the given input file.
+#   ## @raises IOError if the file does have an extension already.
+#   if file.splitFile.ext != "": raise newException(IOError, fmt"Tried to find the extension of a file that already has one.\n  {file}")
+#   let filepath = file
+#   for found in file.dir.string.walkDir:
+#     if found.kind == pcDir: continue
+#     if filepath.string in found.path: return found.path.splitFile.ext
+#   raise newException(IOError, &"Failed to find the extension of file:\n  {file.dir/file.file}")
+
 
 #_______________________________________
 # @section System: Resolution
