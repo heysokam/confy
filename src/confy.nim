@@ -19,7 +19,7 @@ from ./confy/types import nil
 export types.Config
 export types.System
 export types.OS ; export types.CPU ; export types.ABI
-export types.build.Mode
+export types.build.Mode; export types.build.ModeKind; export types.build.ModeOptim
 from ./confy/state as G import nil ; export G.cfg
 
 #_______________________________________
