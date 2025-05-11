@@ -17,8 +17,12 @@ type Dirs * = object
   lib    *:PathLike=  cfg.dirs_bin/cfg.dirs_lib
   cache  *:PathLike=  cfg.dirs_bin/cfg.dirs_cache
 
+const zig_dir = cfg.dirs_bin/cfg.zig_dir  # Internal alias to not repeat the default assignments code
 type Zig * = object
-  bin        *:PathLike=  cfg.dirs_bin/cfg.zig_dir/cfg.zig_bin
+  bin        *:PathLike=  zig_dir/cfg.zig_bin
+  cc         *:PathLike=  zig_dir/cfg.zig_cc
+  cpp        *:PathLike=  zig_dir/cfg.zig_cpp
+  ar         *:PathLike=  zig_dir/cfg.zig_ar
   cache      *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.zig_name
   systemBin  *:bool    =  false
 
@@ -49,6 +53,8 @@ type Nim * = object
     ##  @default:off
     ##   Can cause confusion for nim users.
     ##   They will expect it `on` because both the nim compiler and nimble work that way.
+  systemZigCC  *:bool=  false ## @descr
+    ##  Uses the System's PATH to find `zigcc`, `zigcpp` and `zigar` binaries when true
   unsafe  *:NimUnsafe=  NimUnsafe() ## @descr
     ##  Unsafe (optional) flags that can be added to a Nim BuildTarget to ignore ZigCC safety flags.
 

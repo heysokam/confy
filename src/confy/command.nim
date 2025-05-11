@@ -26,6 +26,18 @@ func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discarda
 
 
 #_______________________________________
+# @section Command: Asm
+#_____________________________
+func assembly *(_:typedesc[Command];
+    trg : BuildTarget;
+  ) :Command=
+  # FIX: Figure out how to implement assembly commands with the new architecture
+  #      Should (likely) use the same api than Object
+  if trg.kind != Object: trg.fail CompileError, "Compiling Assembly into non-Object files is not supported."
+  discard
+
+
+#_______________________________________
 # @section Command: C & C++
 #_____________________________
 # Command: C.generic
@@ -114,20 +126,48 @@ func zig *(_:typedesc[Command];
 #_______________________________________
 # @section Command: Nim
 #_____________________________
+func nim_zigcc *(_:typedesc[Command];
+    trg   : BuildTarget;
+    templ : static string= Templ_nim_zigcc;
+  ) :seq[string]=
+  ## @descr
+  ##  Creates the template command for compiling Nim with ZigCC
+  ##
+  ##  zigcc  : Path to the zigcc alias binary. Can be relative, absolute or on $PATH
+  ##  zigcpp : Path to the zigcpp alias binary. Can be relative, absolute or on $PATH
+  ##
+  ## @reference
+  ##  clang.cppCompiler = "zigcpp"
+  ##  clang.cppXsupport = "-std=C++20"
+  ##  nim c --cc:clang --clang.exe="zigcc" --clang.linkerexe="zigcc" --opt:speed hello.nim
+  if trg.cfg.nim.backend notin {c,cpp}: return
+  result.add "-d:zig"
+  result.add "-cc:clang"
+  result.add &"--clang.exe=\"{trg.cfg.zig.cc}\""
+  result.add &"--clang.linkerexe=\"{trg.cfg.zig.cc}\""
+  result.add &"--clang.cppCompiler=\"{trg.cfg.zig.cpp}\""
+  result.add &"--clang.cppXsupport=\"-std=c++20\""
+#_____________________________
 func nim *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   # Binary & Subcommand
   result.add trg.cfg.nim.bin, $trg.cfg.nim.backend
+  result.add trg.nim_zigcc()
   # Add application type
   case trg.kind
   of SharedLib: result.add "--app:lib"
   of StaticLib: result.add "--app:staticlib"
   else:discard  # FIX: Add gui/console cases
+  # Config to nimc Options
+  if   trg.cfg.force   : result.add "-f"
+  if   trg.cfg.verbose : result.add "--verbosity:3"
+  elif trg.cfg.quiet   : result.add "--hints:off"
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
-  # Cross Compilation Flags
+  # Compilation Flags
+  # └─ 1. Cross Compilation Flags
   if trg.system.cross or trg.system.explicit:
     let system_nim = sys.toNim(trg.system)
     result.add &"--os:{system_nim.os}"
@@ -135,7 +175,11 @@ func nim *(_:typedesc[Command];
     let system_zig = sys.toZigTag(trg.system)
     result.add &"--passC:\"{system_zig}\""
     result.add &"--passL:\"{system_zig}\""
-  # User-defined Flags
+  # └─ 2. Internally managed flags
+  if trg.cfg.nim.unsafe.functionPointers:
+    if trg.cfg.quiet : result.add "--passC:-Wno-incompatible-function-pointer-types"
+    else             : result.add "--passC:-Wno-error=incompatible-function-pointer-types"
+  # └─ 3. User-defined Flags
   for flag in trg.flags.cc: result.add &"--passC:\"{flag}\""
   for flag in trg.flags.ld: result.add &"--passL:\"{flag}\""
   # Dependencies
@@ -150,16 +194,28 @@ func nim *(_:typedesc[Command];
 
 
 #_______________________________________
+# @section Command: Minim
+#_____________________________
+func minim *(_:typedesc[Command];
+    trg : BuildTarget;
+  ) :Command=
+  # TODO: Implement support for minim when its compiler cli is implemented
+  discard
+
+
+#_______________________________________
 # @section Command: Build
 #_____________________________
 func build *(_:typedesc[Command];
     trg :BuildTarget;
   ) :Command=
   result = case trg.lang
-    of Lang.C   : Command.c(trg)
-    of Lang.Zig : Command.zig(trg)
-    of Lang.Cpp : Command.cpp(trg)
-    of Lang.Nim : Command.nim(trg)
+    of Lang.C     : Command.c(trg)
+    of Lang.Zig   : Command.zig(trg)
+    of Lang.Cpp   : Command.cpp(trg)
+    of Lang.Nim   : Command.nim(trg)
+    of Lang.Asm   : Command.assembly(trg)
+    of Lang.Minim : Command.minim(trg)
     else:Command()
 
 

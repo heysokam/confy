@@ -26,9 +26,12 @@ export types.Build
 #_____________________________
 func updateSystemBin *(cfg :Config) :Config=
   result = cfg
+  if result.zig.systemBin    : result.zig.bin    = config.zig_bin
+  if result.nim.systemZigCC  : result.zig.cc     = config.zig_cc
+  if result.nim.systemZigCC  : result.zig.cpp    = config.zig_cpp
+  if result.nim.systemZigCC  : result.zig.ar     = config.zig_ar
   if result.nim.systemBin    : result.nim.bin    = config.nim_bin
   if result.nimble.systemBin : result.nimble.bin = config.nimble_bin
-  if result.zig.systemBin    : result.zig.bin    = config.zig_bin
 
 
 #_______________________________________

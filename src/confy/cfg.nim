@@ -35,17 +35,20 @@ const dirs_lib    *{.strdefine.}= ".lib"
 const dirs_cache  *{.strdefine.}= ".cache"
 const dirs_tests  *{.strdefine.}= "tests"
 # defaults.zig
+const zig_dir     *{.strdefine.}= ".zig"
 const zig_name    *{.strdefine.}= "zig"
 const zig_bin     *{.strdefine.}= zig_name
-const zig_dir     *{.strdefine.}= ".zig"
+const zig_cc      *{.strdefine.}= zig_name&"cc"
+const zig_cpp     *{.strdefine.}= zig_name&"cpp"
+const zig_ar      *{.strdefine.}= zig_name&"ar"
 # defaults.nim
+const nim_dir     *{.strdefine.}= ".nim"
 const nim_name    *{.strdefine.}= "nim"
 const nim_bin     *{.strdefine.}= nim_name
-const nim_dir     *{.strdefine.}= ".nim"
 # defaults.nimble
+const nimble_dir  *{.strdefine.}= ".nimble"
 const nimble_name *{.strdefine.}= "nimble"
 const nimble_bin  *{.strdefine.}= nimble_name
-const nimble_dir  *{.strdefine.}= ".nimble"
 # defaults.git
 const git_bin     *{.strdefine.}= "git"
 
