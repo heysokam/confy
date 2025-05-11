@@ -17,7 +17,7 @@ const Templ_PackageInfo = """
   ::  Name         :  {info.name}
   ::  Version      :  {info.version}
   ::  Description  :  {info.description}
-  ::  Author       :  {info.author}
+  ::  Author       :  {info.author.human}
   ::  License      :  {info.license}
   ::  Website      :  {info.url}
   ::  Repository   :  {info.repo}
@@ -28,7 +28,7 @@ type Info * = object
   ## @descr Describes metadata/information about a Package.
   name        *:string
   version     *:Version
-  author      *:string
+  author      *:base.Name
   license     *:string
   description *:string
   url         *:URL

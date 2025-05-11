@@ -8,4 +8,8 @@ type PathLike   * = string
 type SourceFile * = base.PathLike
 type SourceList * = seq[base.SourceFile]
 const NullPath  *:PathLike= "__Invalid_NULL_Path__"
+type Name * = object
+  short  *:string
+  long   *:string
+  human  *:string
 
