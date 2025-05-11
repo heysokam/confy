@@ -4,6 +4,7 @@
 # @deps std
 from std/os import `/`, execShellCmd
 from std/strformat import `&`
+from std/strutils import normalize
 from std/algorithm import reversed
 # @deps confy
 import ./types/base
@@ -161,8 +162,10 @@ func nim *(_:typedesc[Command];
   else:discard  # FIX: Add gui/console cases
   # Config to nimc Options
   if   trg.cfg.force   : result.add "-f"
-  if   trg.cfg.verbose : result.add "--verbosity:3"
+  if   trg.cfg.verbose : result.add "--verbosity:2"
   elif trg.cfg.quiet   : result.add "--hints:off"
+  let mode = ($trg.mode).normalize()
+  result.add &"-d:{mode}"
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
