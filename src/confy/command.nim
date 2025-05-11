@@ -163,11 +163,15 @@ func nim *(_:typedesc[Command];
   # Config to nimc Options
   if   trg.cfg.force   : result.add "-f"
   if   trg.cfg.verbose : result.add "--verbosity:2"
-  elif trg.cfg.quiet   : result.add "--hints:off"
+  elif trg.cfg.quiet   :
+    result.add "--verbosity:0"
+    result.add "--hints:off"
   let mode = ($trg.mode.kind).normalize()
   let opt  = ($trg.mode.opt).normalize()
   result.add &"-d:{mode}"
   result.add &"--opt:{opt}"
+  if trg.mode.strip: result.add "-d:strip"
+  if trg.mode.lto:   result.add "-d:lto"
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"

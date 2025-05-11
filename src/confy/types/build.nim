@@ -72,8 +72,10 @@ type Build *{.pure.}= enum None, Program, SharedLib, StaticLib, UnitTest, Object
 type ModeKind  *{.pure.}= enum Debug, Release, Danger
 type ModeOptim *{.pure.}= enum None, Speed, Size
 type Mode * = object
-  kind  *:ModeKind=   Debug
-  opt   *:ModeOptim=  None
+  kind   *:ModeKind=   Debug
+  opt    *:ModeOptim=  None
+  strip  *:bool=       false
+  lto    *:bool=       false
 
 
 #_______________________________________
@@ -148,7 +150,7 @@ type BuildTarget * = object
   ##  Don't use directly. Use {@link Build}.* instead
   ##  eg: Build.Program
   kind     *:Build              ## Type of binary that this BuildTarget represents
-  mode     *:build.Mode         ## Mode in which the resulting binary will be built  (default: Debug.None)
+  mode     *:build.Mode         ## Mode in which the resulting binary will be built  (default: debug, none, strip:off, lto:off)
   version  *:Version            ## Semantic Version of this target
   src      *:SourceList         ## List of code files used by the compiler to create the resulting binary
   trg      *:PathLike           ## Target Binary that the compiler will output on compilation
