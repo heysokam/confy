@@ -14,7 +14,7 @@ app.add(“./src/hello.c”)
 Then they'd call the build tool, which would import/require their file.  
 The internal buildsystem manager would then deal with sorting the code, and solving any inter-dependencies declared by the user.  
 The user, thus, would **not** own the flow of their build tool.  
-They can only -declare- what they want, not tell the computer what they want and when.  
+They can only -declare- what they want, not tell the computer what they want, how exactly and when.  
 
 Declarativeness means that if you want to:
 1. Download repository A
@@ -23,12 +23,13 @@ Declarativeness means that if you want to:
 4. Call -their- buildsystem (eg: make)
 5. and only THEN build your app ...  
 
-You can't... because you have to declare the code, not run it.  
+You can't... because you declare the code, not run it.  
 
 In this simple case:
 - You cannot enter the folder and call a custom tool on its contents.  
   The repository does not exist. It has not been downloaded yet.  
-- You need to declare what tool will be run, and how it works.  
+- You need to:
+- ... declare what tool will be run, and how it works.  
 - ... declare what folder the builder will enter, and when it will be available.  
 - ... declare what action to run and with which tool  
 - ... declare that the action depends on the folder already existing.  
@@ -37,7 +38,7 @@ In this simple case:
 - ... declare which files must exist after running, and how to wait for them to be done.
 - ... ...
 
-_There is a clear pattern forming already, and this is the simplest case._  
+_There is a clear pattern forming already, and this is the simplest possible usecase._  
 
 This means that, with declarativeness, the buildsystem needs to:  
 - Polute the user's buildsystem with tens (or hundreds) of extra lines of boilerplate code,  
@@ -67,18 +68,18 @@ Confy is a buildsystem **library**.
 The default setup provides you with an easy way to run it as if it was a binary,  
 but confy is, by design, **not** a binary app.  
 
-**Your build file** (not confy) will be a full systems binary application,  
+**Your build file** _(not confy, big difference)_ will be a full systems binary application,  
 that you compile with nim's compiler _(or automated with confy's premade caller)_ to build your project.  
 
 Because of this:
-- There is no weird make-specific or shell-only language restrictions, like make/cmake.  
+- There is no make-specific or shell-only language restrictions, like make/cmake.  
 - There is no interpreted-language restrictions either, like in python.  
 - There is no "can only do what the VM can do" problems either, like nimscript or lua.  
-- Your builder will be a full systems binary, that will be able to do literally anything you want.  
+- Your builder will be a full systems binary, that will be able to do literally **anything you want**.  
 
 In declarative buildsystems _(eg: make, cmake, ninja, etc)_, you **do not own** the control flow.  
 If you want to do extra things that the buildsystem creators didn't think of, you are on your own.  
-And you must call for external applications, which will make your buildsystem immediately platform-dependent and overly complicated for no reason.  
+And you must call for external applications, which will force your buildsystem to be platform-dependent and overly complicated for no reason.  
 
 Confy, instead, provides you with a -library- of tools to build your project.  
 It designed to make this process seamless and ergonomic, as if it was a regular buildscript.  
@@ -107,8 +108,8 @@ At some point you realize will _eventually_ have to write support for:
 - .... etc, etc, etc ...  
 
 Annoyed by the fragmented ecosystem, you give up and rely on the user to do all the heavy work.  
-Now your project became just another version of make/cmake/etc.  
-Which means you became just as hard to use, setup and manage for newcomers.  
+Now your project just became another version of make/cmake/etc.  
+Which means its just as hard to use, setup and manage for newcomers.  
 
 Alternatively, you consider using ZigCC.  
 ZigCC comes with all of these features **builtin**, out of the box. No extra setup:
@@ -120,7 +121,7 @@ ZigCC comes with all of these features **builtin**, out of the box. No extra set
 - Sane and Modern optimization defaults
 - Pre-packed libc
 
-... and all of that fits in a self-contained 50mb download!  
+... and all of that fits in a self-contained 50mb download.... !!  
 
-I say there is a clear winner here.  
+There is a clear winner here.  
 

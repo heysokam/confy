@@ -9,13 +9,11 @@
 - [x] Autocreate subdirs to compile into
 - [x] Multi-file build
 - [ ] Support for file globbing _(automatic grabbing all files contained in a folder)_
-- [ ] ld.flags input support
-- [ ] cc.flags input support
+- [x] cc.flags input support
+- [x] ld.flags input support
 - [ ] multi-object build
-- [ ] strip final binary on release vers
-      (user sends the flags: `-Wl,-s`, `-strip-debug`, `-s`, etc, since its compiler-dependent)
 - [_] Per-file formatted progress bar for binaries on quiet
-- [ ] BuildInfo report when not quiet
+- [x] BuildInfo report when not quiet
 - [x] cfg: configuration option:  `cfg.zigSystemBin`  (default:on)
            ZigCC uses the system's `zig` command when `cfg.zigSystemBin = on`.
            A local-only version is downloaded and used for the project when off.
@@ -54,6 +52,8 @@
     defines.os  : builtin.os
 - [ ] Give context/info about the target when building/running.
 - [x] Support for sending extra arguments to the compiler.
+- [x] strip final binary on release vers
+- [ ] lto
 ## C and C++
 - [x] Basic C support
 - [x] Basic C++ support
@@ -64,17 +64,22 @@
 - [ ] [c,cpp] Fallback set of cc/ld flags, for both debug/release modes.
       Can specify flags, add the defaults explicitly, or just don't specify and use the fallback when omitted.
 - [x] Support for sending extra arguments to the compiler.
+- [ ] strip final binary on release vers
+      (send the flags: `-Wl,-s`, `-strip-debug`, `-s`, to zigcc)
+- [ ] lto
 ## Nim
 - [x] Basic Nim code support _(with ZigCC)_
-- [ ] Cross compilation for Nim, with the same Zig-confy toolchain
+- [x] Cross compilation for Nim, with the same Zig-confy toolchain
 - [ ] Fully verbose example, changing everything that can be changed.
 - [x] Support for sending extra arguments to the compiler.
 - [x] Support for the `cpp` nimc backend
+- [x] strip final binary on release vers
+- [x] lto
 - [ ] Nimble-like `require "package"` in builder
 - [ ] SharedLibrary build
 - [ ] StaticLibrary build
 - [ ] zigcc and zigcpp aliases:
-  - [ ] : Call for the system's `zig` command when `cfg.zigSystemBin = on`
+  - [x] : Call for the system's `zig` command when `cfg.zig.systemBin = on`
   - [_] : Ordered to rebuild every run (in case the project is moved or the config options change).
           _Tiny file. Consumes less than a second in total._
           Done: Not needed with the new path resolution solution.
