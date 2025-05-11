@@ -4,6 +4,7 @@
 # @deps std
 from std/os import `/`
 from std/strutils import join
+from std/strformat import fmt
 import std/enumutils
 # @deps confy
 import ./types/base
@@ -27,24 +28,6 @@ func outDir *(trg :BuildTarget) :PathLike= trg.cfg.dirs.bin/trg.sub
 func binary *(trg :BuildTarget) :PathLike= trg.outDir()/trg.trg&trg.ext()
 func outBin *(trg :BuildTarget) :PathLike= trg.trg & trg.ext()
 
-
-#_______________________________________
-# @section BuildTarget: Triplet Resolution
-#_____________________________
-func toNim *(syst :System) :SystemStr=  (os: $syst.os, cpu: $syst.cpu, abi: $syst.abi)
-  ## @descr Converts a system object into an (os,cpu,abi) string pair, usable with nimc as --os:OS --cpu:CPU
-func toZig *(syst :System) :SystemStr=
-  ## @descr Converts a sytem object into an (os,cpu,abi) string pair, usable with `zig cc` as `-target CPU-OS`
-  result.os = case syst.os
-    of Mac: "macos" # Remove the x from default
-    else:   $syst.os
-  result.cpu = case syst.cpu
-    of x86, x86_64: syst.cpu.symbolName
-    of arm64:       "aarch64"
-    else:           $syst.cpu
-  result.abi = $syst.abi
-
-
 #_______________________________________
 # @section System: Resolution
 #_____________________________
@@ -52,6 +35,7 @@ proc with *(os :OS; cpu :CPU; abi :ABI= ABI.gnu) :System=
   ## @descr Returns a System object for the given os and cpu.
   result.os  = os
   result.cpu = cpu
+  result.abi = abi
 #_____________________________
 proc host *() :System=
   ## @descr Returns the properties of the host, as a System object
@@ -85,5 +69,44 @@ proc host *() :System=
   of   "alpha":       result.cpu = CPU.alpha
   result.abi = ABI.gnu
 #_____________________________
-proc host *(_:typedesc[System]) :System= system.host()
+proc host *(_:typedesc[System]) :System= systm.host()
+
+
+
+#_______________________________________
+# @section BuildTarget: Triplet Resolution
+#_____________________________
+func toNim *(syst :System) :SystemStr=  (os: $syst.os, cpu: $syst.cpu, abi: "")
+  ## @descr Converts a system object into an (os,cpu) string pair, usable with nimc as --os:OS --cpu:CPU
+#___________________
+func toZig *(os :OS) :string=
+  case os
+  of UndefinedOS : systm.host().os.toZig()
+  of Mac         : "macos" # Remove the x from default
+  else           : $os
+#___________________
+func toZig *(cpu :CPU) :string=
+  case cpu
+  of UndefinedCPU : systm.host().cpu.toZig()
+  of x86, x86_64  : cpu.symbolName
+  of arm64        : "aarch64"
+  else            : $cpu
+#___________________
+func toZig *(syst :System) :SystemStr=
+  ## @descr Converts a sytem object into an (os,cpu,abi) string pair, usable with `zig cc` as `-target CPU-OS`
+  ## @note `result.abi` will be "" when {@arg syst}.abi is {@link ABI}.none
+  result.os  = syst.os.toZig()
+  result.cpu = syst.cpu.toZig()
+  if syst.abi != ABI.none: result.abi = $syst.abi
+#___________________
+func tag *(syst :SystemStr) :string=
+  ## @descr Returns the Zig triplet tag (-target ???) for the given {@link SystemStr}
+  result = fmt"{syst.cpu}-{syst.os}"
+  if syst.abi != "none" and syst.abi != "":
+    result.add fmt"-{syst.abi}"
+#___________________
+func toZigTag *(syst :System) :string=
+  result.add "-target "
+  result.add syst.toZig().tag()
+
 

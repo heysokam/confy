@@ -85,7 +85,7 @@ type CPU *{.pure.}= enum
   mips    = "mips",    mipsel    = "mipsel",    mips64      = "mips64",      mips64el = "mips64el", 
   powerpc = "powerpc", powerpc64 = "powerpc64", powerpc64el = "powerpc64el", sparc    = "sparc",
   riscv32 = "riscv32", riscv64   = "riscv64",   alpha       = "alpha",       unknown  = "unknown",
-type ABI *{.pure.}= enum gnu, musl
+type ABI *{.pure.}= enum none, gnu, musl
 #___________________
 type System * = object
   ## Properties of a specific target system

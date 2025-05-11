@@ -96,7 +96,3 @@ proc new *(kind :BinKind;
   ## Creates a new BuildTrg with the given data.
   BuildTrg.new(@[src.Fil.toDirFile], trg, kind, cc, flags, syst, root, sub, remotes, deps, args, version)
 
-#_____________________________
-proc print *(obj :BuildTrg) :void=  info.report(obj)
-  ## Prints all contents of the object to the command line.
-

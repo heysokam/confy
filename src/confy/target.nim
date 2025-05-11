@@ -3,6 +3,7 @@
 #:______________________________________________________________________
 # @deps std
 from std/paths import Path
+from std/strformat import fmt
 # @deps confy
 import ./types/base
 import ./types/errors
@@ -14,7 +15,7 @@ import ./lang
 import ./command
 import ./dependency
 import ./flags as confy_flags
-from ./system as sys import nil
+from ./systm as sys import nil
 from ./cfg as config import nil
 from ./state as G import nil
 
@@ -28,6 +29,38 @@ func updateSystemBin *(cfg :Config) :Config=
   if result.nim.systemBin    : result.nim.bin    = config.nim_bin
   if result.nimble.systemBin : result.nimble.bin = config.nimble_bin
   if result.zig.systemBin    : result.zig.bin    = config.zig_bin
+
+
+#_______________________________________
+# @section BuildTarget: Information Report
+#_____________________________
+const NoValue          = "..."
+const Templ_TargetInfo = """
+{obj.cfg.prefix} Building {obj.kind} | {obj.trg} from folder `{obj.cfg.dirs.root}`:
+  Version:          {version}
+  Target Binary:    {sys.binary(obj)}
+  Target Platform:  {obj.system.os}
+  Target Arch:      {obj.system.cpu}
+  Host Platform:    {sys.host().os}
+  Host Arch:        {sys.host().cpu}
+  Language:         {obj.lang}
+  Flags.cc:         {obj.flags.cc}
+  Flags.ld:         {obj.flags.ld}
+  Remotes:          {remotes}
+  Code Subdir:      {subdir}
+  Code file list:   {obj.src}
+"""
+func report *(
+    obj   : BuildTarget;
+    templ : static string= Templ_TargetInfo;
+  ) :void=
+  ## @descr Reports information about the {@link BuildTarget} object on CLI.
+  if not obj.cfg.verbose: return
+  let remotes = NoValue
+  # let remotes = if obj.remotes.len > 0  : $obj.remotes  else: NoValue
+  let version = if $obj.version != ""   : $obj.version  else: NoValue
+  let subdir  = if obj.sub.string != "" : $obj.sub      else: NoValue
+  debugEcho fmt( templ )
 
 
 #_______________________________________
@@ -61,14 +94,15 @@ func new *(kind :Build;
   ##  ```nim
   ##  const app = Program.new("hello.c")
   ##  ```
-  result      = BuildTarget(kind: kind, version: version)
-  result.cfg  = cfg.updateSystemBin()
-  result.src  = if entry != "": @[entry] & src else: src
-  result.trg  = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
-  result.sub  = sub
-  result.lang = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
-  result.deps = deps
-  result.args = args
+  result        = BuildTarget(kind: kind, version: version)
+  result.cfg    = cfg.updateSystemBin()
+  result.src    = if entry != "": @[entry] & src else: src
+  result.trg    = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
+  result.sub    = sub
+  result.lang   = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
+  result.deps   = deps
+  result.args   = args
+  result.system = system
   # Add the flags
   let flags_default = case result.lang
     of C   : confy_flags.C
@@ -84,10 +118,32 @@ func new *(kind :Build;
 #_____________________________
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   trg.download(Dependencies)
+  trg.report()
   let cmd = Command.build(trg)
   if sys.exec(cmd) != 0: trg.fail CompileError, "Failed to build the target:\n  ", $trg
   result = trg
-
+#___________________
+func cross *(
+    trg  : BuildTarget;
+    syst : System;
+  ) :BuildTarget {.discardable.}=
+  # Guard clause to regular build when not cross-compiling a target
+  const host = sys.host()
+  if trg.system == host and syst == host: return trg.build()
+  # Cross Compile
+  result = trg
+  result.system = syst
+  result.report()
+  let cmd = Command.build(result)
+  if sys.exec(cmd) != 0: result.fail CompileError, "Failed to cross-compile {$result}  for  {$syst}"
+#___________________
+func buildFor *(
+    trg     : BuildTarget;
+    systems : openArray[System];
+  ) :seq[BuildTarget] {.discardable.}=
+  if systems.len == 0: return @[]
+  trg.download(Dependencies)
+  for syst in systems: result.add trg.cross(syst)
 
 #_______________________________________
 # @section BuildTarget: Order to Run

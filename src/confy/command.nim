@@ -11,10 +11,10 @@ import ./types/build
 import ./log
 from ./flags import nil
 from ./dependency import nil
-from ./system as sys import nil
+from ./systm as sys import nil
 
 #_______________________________________
-# @section Command Type Exports
+# @section Command: Type Exports
 #_____________________________
 export build.Command
 
@@ -26,7 +26,7 @@ func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discarda
 
 
 #_______________________________________
-# @section C
+# @section Command: C
 #_____________________________
 func c *(_:typedesc[Command];
     trg :BuildTarget;
@@ -35,6 +35,8 @@ func c *(_:typedesc[Command];
   result.add trg.cfg.zig.bin, "cc"
   # Options
   if trg.cfg.verbose: result.add "-v"
+  # Cross Compilation Flags
+  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
   # Flags
   result.add trg.flags.cc
   result.add trg.flags.ld
@@ -48,7 +50,7 @@ func c *(_:typedesc[Command];
 
 
 #_______________________________________
-# @section C++
+# @section Command: C++
 #_____________________________
 func cpp *(_:typedesc[Command];
     trg :BuildTarget;
@@ -57,6 +59,8 @@ func cpp *(_:typedesc[Command];
   result.add trg.cfg.zig.bin, "c++"
   # Options
   if trg.cfg.verbose: result.add "-v"
+  # Cross Compilation Flags
+  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
   # Flags
   result.add trg.flags.cc
   result.add trg.flags.ld
@@ -70,7 +74,7 @@ func cpp *(_:typedesc[Command];
 
 
 #_______________________________________
-# @section Zig
+# @section Command: Zig
 #_____________________________
 func zig_getModules (trg :BuildTarget) :ArgsList=
   ## @descr Build the arguments list with all the dependencies of trg, starting from root
@@ -98,6 +102,8 @@ func zig *(_:typedesc[Command];
   # Cache
   result.add [       "--cache-dir", trg.cfg.zig.cache]
   result.add ["--global-cache-dir", trg.cfg.zig.cache]
+  # Cross Compilation Flags
+  if trg.system != sys.host(): result.add sys.toZigTag(trg.system)
   # Flags
   if trg.kind == Program: result.add "-freference-trace"
   # Dependencies
@@ -117,7 +123,7 @@ func zig *(_:typedesc[Command];
 
 
 #_______________________________________
-# @section Zig
+# @section Command: Nim
 #_____________________________
 func nim *(_:typedesc[Command];
     trg :BuildTarget;
@@ -132,7 +138,15 @@ func nim *(_:typedesc[Command];
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
-  # Flags
+  # Cross Compilation Flags
+  if trg.system != sys.host():
+    let system_nim = sys.toNim(trg.system)
+    result.add &"--os:{system_nim.os}"
+    result.add &"--cpu:{system_nim.cpu}"
+    let system_zig = sys.toZigTag(trg.system)
+    result.add &"--passC:\"{system_zig}\""
+    result.add &"--passL:\"{system_zig}\""
+  # User-defined Flags
   for flag in trg.flags.cc: result.add &"--passC:\"{flag}\""
   for flag in trg.flags.ld: result.add &"--passL:\"{flag}\""
   # Dependencies
@@ -147,7 +161,7 @@ func nim *(_:typedesc[Command];
 
 
 #_______________________________________
-# @section Build Command Manager
+# @section Command: Build
 #_____________________________
 func build *(_:typedesc[Command];
     trg :BuildTarget;
@@ -161,7 +175,7 @@ func build *(_:typedesc[Command];
 
 
 #_______________________________________
-# @section Run Command Manager
+# @section Command: Run
 #_____________________________
 func run *(_:typedesc[Command];
     trg   :BuildTarget;
