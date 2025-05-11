@@ -142,7 +142,7 @@ func nim_zigcc *(_:typedesc[Command];
   ##  nim c --cc:clang --clang.exe="zigcc" --clang.linkerexe="zigcc" --opt:speed hello.nim
   if trg.cfg.nim.backend notin {NimBackend.c, NimBackend.cpp}: return
   result.add "-d:zig"
-  result.add "-cc:clang"
+  result.add "--cc:clang"
   result.add &"--clang.exe=\"{trg.cfg.zig.cc}\""
   result.add &"--clang.linkerexe=\"{trg.cfg.zig.cc}\""
   result.add &"--clang.cppCompiler=\"{trg.cfg.zig.cpp}\""
