@@ -2,7 +2,7 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps std
-from std/paths import Path
+from std/os import `/`, splitFile
 from std/strformat import fmt
 # @deps confy
 import ./types/base
@@ -10,6 +10,7 @@ import ./types/errors
 import ./types/config as types_config
 import ./types/build as types
 import ./tools/version as V
+import ./tools/files as F
 from   ./log import fail, verb, warn
 import ./lang
 import ./command
@@ -89,18 +90,24 @@ func new *(kind :Build;
     flags   : Flags        = Flags();
     args    : ArgsList     = @[];
     system  : System       = sys.host();
+    remotes : Remotes      = Remotes.with(G.cfg.dirs.src);
   ) :BuildTarget=
   ## @descr
   ##  Creates a new {@link BuildTarget} object containing all the data needed by confy to build the given binary {@arg kind}
   ##  Any arguments omitted will be automatically resolved to sane defaults.
   ## @example
   ##  ```nim
-  ##  const app = Program.new("hello.c")
+  ##  let app = Program.new("hello.c")
   ##  ```
-  result        = BuildTarget(kind: kind, version: version)
-  result.cfg    = cfg.updateSystemBin()
-  result.src    = if entry != "": @[entry] & src else: src
-  result.trg    = if trg == NullPath: string(paths.splitFile(entry.Path).name) else: trg
+  # Base config
+  result     = BuildTarget(kind: kind, version: version)
+  result.cfg = cfg.updateSystemBin()
+  # Merge the source code, and adjust it
+  result.src = if entry != "": @[result.cfg.dirs.src/entry] & src else: src
+  let R = Remotes.with(result.cfg.dirs.src).merge(remotes)
+  if R.autoAdjust: result.src = R.adjust(result.src, root=result.cfg.dirs.src)
+  # Get the rest of the options
+  result.trg    = if trg == NullPath: entry.splitFile().name else: trg
   result.sub    = sub
   result.lang   = if lang != Lang.Unknown: lang else: Lang.identify(result.src)
   result.deps   = deps
