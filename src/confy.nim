@@ -12,6 +12,7 @@ from ./confy/dependency    import nil ; export dependency
 from ./confy/flags         import nil ; export flags
 from ./confy/tools/version import nil ; export version
 from ./confy/tools/git     import nil ; export git
+from ./confy/tools/files   import nil ; export files
 from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
 from ./confy/systm as sys  import nil ; export sys
