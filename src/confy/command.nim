@@ -36,7 +36,24 @@ func assembly *(_:typedesc[Command];
   # FIX: Figure out how to implement assembly commands with the new architecture
   #      Should (likely) use the same api than Object
   if trg.kind != Object: trg.fail CompileError, "Compiling Assembly into non-Object files is not supported."
-  discard
+  result.add trg.cfg.zig.bin
+  result.add "cc"
+  # Compilation Flags
+  # └─ 1. Cross Compilation Flags
+  if trg.system.cross or trg.system.explicit:
+    result.add sys.toZigTag(trg.system)
+  # └─ 2. Internally managed flags
+  result.add "-x"
+  result.add "assembler-with-cpp"
+  # result.add "-fno-leading-underscore"
+  # └─ 3. User-defined Flags
+  result.add trg.flags.cc
+  # Output
+  result.add "-o"
+  result.add sys.binary(trg)
+  # Source Code
+  result.add "-c" # Compile only, don't link  (will generate objects)
+  result.add trg.src
 
 
 #_______________________________________
