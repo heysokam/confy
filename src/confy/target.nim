@@ -102,7 +102,7 @@ func new *(kind :Build;
   # Base config
   result     = BuildTarget(kind: kind, version: version)
   result.cfg = cfg.updateSystemBin()
-  # Merge the source code, and adjust it
+  # Merge the source code, and adjust it based on the remotes
   result.src = if entry != "": @[result.cfg.dirs.src/entry] & src else: src
   let R = Remotes.with(result.cfg.dirs.src).merge(remotes)
   if R.autoAdjust: result.src = R.adjust(result.src, root=result.cfg.dirs.src)

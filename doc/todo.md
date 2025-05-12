@@ -8,7 +8,7 @@
 ## All
 - [x] Autocreate subdirs to compile into
 - [x] Multi-file build
-- [ ] Support for file globbing _(automatic grabbing all files contained in a folder)_
+- [x] Support for file globbing _(automatic grabbing all files contained in a folder)_
 - [x] cc.flags input support
 - [x] ld.flags input support
 - [ ] multi-object build
@@ -58,7 +58,7 @@
 - [x] Basic C support
 - [x] Basic C++ support
 - [x] Correctly select `C` or `C++` compiler inside a seq (found for each file, instead of globally for the whole list)
-- [ ] Remote folders _(same concept as Repositories in SCons)_
+- [x] Remote folders _(same concept as Repositories in SCons)_
 - [ ] SharedLibrary build
 - [ ] windres with zig cc  (milestone feature for zig 0.11/0.12, request accepted on 2022.apr.09. https://github.com/ziglang/zig/issues/9564)
 - [ ] [c,cpp] Fallback set of cc/ld flags, for both debug/release modes.
