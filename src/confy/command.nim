@@ -61,7 +61,7 @@ func zigcc (_:typedesc[Command];
   # User Args
   result.add trg.args
   # Source code
-  for file in trg.src: result.add trg.cfg.dirs.src/file
+  for file in trg.src: result.add file
   # Output
   result.add "-o"
   result.add sys.binary(trg)
@@ -84,7 +84,7 @@ func zig_getModules (trg :BuildTarget) :ArgsList=
   # Add all root dependencies as --dep to the resulting command
   for dep in trg.deps: result &= dependency.toZig(dep, trg.cfg.dirs.lib, false)
   # The first module is the root module  (zig -h)
-  let entry = trg.cfg.dirs.src/trg.src[0] # Always treat the first file as the root/entry file
+  let entry = trg.src[0] # Always treat the first file as the root/entry file
   result.add &"-M{trg.trg}={entry}"
   # Add the dependencies in reverse order
   for dep in trg.deps.reversed: result &= dependency.toZig(dep, trg.cfg.dirs.lib, true)
@@ -122,11 +122,11 @@ func zig *(_:typedesc[Command];
   # Source Code
   case trg.kind
   of UnitTest:
-    for file in trg.src: result.add trg.cfg.dirs.src/file
+    for file in trg.src: result.add file
   else:
     if trg.src.len > 1:  # Always skip the entry file. It is treated as a module root
       let start = if trg.src.len > 1: 1 else: 0
-      for file in trg.src[start..^1]: result.add trg.cfg.dirs.src/file
+      for file in trg.src[start..^1]: result.add file
 
 
 #_______________________________________
@@ -203,7 +203,7 @@ func nim *(_:typedesc[Command];
   # User Args
   result.add trg.args
   # Source code
-  for file in trg.src: result.add trg.cfg.dirs.src/file
+  for file in trg.src: result.add file
 
 
 #_______________________________________
