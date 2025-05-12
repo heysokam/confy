@@ -13,6 +13,7 @@ from ./confy/flags         import nil ; export flags
 from ./confy/tools/version import nil ; export version
 from ./confy/tools/git     import nil ; export git
 from ./confy/tools/files   import nil ; export files
+from ./confy/tools/args    import nil ; export args
 from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
 from ./confy/systm as sys  import nil ; export sys
@@ -21,7 +22,8 @@ export types.Config
 export types.System
 export types.OS ; export types.CPU ; export types.ABI
 export types.build.Mode; export types.build.ModeKind; export types.build.ModeOptim
-from ./confy/state as G import nil ; export G.cfg
+from ./confy/state as G import nil ;
+export G.cfg ; export G.cli
 
 #_______________________________________
 # @section Forward Export useful nstd tools
