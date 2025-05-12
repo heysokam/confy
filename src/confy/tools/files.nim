@@ -2,8 +2,10 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps std
-from std/os import `/`, walkDirRec, walkDir, pcFile, fileExists, relativePath
-from std/strutils import endsWith, contains, replace
+from std/os import `/`, walkDirRec, walkDir, pcFile, fileExists, relativePath, splitFile
+from std/strutils import endsWith, replace
+# @deps nstd
+from pkg/nstd/strings import contains
 # @deps confy
 import ../types/base
 
@@ -80,10 +82,10 @@ proc glob *(
   if rec:
     for file in dir.walkDirRec(relative=rel, skipSpecial=true):
       if filters.shouldSkip(file): continue
-      if file.endsWith(ext): result.add file
+      if file.splitFile.ext == ext: result.add file
   else:
     for file in dir.walkDir(relative=rel, skipSpecial=true):
       if file.kind != pcFile: continue
       if filters.shouldSkip(file.path): continue
-      if file.path.endsWith(ext): result.add file.path
+      if file.path.splitFile.ext == ext: result.add file.path
 
