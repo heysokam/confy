@@ -21,7 +21,9 @@ const Strict * = @[
   "-Werror",
   "-pedantic",
   "-pedantic-errors",
+  # Remove purely stylistic warnings
   "-Wno-declaration-after-statement",
+  "-Wno-covered-switch-default",
   # Warn of dodgy situations
   "-Wno-error=vla",
   "-Wno-error=padded",
