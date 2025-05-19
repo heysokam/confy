@@ -19,6 +19,8 @@ from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
 from ./confy/systm as sys  import nil ; export sys
 from ./confy/types import nil
+from ./confy/types/base import Name
+export Name
 export types.Config
 export types.System
 export types.OS ; export types.CPU ; export types.ABI
