@@ -72,12 +72,18 @@ func zigcc (_:typedesc[Command];
   # Cross Compilation Flags
   if trg.system.cross or trg.system.explicit:
     result.add sys.toZigTag(trg.system)
-  # Flags
+  # Dependencies Flags
+  if trg.deps.len > 0: result.add &"-I{trg.cfg.dirs.lib}"
+  for dep in trg.deps:
+    let dir = trg.cfg.dirs.lib/dep.name/dep.src
+    result.add &"-I{dir}"
+  # User Flags
   result.add trg.flags.cc
   result.add trg.flags.ld
   # User Args
   result.add trg.args
   # Source code
+  if trg.kind == Object: result.add "-c"
   for file in trg.src: result.add file
   # Output
   result.add "-o"
@@ -137,8 +143,7 @@ func zig *(_:typedesc[Command];
   # Output
   result.add "-femit-bin=" & sys.binary(trg)
   # Source Code
-  case trg.kind
-  of UnitTest:
+  if trg.kind == UnitTest and trg.deps.len == 0:
     for file in trg.src: result.add file
   else:
     if trg.src.len > 1:  # Always skip the entry file. It is treated as a module root
