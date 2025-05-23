@@ -189,15 +189,7 @@ func nim *(_:typedesc[Command];
   # Config to nimc Options
   if   trg.cfg.force   : result.add "-f"
   if   trg.cfg.verbose : result.add "--verbosity:2"
-  elif trg.cfg.quiet   :
-    result.add "--verbosity:0"
-    result.add "--hints:off"
-  let mode = ($trg.mode.kind).normalize()
-  let opt  = ($trg.mode.opt).normalize()
-  result.add &"-d:{mode}"
-  result.add &"--opt:{opt}"
-  if trg.mode.strip: result.add "-d:strip"
-  if trg.mode.lto:   result.add "-d:lto"
+  elif trg.cfg.quiet   : result.add @["--verbosity:0", "--hints:off"]
   # Cache & Nimble path
   result.add &"--nimCache:{trg.cfg.nim.cache}"
   result.add &"--NimblePath:{trg.cfg.nimble.cache}"
@@ -214,7 +206,15 @@ func nim *(_:typedesc[Command];
   if trg.cfg.nim.unsafe.functionPointers:
     if trg.cfg.quiet : result.add "--passC:-Wno-incompatible-function-pointer-types"
     else             : result.add "--passC:-Wno-error=incompatible-function-pointer-types"
-  # └─ 3. User-defined Flags
+  # └─ 3. User-defined Optimization
+  let mode = ($trg.mode.kind).normalize()
+  let opt  = ($trg.mode.opt).normalize()
+  result.add &"-d:{mode}"
+  result.add &"--opt:{opt}"
+  if trg.mode.kind == Debug : result.add "--debugger:native"
+  if trg.mode.strip         : result.add "-d:strip"
+  if trg.mode.lto           : result.add "-d:lto"
+  # └─ 4. User-defined Flags
   for flag in trg.flags.cc: result.add &"--passC:\"{flag}\""
   for flag in trg.flags.ld: result.add &"--passL:\"{flag}\""
   # Dependencies
