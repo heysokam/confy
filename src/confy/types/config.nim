@@ -33,6 +33,8 @@ type Zig * = object
   cc         *:PathLike=  zig_dir/cfg.zig_cc
   cpp        *:PathLike=  zig_dir/cfg.zig_cpp
   ar         *:PathLike=  zig_dir/cfg.zig_ar
+  lld        *:bool    =  cfg.zig_llvm
+  llvm       *:bool    =  cfg.zig_llvm
   cache      *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.zig_name
   systemBin  *:bool    =  false
 

@@ -47,6 +47,7 @@ const zig_bin     *{.strdefine.}= cfg.zig_name
 const zig_cc      *{.strdefine.}= cfg.zig_name&"cc"
 const zig_cpp     *{.strdefine.}= cfg.zig_name&"cpp"
 const zig_ar      *{.strdefine.}= cfg.zig_name&"ar"
+const zig_llvm    *{.booldefine.}= false
 # defaults.nim
 const nim_dir     *{.strdefine.}= ".nim"
 const nim_name    *{.strdefine.}= "nim"

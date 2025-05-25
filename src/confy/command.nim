@@ -136,8 +136,10 @@ func zig *(_:typedesc[Command];
   # └─ 2. Internally managed flags
   if trg.kind == Program: result.add "-freference-trace"
   # └─ 3. User-defined Flags
-  for flag in trg.flags.cc: result.add flag
-  for flag in trg.flags.ld: result.add flag
+  if not trg.cfg.zig.lld   : result.add "-fno-lld"
+  if not trg.cfg.zig.llvm  : result.add "-fno-llvm"
+  for flag in trg.flags.cc : result.add flag
+  for flag in trg.flags.ld : result.add flag
   # User Args
   result.add trg.args
   # Output
