@@ -36,7 +36,7 @@ type Zig * = object
   lld        *:bool    =  cfg.zig_llvm
   llvm       *:bool    =  cfg.zig_llvm
   cache      *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.zig_name
-  systemBin  *:bool    =  false
+  systemBin  *:bool    =  cfg.all_systemBin
 
 
 #_______________________________________
@@ -62,7 +62,7 @@ type Nim * = object
   backend  *:NimBackend=  NimBackend.c ## @descr
     ##  Backend that the nim compiler will use to build the project.
     ##  @note Only applies to the project files. The builder app always compiles with the `nim c` backend.
-  systemBin  *:bool=  false ## @descr
+  systemBin  *:bool=  cfg.all_systemBin ## @descr
     ##  Uses the System's Nim path, without downloading a new version from the web.
     ##  @when on : Uses the system's nim like `nim c file.nim`
     ##  @when off: Runs the nim compiler setup logic and executes the nim compiler like `cfg.nimDir/bin/nim c file.nim`
@@ -81,7 +81,7 @@ type Nim * = object
 type Nimble * = object
   bin       *:PathLike=  cfg.dirs_bin/cfg.nim_dir/"bin"/cfg.nimble_bin
   cache     *:PathLike=  cfg.dirs_bin/cfg.dirs_cache/cfg.nimble_dir/"pkgs2"
-  systemBin *:bool    =  false
+  systemBin *:bool    =  cfg.all_systemBin
 
 
 #_______________________________________

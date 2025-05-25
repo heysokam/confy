@@ -34,6 +34,8 @@ const log_debug *{.strdefine.}= " 🐜 Debug 🐜"
 #_______________________________________
 # @section Default Values
 #_____________________________
+# defaults.all
+const all_systemBin *{.booldefine.}= false
 # defaults.dirs
 const dirs_bin    *{.strdefine.}= "bin"
 const dirs_src    *{.strdefine.}= "src"
