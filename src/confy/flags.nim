@@ -53,7 +53,7 @@ const Cpp * = @[Lang.Cpp.std()] & flags.Strict
 
 
 #_______________________________________
-# @section Default Flags (Strict)
+# @section Default Flags (Strict): Nim
 #_____________________________
 from "$nim"/compiler/lineinfos as nim import nil
 from std/sequtils import mapIt, filterIt, toSeq
