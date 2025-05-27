@@ -44,6 +44,9 @@ type Zig * = object
 #_____________________________
 type NimUnsafe * = object
   ## @descr Unsafe (optional) flags that can be added to a Nim BuildTarget to ignore safety flags.
+  defs  *:bool= false ## @descr
+    ##  When active, the flag --strictDefs:on will not be added to the compiler options
+    ##  https://nim-lang.org/docs/manual_experimental.html#strict-definitions-and-nimout-parameters
   functionPointers  *:bool= false ## @descr
     ##  When active, the flag `-Wno-incompatible-function-pointer-types` will be passed to ZigCC for compiling nim code.
     ##  The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.

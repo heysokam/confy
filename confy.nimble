@@ -3,7 +3,7 @@
 #:______________________________________________________________________
 # Package Information
 packageName  = "confy"
-version      = "0.8.2"
+version      = "0.8.3"
 author       = "heysokam"
 description  = "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim"
 license      = "GPLv3-or-later"
