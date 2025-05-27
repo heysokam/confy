@@ -51,3 +51,15 @@ func std *(lang :build.Lang) :build.Flag=
 const C   * = @[Lang.C.std()]   & flags.Strict
 const Cpp * = @[Lang.Cpp.std()] & flags.Strict
 
+
+#_______________________________________
+# @section Default Flags (Strict)
+#_____________________________
+from "$nim"/compiler/lineinfos as nim import nil
+from std/sequtils import mapIt, filterIt, toSeq
+from std/enumutils import symbolName
+from std/strutils import startsWith
+const nim_StrictWarnings * = nim.TMsgKind.items.toSeq
+  .filterIt(it.symbolName.startsWith("warn"))
+  .mapIt("--warningAsError:" & $it)
+

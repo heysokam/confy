@@ -206,6 +206,8 @@ func nim *(_:typedesc[Command];
     result.add &"--passL:\"{system_zig}\""
   # └─ 2. Internally managed flags
   if not trg.cfg.nim.unsafe.defs: result.add "--experimental:strictDefs"
+  if not trg.cfg.nim.unsafe.warnings:
+    for flag in flags.nim_StrictWarnings: result.add flag
   if trg.cfg.nim.unsafe.functionPointers:
     if trg.cfg.quiet : result.add "--passC:-Wno-incompatible-function-pointer-types"
     else             : result.add "--passC:-Wno-error=incompatible-function-pointer-types"

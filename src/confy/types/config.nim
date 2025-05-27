@@ -47,6 +47,10 @@ type NimUnsafe * = object
   defs  *:bool= false ## @descr
     ##  When active, the flag --strictDefs:on will not be added to the compiler options
     ##  https://nim-lang.org/docs/manual_experimental.html#strict-definitions-and-nimout-parameters
+  warnings  *:bool= false ## @descr
+    ##  When active, warnings will not be treated as errors by the Nim compiler.
+    ##  @note Does not change the behavior of `User` warnings
+    ##  @note This safety option is achieved by confy explicitely adding all warnings as --warningAsError:X
   functionPointers  *:bool= false ## @descr
     ##  When active, the flag `-Wno-incompatible-function-pointer-types` will be passed to ZigCC for compiling nim code.
     ##  The correct fix for this unsafety is done in wrapper code. ZigCC is just pointing at incorrectly written code.
