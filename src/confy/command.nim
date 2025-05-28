@@ -273,7 +273,7 @@ func archive *(_:typedesc[Command];
     trg : BuildTarget;
     bin : string;
   ) :Command=
-  ## Returns the command that must be run for C targets
+  ## @descr Returns the command that must be run for archiving the intermediate objects of C targets
   Command.zigcc(trg, "ar", bin)
 
 
