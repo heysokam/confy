@@ -19,12 +19,14 @@ from ./confy/log           import nil ; export log
 from ./confy/command       import nil ; export command
 from ./confy/systm as sys  import nil ; export sys
 from ./confy/types import nil
-from ./confy/types/base import Name
-export Name
+from ./confy/types/base import Name, PathLike, URL
+export Name ; export PathLike ; export URL
 export types.Config
 export types.System
 export types.OS ; export types.CPU ; export types.ABI
-export types.build.Mode; export types.build.ModeKind; export types.build.ModeOptim
+export types.build.Mode ; export types.build.ModeKind
+type Target * = types.build.BuildTarget
+type Optim  * = types.build.ModeOptim
 from ./confy/state as G import nil ;
 export G.cfg ; export G.cli
 
@@ -38,4 +40,8 @@ export os.dirExists
 export os.getEnv
 export os.parentDir
 export os.removeDir
+#___________________
+from std/strformat import `&`, fmt
+export `&`
+export fmt
 
