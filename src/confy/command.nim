@@ -63,9 +63,16 @@ func assembly *(_:typedesc[Command];
 func zigcc (_:typedesc[Command];
     trg : BuildTarget;
     tag : string;
+    bin : string = ""; # For archiving only
   ) :Command=
   # Binary & Subcommand
   result.add trg.cfg.zig.bin, tag
+  # Archiving: Early Exit
+  if tag == "ar":
+    result.add "-rc"
+    result.add bin
+    result.add sys.binary(trg)
+    return
   # Options
   if trg.cfg.verbose: result.add "-v"
   if trg.kind == SharedLib: result.add "-shared"
@@ -257,6 +264,17 @@ func build *(_:typedesc[Command];
     of Lang.Asm   : Command.assembly(trg)
     of Lang.Minim : Command.minim(trg)
     else:Command()
+
+
+#_______________________________________
+# @section Command: Build
+#_____________________________
+func archive *(_:typedesc[Command];
+    trg : BuildTarget;
+    bin : string;
+  ) :Command=
+  ## Returns the command that must be run for C targets
+  Command.zigcc(trg, "ar", bin)
 
 
 #_______________________________________

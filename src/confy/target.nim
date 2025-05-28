@@ -68,6 +68,15 @@ func report *(
 
 
 #_______________________________________
+# @section BuildTarget: Helpers
+#_____________________________
+func isCStaticLib (trg :BuildTarget) :bool=
+  ## C StaticLib needs 2 steps: an intermediate .o step, and an archive step
+  trg.lang in {Lang.C, Lang.Cpp} and
+  trg.kind == StaticLib
+
+
+#_______________________________________
 # @section BuildTarget: Create
 #_____________________________
 func entry *(trg :var BuildTarget; file :PathLike) :PathLike=
@@ -129,8 +138,13 @@ func new *(kind :Build;
 func build *(trg :BuildTarget) :BuildTarget {.discardable.}=
   trg.download(Dependencies)
   trg.report()
-  let cmd = Command.build(trg)
-  if sys.exec(cmd) != 0: trg.fail CompileError, "Failed to build the target:\n  ", $trg
+  var target = trg
+  if trg.isCStaticLib: target.kind = Object
+  let cc = Command.build(target)
+  if sys.exec(cc) != 0: trg.fail CompileError, "Failed to compile the target:\n  ", $trg
+  if trg.isCStaticLib:
+    let ar = Command.archive(target, sys.binary(trg))
+    if sys.exec(ar) != 0: trg.fail CompileError, "Failed to archive the objects for target:\n  ", $trg
   result = trg
 #___________________
 func cross *(

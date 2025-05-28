@@ -16,6 +16,8 @@ func add *(A :var build.Flags; B :build.Flags) :var build.Flags {.discardable.}=
   result = A
   A.cc.add B.cc
   A.ld.add B.ld
+#___________________
+func `&` *(A,B :build.Flags) :build.Flags= Flags(cc: A.cc&B.cc, ld: A.ld&B.ld)
 
 
 #_______________________________________
