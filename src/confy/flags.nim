@@ -7,10 +7,15 @@
 import ./types/build
 
 #_______________________________________
-# @section Forward Export Flags Types
+# @section Export Flags Types & Tools
 #_____________________________
 export build.Flag
 export build.Flags
+#___________________
+func add *(A :var build.Flags; B :build.Flags) :var build.Flags {.discardable.}=
+  result = A
+  A.cc.add B.cc
+  A.ld.add B.ld
 
 
 #_______________________________________
