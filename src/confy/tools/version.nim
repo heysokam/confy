@@ -19,7 +19,7 @@ type Version * = object
   tag    *:version.Tag  = ""
   build  *:version.Build= ""
 
-func toString *(V :Version) :string {.inline.}= &"{$V.major}.{$V.major}.{$V.major}{V.tag}{V.build}"
+func toString *(V :Version) :string {.inline.}= &"{$V.major}.{$V.minor}.{$V.patch}{V.tag}{V.build}"
 template `$`  *(V :Version) :string= V.toString()
 
 func version *(
