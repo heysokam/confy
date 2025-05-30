@@ -4,10 +4,11 @@ Confy is a buildsystem for compiling code with ZigCC.
 Inspired by SCons, without the issues of a typeless language.  
 You can expect: 
 - Ergonomic, readable and minimal/simple syntax.  
-- Behaves like a library. Build your own binary that runs the compilation commands.  
+- Behaves like a library. Build your own binary that compiles your app.  
 - Imperative, not declarative. You own the control flow.  
-- Sane project configuration defaults.  
-- Builds with `zig cc`. Auto-downloads the latest version for the host.  
+- Sane project and configuration defaults.  
+- Auto-downloads the latest compiler for the host.  
+- Cross-compilation as a **first class citizen**, not an afterthought.  
 
 ## Preview
 Minimal build file:
