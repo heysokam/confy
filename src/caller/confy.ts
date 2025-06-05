@@ -187,10 +187,14 @@ namespace Commands {
     await run(cfg, ...cmd)
   }
 
-  // export async function sh (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }
-  export async function bun (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }  // We always validate bun at the start
-  export async function zig (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.zig.bin, "Zig", Manager.Zig.run, Manager.Zig.validate) }
+  export async function bun (cfg :confy.Config) :Promise<void> {
+    // We always validate bun at the start
+    await Manager.Bun.validate(cfg, cfg.force)
+    await Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run)
+  }
 
+  // export async function sh (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.bun.bin, "Bun", Manager.Bun.run) }
+  export async function zig (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.zig.bin, "Zig", Manager.Zig.run, Manager.Zig.validate) }
   export async function nim (cfg :confy.Config) :Promise<void> { await Commands.passthrough(cfg, cfg.nim.bin, "Nim", Manager.Nim.run, Manager.Nim.validate) }
   // export async function nimble    (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.nimble.bin, "Nimble", Manager.Nimble.run, Manager.Nimble.validate) }
   // export async function atlas     (cfg :confy.Config) :Promise<void> { Commands.passthrough(cfg, cfg.nim.atlas.bin, "Atlas", Manager.Atlas.run, Manager.Atlas.validate) }
