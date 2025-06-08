@@ -22,9 +22,13 @@ Program.new("hello.c").build.run
 > Full **how-to** guide @[doc/howto](./doc/howto.md)  
 > See the [examples](./examples) folder in the meantime
 
+> Warning for Nim:  
+> The compiler is set in the strictest mode possible by default.  
+> Your code might not compile because of these flags.  
+> You can deactivate or modify this behavior by changing the `Config().nim.unsafe` options  
+> See the Configuration section below for more details.  
+
 ### Configuration
-All the configuration variables are stored @[confy/cfg.nim](./src/confy/cfg.nim).  
-To change them, add `cfg.theVariable = value` at the top of your `build.nim` file.  
 ```nim
 import confy
 cfg.dirs.src = "./code"   # Changes the source code folder from its default `dirs.root/"src"`.  
@@ -32,6 +36,24 @@ cfg.dirs.bin = "./build"  # Changes the binaries output folder from its default 
 cfg.verbose  = on         # Makes the cli output information completely verbose. (for debugging)
 cfg.quiet    = on         # Makes the cli output information to be as minimal as possible.  (for cleaner cli output)  (default: on)  
                           # Note: verbose = on will ignore quiet being active.  (default: off)  
+```
+Every build `Target` has its own separate configuration options, decided when first creating that target.
+When omitted, Confy uses a global configuration variable that you can modify.
+To change its values, add `cfg.theVariable = value` anywhere in your `build.nim` file.  
+
+You can also create your own `confy.Config()` object and pass it as the `cfg = ...` argument to each `confy.Target` you create.
+Confy does this automatically, but it uses the global config state/variable for ergonomics when omitted.
+In practice, this means that if you pass your own Config object to a target,  
+confy will ignore the global variable and only use your config instead.  
+
+You can find the complete list of default options at @[confy/types/config.nim](./src/confy/types/config.nim)
+
+#### Comptime defaults
+All the comptime configuration variables are stored @[confy/cfg.nim](./src/confy/cfg.nim).  
+Without changing anything else, you can override these options by compiling your builder with a different value.  
+For example, this will compile and run your builder, and change the default to use system/PATH binaries for everything
+```nim
+nim c -r -d:confy.all_systemBin=off build.nim
 ```
 
 
