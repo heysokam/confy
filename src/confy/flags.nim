@@ -66,7 +66,20 @@ from "$nim"/compiler/lineinfos as nim import nil
 from std/sequtils import mapIt, filterIt, toSeq
 from std/enumutils import symbolName
 from std/strutils import startsWith
+#___________________
 const nim_StrictWarnings * = nim.TMsgKind.items.toSeq
   .filterIt(it.symbolName.startsWith("warn"))
   .mapIt("--warningAsError:" & $it)
+#___________________
+const nim_StrictHints * = @[
+  nim.hint_XDeclaredButNotUsed,
+  nim.hint_DuplicateModuleImport,
+  nim.hint_XCannotRaiseY,
+  nim.hint_ConvToBaseNotNeeded,
+  nim.hint_ConvFromXtoItselfNotNeeded,
+  nim.hint_ExprAlwaysX,
+  nim.hint_ConditionAlwaysTrue,
+  nim.hint_ConditionAlwaysFalse,
+  nim.hint_UnknownRaises,
+  ].mapIt("--hintAsError:" & $it)
 
