@@ -154,10 +154,12 @@ func zig *(_:typedesc[Command];
   # Source Code
   if trg.kind == UnitTest and trg.deps.len == 0:
     for file in trg.src: result.add file
+  elif trg.src.len != 0:
+    let start = if trg.deps.len > 0: 1 else: 0   # Skip the entry file when there are dependencies. It is treated as a module root
+    for file in trg.src[start..^1]: result.add file
   else:
-    if trg.src.len > 1:  # Always skip the entry file. It is treated as a module root
-      let start = if trg.src.len > 1: 1 else: 0
-      for file in trg.src[start..^1]: result.add file
+    if trg.deps.len != 0: trg.fail CompileError, "Unreachable case. Cannot create a Zig command for compiling a target with dependencies and only one source file. Should have triggered a different case"
+    result.add trg.src[0]
 
 
 #_______________________________________
