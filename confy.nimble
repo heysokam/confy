@@ -1,6 +1,9 @@
 #:______________________________________________________________________
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
+when not defined(nimscript): import system/nimscript # Silence LSP errors
+
+#_____________________________
 # Package Information
 packageName  = "confy"
 version      = "0.8.9"
