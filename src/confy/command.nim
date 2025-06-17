@@ -19,6 +19,7 @@ from ./systm as sys import cross
 # @section Command: Type Exports
 #_____________________________
 export build.Command
+export build.CommandList
 
 
 #_______________________________________
@@ -294,4 +295,7 @@ func run *(_:typedesc[Command];
   result.add args
 #___________________
 proc run *(cmd :Command) :int {.discardable.}= return sys.exec(cmd)
+proc run *(list :CommandList) :seq[int] {.discardable.}=
+  result = @[]
+  for cmd in list: result.add sys.exec(cmd)
 

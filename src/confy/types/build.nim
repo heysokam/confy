@@ -57,6 +57,7 @@ type Arg      * = string
 type ArgsList * = seq[Arg]
 type Command * = object
   args  *:ArgsList
+type CommandList * = seq[Command]
 
 
 #_______________________________________
