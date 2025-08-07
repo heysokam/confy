@@ -55,8 +55,13 @@ export namespace minisign {
 //____________________________
 export namespace mirrors {
   export const registry = {
-    url : new URL("https://raw.githubusercontent.com/mlugg/setup-zig/refs/heads/main/mirrors.json"),
-    get : async() :Promise<[URL, string]>=> await (await fetch(Zig.mirrors.registry.url)).json() as any,  // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+    url : new URL("https://ziglang.org/download/community-mirrors.txt"),
+    get : async() :Promise<[URL]>=> {
+      const lines = (await (await fetch(Zig.mirrors.registry.url)).text())
+      return lines.split("\n")
+        .map(line => line.trim())
+        .filter(line => line)
+    }
   }
 
   export namespace official {
