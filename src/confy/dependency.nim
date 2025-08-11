@@ -102,12 +102,17 @@ func toNim *(
   ) :build.ArgsList;
 #_____________________________
 # Standard Tools
+func path *(
+    dep  : build.Dependency;
+    dir  : PathLike = ".";
+  ) :PathLike= dir/dep.name/dep.src
+#___________________
 func nim_path (
     dep  : build.Dependency;
     dir  : PathLike = ".";
   ) :build.Arg=
   result.add "--path:"
-  result.add( dir/dep.name/dep.src )
+  result.add dep.path(dir)
 #___________________
 func toNim *(
     dep  : build.Dependency;
