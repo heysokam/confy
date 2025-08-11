@@ -72,7 +72,7 @@ export namespace mirrors {
   }
 
   export async function list () :Promise<URL[]> {
-    const result = Shuffle.FisherYates((await Zig.mirrors.registry.get()).map((a:any) => a[0]))    // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    const result = Shuffle.FisherYates(await Zig.mirrors.registry.get())    // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     result.push(Zig.mirrors.official.downloads())
     return result as URL[]
   }
