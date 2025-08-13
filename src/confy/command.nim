@@ -2,10 +2,11 @@
 #  ᛝ confy  |  Copyright (C) Ivan Mar (sOkam!)  |  GNU GPLv3 or later  :
 #:______________________________________________________________________
 # @deps std
-from std/os import `/`, execShellCmd
+from std/os import `/`, execShellCmd, splitFile
 from std/strformat import `&`
 from std/strutils import normalize
 from std/algorithm import reversed
+from std/sequtils import filterIt
 # @deps confy
 import ./types/base
 import ./types/build
@@ -25,7 +26,11 @@ export build.CommandList
 #_______________________________________
 # @section Command: Data Helpers
 #_____________________________
+func len *(cmd :var Command) :int=  cmd.args.len
 func add *(cmd :var Command; args :varargs[string, `$`]) :var Command {.discardable.}=  cmd.args &= args; return cmd
+func insert *(cmd :var Command; list :seq[sink string], pos :int) :var Command {.discardable.}=
+  for entry in list: cmd.args.insert(entry, pos)
+  return cmd
 
 
 #_______________________________________
@@ -112,10 +117,11 @@ func cpp *(_:typedesc[Command];
 func zig_getModules (trg :BuildTarget) :ArgsList=
   ## @descr Build the arguments list with all the dependencies of trg, starting from root
   if trg.deps.len == 0: return
+  let files_z = trg.src.filterIt(it.splitFile.ext != ".c")
   # Add all root dependencies as --dep to the resulting command
   for dep in trg.deps: result &= dependency.toZig(dep, trg.cfg.dirs.lib, false)
   # The first module is the root module  (zig -h)
-  let entry = trg.src[0] # Always treat the first file as the root/entry file
+  let entry = files_z[0] # Always treat the first file as the root/entry file
   result.add &"-M{trg.trg}={entry}"
   # Add the dependencies in reverse order
   for dep in trg.deps.reversed: result &= dependency.toZig(dep, trg.cfg.dirs.lib, true)
@@ -136,6 +142,7 @@ func zig *(_:typedesc[Command];
   result.add [       "--cache-dir", trg.cfg.zig.cache]
   result.add ["--global-cache-dir", trg.cfg.zig.cache]
   # Dependencies
+  let files_c_start = result.len  # C files must be listed before any modules
   result.add trg.zig_getModules()
   # Compilation Flags
   # └─ 1. Cross Compilation Flags
@@ -153,14 +160,20 @@ func zig *(_:typedesc[Command];
   # Output
   result.add "-femit-bin=" & sys.binary(trg)
   # Source Code
+  # └─ Split C files
+  let files_c = trg.src.filterIt(it.splitFile.ext == ".c")
+  let files_z = trg.src.filterIt(it.splitFile.ext != ".c")
+  # └─ Add C files
+  result.insert files_c, files_c_start
+  # └─ Add Root File   FIX: This is a mess. Figure out how to clean it up
   if trg.kind == UnitTest and trg.deps.len == 0:
-    for file in trg.src: result.add file
-  elif trg.src.len != 0:
+    for file in files_z: result.add file
+  elif files_z.len != 0:
     let start = if trg.deps.len > 0: 1 else: 0   # Skip the entry file when there are dependencies. It is treated as a module root
-    for file in trg.src[start..^1]: result.add file
+    for file in files_z[start..^1]: result.add file
   else:
     if trg.deps.len != 0: trg.fail CompileError, "Unreachable case. Cannot create a Zig command for compiling a target with dependencies and only one source file. Should have triggered a different case"
-    result.add trg.src[0]
+    result.add files_z[0]
 
 
 #_______________________________________

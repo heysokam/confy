@@ -6,7 +6,7 @@ when not defined(nimscript): import system/nimscript # Silence LSP errors
 #_____________________________
 # Package Information
 packageName  = "confy"
-version      = "0.8.13"
+version      = "0.8.14"
 author       = "heysokam"
 description  = "ᛝ confy | Comfortable and Configurable Buildsystem for C, C++, Zig and Nim"
 license      = "GPLv3-or-later"
