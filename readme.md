@@ -28,6 +28,22 @@ Program.new("hello.c").build.run
 > You can deactivate or modify this behavior by changing the `Config().nim.unsafe` options  
 > See the Configuration section below for more details.  
 
+
+### WARNING: Windows Support
+Confy has been recently rewritten from scratch, and support on windows without nimble is not working yet.  
+Temporarily, you'll need to use nimble to build your `build.nim` file, like so:  
+```nim
+# yourproject.nimble
+task confy, "Build the project with confy using systemBin=on":
+  requires "https://github.com/heysokam/confy#head"
+  selfExec "c -r -d:confy.all_systemBin=on build.nim"
+
+# Run with
+nimble confy
+```
+This requires you to have `zig`, `nim`, and `nimble` available in your system `PATH`.  
+
+
 ### Configuration
 ```nim
 import confy
