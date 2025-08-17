@@ -47,7 +47,7 @@ const Strict * = @[
 #___________________
 func std *(lang :build.Lang) :build.Flag=
   case lang
-  of C   : "-std=c2x"
+  of C   : "-std=c23"
   of Cpp : "-std=c++20"
   else   : ""
 
